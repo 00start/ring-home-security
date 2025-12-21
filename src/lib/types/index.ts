@@ -28,26 +28,39 @@ export interface EventLogRow {
 }
 
 // Device Types
-export type DeviceType = 'doorbell' | 'camera' | 'sensor';
+export type DeviceType = 'doorbell' | 'camera' | 'sensor' | 'misc';
+
+// Sensor subtypes for more specific categorization
+export type SensorSubtype = 'contact' | 'motion' | 'flood' | 'smoke' | 'co' | 'unknown';
+
+// Misc device subtypes
+export type MiscSubtype = 'base_station' | 'keypad' | 'range_extender' | 'siren' | 'hub' | 'unknown';
 
 export interface Device {
 	id: string;
 	name: string;
 	type: DeviceType;
+	subtype?: SensorSubtype | MiscSubtype;
 	location?: string;
 	batteryLevel?: number;
 	isOnline: boolean;
 	lastSeen: Date;
+	// Sensor-specific state
+	faulted?: boolean; // For contact sensors: true = open, false = closed
+	tamperStatus?: string;
 }
 
 export interface DeviceRow {
 	id: string;
 	name: string;
 	type: DeviceType;
+	subtype: string | null;
 	location: string | null;
 	battery_level: number | null;
 	is_online: number;
 	last_seen: string;
+	faulted: number | null;
+	tamper_status: string | null;
 }
 
 // Recording Types

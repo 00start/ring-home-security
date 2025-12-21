@@ -11,7 +11,8 @@ dotenvConfig();
 import { promises as fs } from 'fs';
 import { initDatabase, recordingsRepo } from '../lib/db/index.js';
 import { config } from '../lib/config/index.js';
-import { createLogger, sleep } from '../lib/utils/index.js';
+import { sleep } from '../lib/utils/index.js';
+import { createLogger } from '../lib/utils/logger.server.js';
 
 const logger = createLogger('retention-worker');
 

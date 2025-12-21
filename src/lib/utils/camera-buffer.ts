@@ -449,11 +449,8 @@ export class CameraBufferManager {
 		for (let i = 0; i < cameras.length; i++) {
 			const camera = cameras[i];
 
-			// Only buffer cameras that support video
-			if (!camera.hasCamera) {
-				logger.info({ cameraId: camera.id, name: camera.name }, 'Skipping non-camera device');
-				continue;
-			}
+			// All devices from getCameras() are cameras, no need to filter
+			logger.info({ cameraId: camera.id, name: camera.name }, 'Setting up buffer for camera');
 
 			const buffer = new CameraBuffer(camera);
 			this.buffers.set(camera.id.toString(), buffer);

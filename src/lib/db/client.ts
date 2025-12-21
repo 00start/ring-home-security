@@ -75,10 +75,76 @@ async function runMigrations(database: Database.Database): Promise<void> {
 			}
 		}
 
+		// Run incremental migrations for new columns
+		runIncrementalMigrations(database);
+
 		logger.info('Database migrations completed');
 	} catch (error) {
 		logger.error({ error }, 'Failed to run migrations');
 		throw error;
+	}
+}
+
+function runIncrementalMigrations(database: Database.Database): void {
+	// Check if devices table has the new columns, add them if missing
+	const columns = database.prepare("PRAGMA table_info(devices)").all() as { name: string }[];
+	const columnNames = columns.map(c => c.name);
+
+	const migrations: { column: string; sql: string }[] = [
+		{ column: 'subtype', sql: 'ALTER TABLE devices ADD COLUMN subtype TEXT' },
+		{ column: 'faulted', sql: 'ALTER TABLE devices ADD COLUMN faulted INTEGER' },
+		{ column: 'tamper_status', sql: 'ALTER TABLE devices ADD COLUMN tamper_status TEXT' },
+	];
+
+	for (const migration of migrations) {
+		if (!columnNames.includes(migration.column)) {
+			logger.info({ column: migration.column }, 'Adding new column to devices table');
+			database.exec(migration.sql);
+		}
+	}
+
+	// Check if the CHECK constraint needs to be updated to include 'misc'
+	// SQLite doesn't support ALTER TABLE to modify constraints, so we need to recreate the table
+	const tableSchema = database.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='devices'").get() as { sql: string } | undefined;
+	if (tableSchema && !tableSchema.sql.includes("'misc'")) {
+		logger.info('Migrating devices table to add misc type support');
+
+		// Temporarily disable foreign keys for the migration
+		database.exec('PRAGMA foreign_keys = OFF');
+
+		// Create new table with updated schema
+		database.exec(`
+			CREATE TABLE devices_new (
+				id TEXT PRIMARY KEY,
+				name TEXT NOT NULL,
+				type TEXT NOT NULL CHECK (type IN ('doorbell', 'camera', 'sensor', 'misc')),
+				subtype TEXT,
+				location TEXT,
+				battery_level INTEGER,
+				is_online INTEGER NOT NULL DEFAULT 1,
+				last_seen TEXT NOT NULL DEFAULT (datetime('now')),
+				faulted INTEGER,
+				tamper_status TEXT,
+				created_at TEXT NOT NULL DEFAULT (datetime('now')),
+				updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+			)
+		`);
+
+		// Copy data from old table
+		database.exec(`
+			INSERT INTO devices_new (id, name, type, subtype, location, battery_level, is_online, last_seen, faulted, tamper_status, created_at, updated_at)
+			SELECT id, name, type, subtype, location, battery_level, is_online, last_seen, faulted, tamper_status, created_at, updated_at
+			FROM devices
+		`);
+
+		// Drop old table and rename new one
+		database.exec('DROP TABLE devices');
+		database.exec('ALTER TABLE devices_new RENAME TO devices');
+
+		// Re-enable foreign keys
+		database.exec('PRAGMA foreign_keys = ON');
+
+		logger.info('Devices table migration completed');
 	}
 }
 

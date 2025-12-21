@@ -30,7 +30,7 @@
 		"mpegts.js": "^1.8.0",
 		"pino": "^9.6.0",
 		"pino-pretty": "^13.0.0",
-		"ring-client-api": "^13.1.1",
+		"ring-client-api": "^14.2.0",
 		"uuid": "^11.1.0",
 		"zod": "^3.24.2"
 	},

@@ -17,7 +17,8 @@ export const devicesByType = derived(devices, ($devices) => {
 	return {
 		doorbells: $devices.filter((d) => d.type === 'doorbell'),
 		cameras: $devices.filter((d) => d.type === 'camera'),
-		sensors: $devices.filter((d) => d.type === 'sensor')
+		sensors: $devices.filter((d) => d.type === 'sensor'),
+		misc: $devices.filter((d) => d.type === 'misc')
 	};
 });
 

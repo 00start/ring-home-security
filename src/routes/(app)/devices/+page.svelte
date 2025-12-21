@@ -109,5 +109,19 @@
 				</div>
 			</div>
 		{/if}
+
+		<!-- Misc Devices (Base Stations, Keypads, etc.) -->
+		{#if $devicesByType.misc.length > 0}
+			<div>
+				<h2 class="mb-4 text-lg font-medium text-zinc-900 dark:text-white">
+					Other Devices ({$devicesByType.misc.length})
+				</h2>
+				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					{#each $devicesByType.misc as device}
+						<DeviceCard {device} onclick={() => window.location.href = `/devices/${device.id}`} />
+					{/each}
+				</div>
+			</div>
+		{/if}
 	{/if}
 </div>

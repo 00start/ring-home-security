@@ -1,13 +1,22 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Navbar } from '$lib/components';
+	import { Navbar, ToastContainer } from '$lib/components';
 	import { checkAuth, subscribeToEvents, unsubscribeFromEvents } from '$lib/stores';
+	import { notificationService } from '$lib/services/notifications';
 
 	let { children } = $props();
 
 	onMount(() => {
 		checkAuth();
 		subscribeToEvents();
+
+		// Request notification permission on first load
+		if (notificationService.getPermission() === 'default') {
+			// Delay permission request slightly to avoid immediate popup
+			setTimeout(() => {
+				notificationService.requestPermission();
+			}, 3000);
+		}
 
 		return () => {
 			unsubscribeFromEvents();
@@ -24,3 +33,6 @@
 		{@render children()}
 	</main>
 </div>
+
+<!-- Toast notifications -->
+<ToastContainer />

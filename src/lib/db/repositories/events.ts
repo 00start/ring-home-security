@@ -153,3 +153,9 @@ export function updateEventRecording(eventId: string, recordingId: string): void
 export function getRecentEvents(limit: number = 10): EventLog[] {
 	return getEvents({ limit });
 }
+
+export function deleteAllEvents(): number {
+	const db = getDatabase();
+	const result = db.prepare('DELETE FROM events').run();
+	return result.changes;
+}

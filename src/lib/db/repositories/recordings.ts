@@ -213,3 +213,15 @@ export function deleteRecording(id: string): void {
 export function getExpiredRecordings(): Recording[] {
 	return getRecordingsOlderThan(config.retentionDays);
 }
+
+export function getAllRecordings(): Recording[] {
+	const db = getDatabase();
+	const rows = db.prepare('SELECT * FROM recordings').all() as RecordingRow[];
+	return rows.map(rowToRecording);
+}
+
+export function deleteAllRecordings(): number {
+	const db = getDatabase();
+	const result = db.prepare('DELETE FROM recordings').run();
+	return result.changes;
+}

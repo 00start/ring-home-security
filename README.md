@@ -7,9 +7,10 @@ A self-hosted Node.js/TypeScript application for recording Ring doorbell and cam
 - **Ring Integration**: Connect to Ring API to monitor doorbells, cameras, and sensors
 - **Live View**: Watch real-time video streams from your cameras and doorbells
 - **Video Recording**: Automatic recording on motion and doorbell events (no Ring Protect subscription required)
+- **Pre-Event Recording**: Captures ~15 seconds before events occur using continuous video buffering
 - **Event Logging**: Log all sensor events (door/window, motion) with timestamps
 - **Web Dashboard**: Responsive web UI for monitoring devices and viewing events
-- **Video Playback**: Watch recordings directly in the browser
+- **Video Playback**: Watch recordings directly in the browser with mpegts.js
 - **Advanced Filtering**: Filter events by device, type, date range, and video availability
 - **Retention Policy**: Automatic cleanup of old recordings
 - **Real-time Updates**: Server-sent events for live updates
@@ -279,6 +280,76 @@ docker-compose up -d
 | `LOG_LEVEL` | Logging level (trace, debug, info, warn, error, fatal) | `info` |
 | `FFMPEG_PATH` | Custom ffmpeg path | System ffmpeg |
 | `FFPROBE_PATH` | Custom ffprobe path | System ffprobe |
+| `BUFFER_PRE_EVENT_SECONDS` | Seconds of video to capture before an event | `15` |
+| `BUFFER_LATENCY_COMPENSATION_SECONDS` | Extra buffer for Ring notification delay | `10` |
+| `BUFFER_SAFETY_MARGIN_SECONDS` | Additional safety buffer | `5` |
+| `BUFFER_POST_EVENT_SECONDS` | Seconds to record after an event | `60` |
+
+## Pre-Event Video Buffering
+
+The Ring Listener maintains a continuous video buffer for each camera, allowing recordings to include footage from **before** an event occurs. This is crucial for capturing the moments leading up to motion or doorbell events.
+
+### How It Works
+
+1. **Continuous Streaming**: The Ring Listener keeps a persistent connection to each camera, streaming video into a circular memory buffer
+2. **Buffer Size**: By default, 30 seconds of video are kept in memory per camera (15s pre-event + 10s latency compensation + 5s safety margin)
+3. **Event Capture**: When an event is detected, the buffered video is combined with a new 60-second recording
+4. **Final Output**: The result is a single video file containing both pre-event and post-event footage
+
+### Resource Usage
+
+| Cameras | Memory Usage | CPU Impact |
+|---------|--------------|------------|
+| 1       | ~15-30 MB    | Low        |
+| 4       | ~60-120 MB   | Medium     |
+| 8       | ~120-240 MB  | Medium-High|
+
+The system uses:
+- **H.264 baseline profile** with ultrafast encoding preset
+- **Memory-based buffering** (no disk I/O during buffering)
+- **Staggered startup** (2-second delay between cameras to reduce initial load)
+- **Auto-reconnect** with exponential backoff if streams disconnect
+
+### Customizing Buffer Settings
+
+Edit your `.env` file to adjust buffer timing:
+
+```env
+# Capture 20 seconds before events instead of 15
+BUFFER_PRE_EVENT_SECONDS=20
+
+# Record 90 seconds after events instead of 60
+BUFFER_POST_EVENT_SECONDS=90
+```
+
+### Fallback Behavior
+
+If the buffer is unavailable (e.g., camera just started, stream disconnected), the system automatically falls back to post-event-only recording, ensuring you never miss an event.
+
+## Live View Streaming
+
+The dashboard supports real-time video streaming from Ring cameras and doorbells using MPEG-TS format with browser-based playback via mpegts.js.
+
+### Technical Details
+
+- **Format**: MPEG-TS container with H.264 baseline video and AAC audio
+- **Encoding**: Real-time transcoding with `libx264 ultrafast` preset for low latency
+- **Playback**: Uses mpegts.js library for browser-based Media Source Extensions (MSE) playback
+- **Latency**: Optimized for low latency with `zerolatency` tuning and live buffer chasing
+
+### Accessing Live View
+
+1. Navigate to the Dashboard or Devices page
+2. Click the "Live" button on any camera or doorbell card
+3. A modal will open with the live video stream
+4. Click outside the modal or press Escape to close
+
+### Browser Compatibility
+
+Live view requires a browser that supports Media Source Extensions (MSE):
+- Chrome/Edge (recommended)
+- Firefox
+- Safari 11+
 
 ## Logging
 

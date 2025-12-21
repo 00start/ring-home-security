@@ -15,7 +15,8 @@ import { RingCamera } from 'ring-client-api';
 import { initDatabase, devicesRepo, eventsRepo, recordingsRepo } from '../lib/db/index.js';
 import { getRingApi, getCameras, getDevices, mapCameraType, mapDeviceType } from '../lib/ring/index.js';
 import { addTranscodeJob } from '../lib/queue/index.js';
-import { createLogger, retry, sleep } from '../lib/utils/index.js';
+import { retry, sleep } from '../lib/utils/index.js';
+import { createLogger } from '../lib/utils/logger.server.js';
 import { getRecordingPath, ensureDir } from '../lib/utils/paths.js';
 import { getBufferManager } from '../lib/utils/camera-buffer.js';
 import type { EventType, TranscodeJobData } from '../lib/types/index.js';
@@ -340,13 +341,10 @@ function handleSensorEvent(
 		'Sensor event detected'
 	);
 
-	// Ensure device exists in database
-	devicesRepo.upsertDevice({
-		id: device.zid,
-		name: device.name || 'Unknown Sensor',
-		type: 'sensor',
-		isOnline: true
-	});
+	// Update faulted state in database if this is a contact sensor event
+	if (eventType === 'door_open' || eventType === 'door_close') {
+		devicesRepo.updateDeviceFaulted(device.zid, eventType === 'door_open');
+	}
 
 	// Create event record
 	eventsRepo.createEvent({
@@ -452,40 +450,180 @@ async function subscribeToCamera(camera: RingCamera): Promise<void> {
 	});
 }
 
+// Track sensor states to detect changes (only fire events on state transitions)
+const sensorStates: Map<string, { faulted?: boolean; motionDetected?: boolean }> = new Map();
+
 async function subscribeToSensors(): Promise<void> {
 	try {
 		const api = await getRingApi();
 		const locations = await api.getLocations();
 
-		for (const location of locations) {
-			logger.info({ locationId: location.id, locationName: location.name }, 'Subscribing to location');
+		logger.info({ locationCount: locations.length }, 'Found Ring locations');
+		console.log(`\n🏠 Found ${locations.length} Ring location(s)\n`);
 
-			// Get all devices at this location
+		for (const location of locations) {
+			logger.info({
+				locationId: location.id,
+				locationName: location.name,
+				hasAlarmSystem: location.hasAlarmBaseStation,
+				hasHubs: location.hasHubs
+			}, 'Subscribing to location');
+
+			console.log(`📍 Location: ${location.name}`);
+			console.log(`   - Has Alarm Base Station: ${location.hasAlarmBaseStation}`);
+			console.log(`   - Has Hubs: ${location.hasHubs}`);
+
+			// Skip if no hubs (getDevices will return empty anyway)
+			if (!location.hasHubs) {
+				console.log('   ⚠️ Location has no hubs, skipping device fetch');
+				continue;
+			}
+
+			// Get all devices at this location with a timeout
+			console.log('   🔄 Fetching Ring Alarm devices (may take up to 30s)...');
+			// Force flush stdout to ensure message is visible
+			process.stdout.write('');
 			logger.debug('Fetching devices for location...');
-			const devices = await location.getDevices();
+			let devices;
+			try {
+				// Add a timeout to prevent hanging forever
+				const timeoutPromise = new Promise<never>((_, reject) => {
+					setTimeout(() => reject(new Error('Timeout: getDevices() took longer than 30 seconds')), 30000);
+				});
+
+				devices = await Promise.race([
+					location.getDevices(),
+					timeoutPromise
+				]);
+				console.log(`   ✅ getDevices() returned ${devices?.length ?? 'null'} devices`);
+			} catch (deviceError) {
+				logger.error({ error: deviceError, locationName: location.name }, 'Failed to get devices for location');
+				console.log(`   ❌ Failed to get devices: ${deviceError}`);
+
+				if (String(deviceError).includes('Timeout')) {
+					console.log('   ℹ️ The Ring Alarm base station may be offline or taking too long to respond.');
+					console.log('   ℹ️ All Ring Alarm hubs must be online for device discovery to complete.');
+					console.log('   ℹ️ Try checking your Ring app to ensure all devices show as online.');
+				}
+				continue;
+			}
+
+			if (!devices || devices.length === 0) {
+				console.log('   ⚠️ No devices returned from getDevices()');
+				console.log('   ℹ️ This could mean:');
+				console.log('      - No Ring Alarm sensors are configured');
+				console.log('      - The Ring Alarm base station is offline');
+				console.log('      - A hub failed to respond in time');
+				continue;
+			}
+
 			logger.info({ deviceCount: devices.length }, 'Found devices at location');
+			console.log(`   📱 Found ${devices.length} device(s)\n`);
 
 			for (const device of devices) {
 				const deviceData = device.data as RingDeviceData;
+				const ringDeviceType = device.deviceType;
+				const deviceTypeInfo = mapDeviceType(device);
 
-				// Register device in database
+				// Log device type for debugging
+				logger.info({
+					deviceId: deviceData.zid,
+					deviceName: deviceData.name,
+					ringDeviceType,
+					mappedType: deviceTypeInfo.type,
+					mappedSubtype: deviceTypeInfo.subtype,
+					hasFaulted: 'faulted' in deviceData,
+					deviceData: JSON.stringify(deviceData).substring(0, 500)
+				}, 'Found device');
+
+				const statusIcon = deviceTypeInfo.type === 'sensor' ? '🔸' :
+					deviceTypeInfo.type === 'misc' ? '⚙️' : '🔹';
+				console.log(`      ${statusIcon} ${deviceData.name || 'Unknown'}`);
+				console.log(`         Ring Type: ${ringDeviceType}`);
+				console.log(`         Category: ${deviceTypeInfo.type}${deviceTypeInfo.subtype ? ` (${deviceTypeInfo.subtype})` : ''}`);
+				console.log(`         ID: ${deviceData.zid}`);
+				if ('faulted' in deviceData) {
+					const state = deviceData.faulted ? '🔓 OPEN' : '🔒 CLOSED';
+					console.log(`         State: ${state}`);
+				}
+
+				// Register device in database with type and subtype
 				devicesRepo.upsertDevice({
 					id: deviceData.zid,
 					name: deviceData.name || 'Unknown Device',
-					type: mapDeviceType(device),
-					isOnline: !deviceData.faulted
+					type: deviceTypeInfo.type,
+					subtype: deviceTypeInfo.subtype,
+					isOnline: true,
+					faulted: deviceData.faulted
 				});
+
+				// Initialize sensor state for sensors only
+				if (deviceTypeInfo.type === 'sensor') {
+					sensorStates.set(deviceData.zid, {
+						faulted: deviceData.faulted,
+						motionDetected: false
+					});
+				}
 
 				// Subscribe to device data updates for sensors
 				device.onData.subscribe({
 					next: (data) => {
 						const newData = data as RingDeviceData;
+						const previousState = sensorStates.get(newData.zid) || {};
 
-						// Handle contact sensor open/close
-						if ('faulted' in newData) {
+						// Handle contact sensor (door/window) open/close
+						if ('faulted' in newData && newData.faulted !== previousState.faulted) {
 							const eventType: EventType = newData.faulted ? 'door_open' : 'door_close';
-							handleSensorEvent(newData, eventType, { faulted: newData.faulted });
+
+							logger.info({
+								deviceId: newData.zid,
+								deviceName: newData.name,
+								eventType,
+								previousFaulted: previousState.faulted,
+								newFaulted: newData.faulted
+							}, 'Contact sensor state changed');
+
+							handleSensorEvent(newData, eventType, {
+								faulted: newData.faulted,
+								sensorType: 'contact'
+							});
+
+							// Update stored state
+							sensorStates.set(newData.zid, { ...previousState, faulted: newData.faulted });
 						}
+
+						// Handle motion sensor
+						// Motion sensors typically have a 'motion' or 'motionStatus' property
+						const motionDetected = (newData as any).motion === true ||
+							(newData as any).motionStatus === 'motion' ||
+							(newData as any).motionDetected === true;
+
+						if (motionDetected && !previousState.motionDetected) {
+							logger.info({
+								deviceId: newData.zid,
+								deviceName: newData.name,
+								eventType: 'motion'
+							}, 'Motion sensor triggered');
+
+							handleSensorEvent(newData, 'motion', {
+								sensorType: 'motion'
+							});
+
+							// Mark motion as detected, will reset after timeout
+							sensorStates.set(newData.zid, { ...previousState, motionDetected: true });
+
+							// Reset motion state after 30 seconds to allow new motion events
+							setTimeout(() => {
+								const currentState = sensorStates.get(newData.zid);
+								if (currentState) {
+									sensorStates.set(newData.zid, { ...currentState, motionDetected: false });
+								}
+							}, 30000);
+						}
+
+						// Handle device online/offline status changes
+						const isOnline = (newData as any).status !== 'offline';
+						devicesRepo.updateDeviceStatus(newData.zid, isOnline);
 					},
 					error: (error) => {
 						logger.error({ error, deviceId: deviceData.zid }, 'Device subscription error');
@@ -496,14 +634,51 @@ async function subscribeToSensors(): Promise<void> {
 			// Subscribe to alarm mode changes and security events
 			location.onDeviceDataUpdate.subscribe({
 				next: (update) => {
-					logger.debug({ update }, 'Device data update');
+					logger.debug({ update }, 'Device data update from location');
+
+					// This catches events that might not come through individual device subscriptions
+					const deviceInfo = update as any;
+					if (deviceInfo.zid && deviceInfo.name) {
+						// Check for motion events
+						if (deviceInfo.motion === true || deviceInfo.motionStatus === 'motion') {
+							const previousState = sensorStates.get(deviceInfo.zid) || {};
+							if (!previousState.motionDetected) {
+								logger.info({
+									deviceId: deviceInfo.zid,
+									deviceName: deviceInfo.name
+								}, 'Motion detected via location update');
+
+								handleSensorEvent(deviceInfo as RingDeviceData, 'motion', {
+									sensorType: 'motion',
+									source: 'location_update'
+								});
+
+								sensorStates.set(deviceInfo.zid, { ...previousState, motionDetected: true });
+								setTimeout(() => {
+									const currentState = sensorStates.get(deviceInfo.zid);
+									if (currentState) {
+										sensorStates.set(deviceInfo.zid, { ...currentState, motionDetected: false });
+									}
+								}, 30000);
+							}
+						}
+					}
 				}
 			});
 		}
 
 		logger.info('Sensor subscription completed');
+		console.log('\n✅ Sensor subscription completed\n');
 	} catch (error) {
 		logger.error({ error }, 'Failed to subscribe to sensors');
+		console.error('\n❌ Failed to subscribe to sensors:', error);
+
+		// Log more details
+		if (error instanceof Error) {
+			console.error('   Error name:', error.name);
+			console.error('   Error message:', error.message);
+			console.error('   Stack:', error.stack);
+		}
 	}
 }
 
@@ -520,14 +695,34 @@ async function startListener(): Promise<void> {
 	const cameras = await getCameras();
 	logger.info({ cameraCount: cameras.length }, 'Found cameras');
 
+	// Initialize camera buffer manager for pre-event recording
+	const bufferManager = getBufferManager();
+	logger.info('Initializing camera buffer manager for pre-event recording');
+	await bufferManager.initialize(cameras);
+
+	// Log buffer status
+	const bufferStatus = bufferManager.getStatus();
+	logger.info({ bufferStatus }, 'Camera buffers initialized');
+
 	for (const camera of cameras) {
 		await subscribeToCamera(camera);
 	}
 
-	// Subscribe to sensors (non-blocking, runs in background)
-	subscribeToSensors().catch((error) => {
+	// Subscribe to sensors (await to see full output for debugging)
+	console.log('\n' + '='.repeat(50));
+	console.log('🔍 STARTING SENSOR SUBSCRIPTION');
+	console.log('='.repeat(50) + '\n');
+	try {
+		await subscribeToSensors();
+		console.log('\n' + '='.repeat(50));
+		console.log('✅ SENSOR SUBSCRIPTION COMPLETE');
+		console.log('='.repeat(50) + '\n');
+	} catch (error) {
 		logger.error({ error }, 'Sensor subscription failed, continuing without sensors');
-	});
+		console.error('\n' + '='.repeat(50));
+		console.error('❌ SENSOR SUBSCRIPTION FAILED:', error);
+		console.error('='.repeat(50) + '\n');
+	}
 
 	logger.info('Ring listener started successfully');
 
@@ -538,6 +733,10 @@ async function startListener(): Promise<void> {
 			isShuttingDown = true;
 
 			logger.info('Shutting down Ring listener');
+
+			// Shutdown buffer manager first
+			bufferManager.shutdown();
+
 			api.disconnect();
 			resolve();
 		};

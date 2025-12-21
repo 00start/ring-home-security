@@ -144,6 +144,25 @@ export function getUserCount(): number {
 	return result.count;
 }
 
+export function getAllUsers(): User[] {
+	const db = getDatabase();
+	const rows = db.prepare('SELECT id, username, created_at FROM users ORDER BY created_at DESC').all() as UserRow[];
+	return rows.map((row) => ({
+		id: row.id,
+		username: row.username,
+		createdAt: new Date(row.created_at)
+	}));
+}
+
+export function deleteUser(id: string): boolean {
+	const db = getDatabase();
+	// First delete all sessions for this user
+	db.prepare('DELETE FROM sessions WHERE user_id = ?').run(id);
+	// Then delete the user
+	const result = db.prepare('DELETE FROM users WHERE id = ?').run(id);
+	return result.changes > 0;
+}
+
 export async function ensureDefaultUser(): Promise<void> {
 	const count = getUserCount();
 	if (count === 0) {

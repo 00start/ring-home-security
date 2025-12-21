@@ -6,11 +6,14 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS devices (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
-    type TEXT NOT NULL CHECK (type IN ('doorbell', 'camera', 'sensor')),
+    type TEXT NOT NULL CHECK (type IN ('doorbell', 'camera', 'sensor', 'misc')),
+    subtype TEXT,
     location TEXT,
     battery_level INTEGER,
     is_online INTEGER NOT NULL DEFAULT 1,
     last_seen TEXT NOT NULL DEFAULT (datetime('now')),
+    faulted INTEGER,
+    tamper_status TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );

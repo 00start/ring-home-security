@@ -1,5 +1,47 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import type { EventLog, EventType, EventFilters } from '$lib/types';
+import { notificationService } from '$lib/services/notifications';
+import { notificationPreferences } from './preferences';
+import { toasts } from './toast';
+
+// Event type display names for toasts
+const EVENT_TITLES: Record<EventType, string> = {
+	ding: 'Doorbell Ring',
+	motion: 'Motion Detected',
+	door_open: 'Door Opened',
+	door_close: 'Door Closed',
+	device_offline: 'Device Offline',
+	device_online: 'Device Online'
+};
+
+/**
+ * Handle incoming real-time event - show notifications
+ */
+function handleNewEvent(event: EventLog): void {
+	const prefs = get(notificationPreferences);
+
+	// Check if we should notify for this event type
+	if (!prefs.enabled || !prefs.eventTypes[event.eventType]) {
+		return;
+	}
+
+	// Show browser notification
+	notificationService.showEventNotification(event, {
+		playSound: prefs.soundEnabled
+	});
+
+	// Show in-app toast
+	const title = EVENT_TITLES[event.eventType] || 'Event';
+	toasts.add({
+		type: event.eventType === 'device_offline' ? 'warning' : 'info',
+		title: `${title} - ${event.deviceName}`,
+		message: new Date(event.timestamp).toLocaleTimeString(),
+		duration: 5000,
+		action: event.recordingId
+			? { label: 'View Recording', href: `/recordings?id=${event.recordingId}` }
+			: undefined
+	});
+}
 
 export const events = writable<EventLog[]>([]);
 export const loading = writable(false);
@@ -85,8 +127,12 @@ export function subscribeToEvents(): void {
 		try {
 			const data = JSON.parse(e.data);
 			if (data.type === 'event') {
-				events.update((evts) => [data.payload, ...evts]);
+				const event = data.payload as EventLog;
+				events.update((evts) => [event, ...evts]);
 				total.update((t) => t + 1);
+
+				// Trigger notifications for the new event
+				handleNewEvent(event);
 			}
 		} catch (err) {
 			console.error('Failed to parse SSE event:', err);

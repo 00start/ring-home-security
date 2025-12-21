@@ -20,10 +20,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.user = auth?.user ?? null;
 	event.locals.session = auth?.session ?? null;
 
-	// Protect routes (except login and API auth)
+	// Protect routes (except login and API auth login/logout)
 	const isPublicRoute =
 		event.url.pathname === '/login' ||
-		event.url.pathname.startsWith('/api/auth');
+		event.url.pathname === '/api/auth/login' ||
+		event.url.pathname === '/api/auth/logout';
 
 	if (!isPublicRoute && !auth) {
 		console.log('[AUTH] Unauthorized access to:', event.url.pathname, 'Redirecting to login');

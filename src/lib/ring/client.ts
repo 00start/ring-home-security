@@ -81,16 +81,67 @@ export function mapCameraType(camera: RingCamera): 'doorbell' | 'camera' {
 	return 'camera';
 }
 
-export function mapDeviceType(device: RingDevice): 'sensor' | 'camera' | 'doorbell' {
-	const deviceType = device.deviceType;
+export interface DeviceTypeInfo {
+	type: 'sensor' | 'camera' | 'doorbell' | 'misc';
+	subtype?: string;
+}
 
-	if (deviceType.includes('sensor') || deviceType.includes('contact')) {
-		return 'sensor';
+export function mapDeviceType(device: RingDevice): DeviceTypeInfo {
+	const deviceType = device.deviceType.toLowerCase();
+
+	// Contact sensors (doors/windows)
+	if (deviceType.includes('contact') || deviceType.includes('sensor.contact')) {
+		return { type: 'sensor', subtype: 'contact' };
 	}
 
+	// Motion sensors
+	if (deviceType.includes('motion') || deviceType.includes('sensor.motion')) {
+		return { type: 'sensor', subtype: 'motion' };
+	}
+
+	// Flood/freeze sensors
+	if (deviceType.includes('flood') || deviceType.includes('freeze')) {
+		return { type: 'sensor', subtype: 'flood' };
+	}
+
+	// Smoke/CO detectors
+	if (deviceType.includes('smoke')) {
+		return { type: 'sensor', subtype: 'smoke' };
+	}
+	if (deviceType.includes('co.alarm') || deviceType === 'listener.co') {
+		return { type: 'sensor', subtype: 'co' };
+	}
+
+	// Generic sensor fallback
+	if (deviceType.includes('sensor')) {
+		return { type: 'sensor', subtype: 'unknown' };
+	}
+
+	// Camera types
 	if (deviceType.includes('doorbell') || deviceType.includes('doorbot')) {
-		return 'doorbell';
+		return { type: 'doorbell' };
+	}
+	if (deviceType.includes('camera') || deviceType.includes('stickup_cam')) {
+		return { type: 'camera' };
 	}
 
-	return 'camera';
+	// Misc devices (base stations, keypads, range extenders, etc.)
+	if (deviceType.includes('hub') || deviceType.includes('base_station') || deviceType === 'hub.redsky') {
+		return { type: 'misc', subtype: 'base_station' };
+	}
+	if (deviceType.includes('keypad')) {
+		return { type: 'misc', subtype: 'keypad' };
+	}
+	if (deviceType.includes('range') || deviceType.includes('extender') || deviceType === 'range-extender.zwave') {
+		return { type: 'misc', subtype: 'range_extender' };
+	}
+	if (deviceType.includes('siren')) {
+		return { type: 'misc', subtype: 'siren' };
+	}
+	if (deviceType.includes('security-panel') || deviceType.includes('alarm') || deviceType === 'security-panel') {
+		return { type: 'misc', subtype: 'base_station' };
+	}
+
+	// Default to misc for unknown device types (non-camera)
+	return { type: 'misc', subtype: 'unknown' };
 }

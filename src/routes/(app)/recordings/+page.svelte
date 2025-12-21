@@ -9,12 +9,12 @@
 	let selectedRecording: Recording | null = $state(null);
 	let showVideoModal = $state(false);
 	let filterDevice = $state('');
-	let filterStatus = $state<RecordingStatus | ''>('');
+	let filterStatus = $state<RecordingStatus | 'completed'>('completed');
 	let retryingId = $state<string | null>(null);
 
 	onMount(async () => {
 		await fetchDevices();
-		await fetchRecordings();
+		await fetchRecordings({status: filterStatus || undefined});
 	});
 
 	function handleFilterChange() {
@@ -128,7 +128,7 @@
 				label="Status"
 				value={filterStatus}
 				onchange={(e) => {
-					filterStatus = (e.target as HTMLSelectElement).value as RecordingStatus | '';
+					filterStatus = (e.target as HTMLSelectElement).value as RecordingStatus | 'completed';
 					handleFilterChange();
 				}}
 			>
