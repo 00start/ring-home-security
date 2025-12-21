@@ -1,38 +1,226 @@
-# sv
+# Ring Home Security
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A self-hosted Node.js/TypeScript application for recording Ring doorbell and camera video feeds, logging sensor events, and providing a web-based dashboard for viewing and searching historical data.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Ring Integration**: Connect to Ring API to monitor doorbells, cameras, and sensors
+- **Video Recording**: Automatic recording on motion and doorbell events
+- **Event Logging**: Log all sensor events (door/window, motion) with timestamps
+- **Web Dashboard**: Responsive web UI for monitoring devices and viewing events
+- **Video Playback**: Watch recordings directly in the browser
+- **Retention Policy**: Automatic cleanup of old recordings
+- **Real-time Updates**: Server-sent events for live updates
 
-```sh
-# create a new project in the current directory
-npx sv create
+## Architecture
 
-# create a new project in my-app
-npx sv create my-app
+This system uses a **single codebase, multiple processes** architecture:
+
+1. **SvelteKit Web Server** - Handles dashboard pages and API endpoints
+2. **Ring Listener Worker** - Maintains connection to Ring API, listens for events
+3. **Transcode Worker** - Processes video recordings via ffmpeg
+4. **Retention Worker** - Cleans up old recordings based on retention policy
+
+## Prerequisites
+
+- Node.js 20 LTS or later
+- Redis (for job queue)
+- ffmpeg (for video transcoding)
+- Ring account with refresh token
+
+## Getting Started
+
+### 1. Clone and Install
+
+```bash
+git clone <repository-url>
+cd ring-home-security
+npm install
 ```
 
-## Developing
+### 2. Configure Environment
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Copy the example environment file and configure it:
 
-```sh
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your settings:
+
+```env
+# Ring API - Get your refresh token from ring-client-api
+RING_REFRESH_TOKEN=your_ring_refresh_token_here
+
+# Database
+DATABASE_PATH=./data/ring-security.db
+
+# Redis
+REDIS_URL=redis://localhost:6379
+
+# Storage paths
+RECORDINGS_PATH=./data/recordings
+THUMBNAILS_PATH=./data/thumbnails
+
+# Retention (days)
+RETENTION_DAYS=30
+
+# Server
+PORT=3000
+
+# Authentication
+AUTH_SECRET=change_this_to_a_secure_random_string
+```
+
+### 3. Get Ring Refresh Token
+
+You'll need to obtain a refresh token from Ring. Use the `ring-client-api` package:
+
+```bash
+npx -p ring-client-api ring-auth-cli
+```
+
+Follow the prompts to authenticate with your Ring account. Copy the refresh token to your `.env` file.
+
+### 4. Initialize Database
+
+```bash
+npm run db:migrate
+```
+
+### 5. Start Development Server
+
+```bash
+# Start Redis (if not running)
+redis-server
+
+# Start the web server
 npm run dev
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+# In separate terminals, start the workers:
+npm run worker:ring
+npm run worker:transcode
 ```
 
-## Building
+Visit http://localhost:3000 and log in with:
+- Username: `admin`
+- Password: `admin`
 
-To create a production version of your app:
+**Important**: Change the default password after first login!
 
-```sh
+## Production Deployment
+
+### Using PM2
+
+```bash
+# Build the application
 npm run build
+
+# Start all processes with PM2
+npm run start:pm2
+
+# Or manually:
+pm2 start ecosystem.config.cjs
 ```
 
-You can preview the production build with `npm run preview`.
+### Using Docker
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```bash
+cd docker
+docker-compose up -d
+```
+
+## Project Structure
+
+```
+/src
+  /lib
+    /components     # Svelte UI components
+    /config         # Configuration management
+    /db             # Database client and repositories
+    /queue          # BullMQ job queue
+    /ring           # Ring API wrapper
+    /server         # Server-side utilities
+    /stores         # Svelte stores for state management
+    /types          # TypeScript interfaces
+    /utils          # Common utilities
+  /routes
+    /api            # API endpoints
+    /(app)          # Dashboard pages
+    /login          # Login page
+  /workers
+    ring-listener.ts      # Ring event listener
+    transcode-worker.ts   # Video transcoding worker
+    retention-worker.ts   # Cleanup worker
+```
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/login` | POST | Authenticate user |
+| `/api/auth/logout` | POST | End session |
+| `/api/auth/me` | GET | Get current user |
+| `/api/devices` | GET | List all devices |
+| `/api/devices/:id` | GET | Get device details |
+| `/api/events` | GET | List events (with filters) |
+| `/api/events/:id` | GET | Get event details |
+| `/api/events/stream` | GET | SSE stream for real-time events |
+| `/api/recordings` | GET | List recordings |
+| `/api/recordings/:id` | GET | Get recording details |
+| `/api/recordings/:id/video` | GET | Stream video file |
+| `/api/recordings/:id/thumbnail` | GET | Get thumbnail image |
+| `/api/stats` | GET | Dashboard statistics |
+
+## Configuration Options
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `RING_REFRESH_TOKEN` | Ring API refresh token | Required |
+| `DATABASE_PATH` | SQLite database path | `./data/ring-security.db` |
+| `REDIS_URL` | Redis connection URL | `redis://localhost:6379` |
+| `RECORDINGS_PATH` | Video storage path | `./data/recordings` |
+| `THUMBNAILS_PATH` | Thumbnail storage path | `./data/thumbnails` |
+| `RETENTION_DAYS` | Days to keep recordings | `30` |
+| `PORT` | Web server port | `3000` |
+| `HOST` | Web server host | `0.0.0.0` |
+| `AUTH_SECRET` | Session encryption key | Required |
+| `LOG_LEVEL` | Logging level | `info` |
+| `FFMPEG_PATH` | Custom ffmpeg path | System ffmpeg |
+
+## Development
+
+```bash
+# Run type checking
+npm run check
+
+# Format code
+npm run format
+
+# Lint code
+npm run lint
+```
+
+## Troubleshooting
+
+### Ring Connection Issues
+
+1. Verify your refresh token is valid
+2. Check if Ring API is accessible
+3. Review logs: `pm2 logs ring-listener`
+
+### Video Not Recording
+
+1. Ensure ffmpeg is installed: `ffmpeg -version`
+2. Check transcode worker logs: `pm2 logs transcode-worker`
+3. Verify Redis is running: `redis-cli ping`
+
+### Database Issues
+
+1. Ensure data directory exists
+2. Check file permissions
+3. Re-run migrations: `npm run db:migrate`
+
+## License
+
+MIT
