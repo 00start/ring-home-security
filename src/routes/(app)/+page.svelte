@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { StatCard, DeviceCard, EventCard } from '$lib/components';
+	import { StatCard, DeviceCard, EventCard, Modal } from '$lib/components';
 	import {
 		stats,
 		fetchStats,
@@ -11,6 +11,11 @@
 	} from '$lib/stores';
 	import { formatBytes } from '$lib/utils';
 	import type { Device } from '$lib/types';
+
+	let showLiveViewModal = $state(false);
+	let liveViewDevice = $state<Device | null>(null);
+	let liveViewLoading = $state(false);
+	let liveViewError = $state<string | null>(null);
 
 	// Prioritized devices: doorbells first, then cameras, then sensors
 	let prioritizedDevices = $derived.by(() => {
@@ -26,6 +31,18 @@
 		fetchDevices();
 		fetchEvents();
 	});
+
+	function handleLiveView(device: Device) {
+		liveViewDevice = device;
+		showLiveViewModal = true;
+		liveViewError = null;
+	}
+
+	function closeLiveView() {
+		showLiveViewModal = false;
+		liveViewDevice = null;
+		liveViewError = null;
+	}
 </script>
 
 <svelte:head>
@@ -97,7 +114,11 @@
 					</div>
 				{:else}
 					{#each prioritizedDevices.slice(0, 4) as device}
-						<DeviceCard {device} onclick={() => window.location.href = `/devices/${device.id}`} />
+						<DeviceCard
+							{device}
+							onclick={() => window.location.href = `/devices/${device.id}`}
+							onLiveView={() => handleLiveView(device)}
+						/>
 					{/each}
 				{/if}
 			</div>
@@ -133,3 +154,45 @@
 		</div>
 	</div>
 </div>
+
+<!-- Live View Modal -->
+<Modal bind:open={showLiveViewModal} title="Live View - {liveViewDevice?.name ?? ''}">
+	{#snippet children()}
+		{#if liveViewDevice}
+			<div class="space-y-4">
+				<div class="aspect-video bg-zinc-900 rounded-lg overflow-hidden relative">
+					{#if liveViewError}
+						<div class="absolute inset-0 flex items-center justify-center">
+							<div class="text-center p-6">
+								<svg class="mx-auto h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+								</svg>
+								<p class="mt-4 text-sm text-red-500">{liveViewError}</p>
+							</div>
+						</div>
+					{:else}
+						<video
+							id="liveViewVideo"
+							class="w-full h-full"
+							autoplay
+							muted
+							playsinline
+							controls
+						>
+							<source src="/api/devices/{liveViewDevice.id}/live" type="video/mp4" />
+							Your browser does not support video playback.
+						</video>
+						<div class="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
+							<span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+							LIVE
+						</div>
+					{/if}
+				</div>
+				<div class="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400">
+					<span>{liveViewDevice.name}</span>
+					<span class="capitalize">{liveViewDevice.type}</span>
+				</div>
+			</div>
+		{/if}
+	{/snippet}
+</Modal>

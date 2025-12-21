@@ -22,8 +22,8 @@ export const GET: RequestHandler = async () => {
 		const totalRecordings = recordingsRepo.getTotalRecordingsCount();
 		console.log('[STATS] Total recordings:', totalRecordings);
 
-		console.log('[STATS] Getting storage used...');
-		const storageUsed = recordingsRepo.getTotalStorageUsed();
+		console.log('[STATS] Getting storage used (including database and logs)...');
+		const storageUsed = await recordingsRepo.getTotalStorageUsedWithSystemFiles();
 		console.log('[STATS] Storage used:', storageUsed);
 
 		const stats: DashboardStats = {

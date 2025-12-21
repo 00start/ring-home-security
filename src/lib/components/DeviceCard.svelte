@@ -5,15 +5,18 @@
 	interface Props {
 		device: Device;
 		onclick?: () => void;
+		onLiveView?: () => void;
 	}
 
-	let { device, onclick }: Props = $props();
+	let { device, onclick, onLiveView }: Props = $props();
 
 	const deviceIcons: Record<string, string> = {
 		doorbell: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
 		camera: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z',
 		sensor: 'M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z'
 	};
+
+	const supportsLiveView = (type: string) => type === 'camera' || type === 'doorbell';
 
 	function formatLastSeen(date: Date | string): string {
 		const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -23,14 +26,19 @@
 		if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
 		return dateObj.toLocaleDateString();
 	}
+
+	function handleLiveView(e: MouseEvent) {
+		e.stopPropagation();
+		onLiveView?.();
+	}
 </script>
 
-<button
-	onclick={onclick}
-	class="w-full text-left transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg"
->
-	<Card>
-		{#snippet children()}
+<Card>
+	{#snippet children()}
+		<button
+			onclick={onclick}
+			class="w-full text-left -m-6 p-6 transition-transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg"
+		>
 			<div class="flex items-start justify-between">
 				<div class="flex items-center gap-3">
 					<div class="rounded-full p-2 {device.isOnline ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400' : 'bg-zinc-100 text-zinc-400 dark:bg-zinc-700'}">
@@ -61,6 +69,22 @@
 					</div>
 				{/if}
 			</div>
-		{/snippet}
-	</Card>
-</button>
+		</button>
+
+		{#if supportsLiveView(device.type) && device.isOnline}
+			<div class="mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-700">
+				<button
+					onclick={handleLiveView}
+					type="button"
+					class="w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors cursor-pointer"
+				>
+					<svg class="h-4 w-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+					</svg>
+					Live View
+				</button>
+			</div>
+		{/if}
+	{/snippet}
+</Card>

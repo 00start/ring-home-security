@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { EventLog } from '$lib/types';
 	import { Badge } from './ui';
+	import { recordings } from '$lib/stores/recordings';
 
 	interface Props {
 		event: EventLog;
@@ -8,6 +9,43 @@
 	}
 
 	let { event, onclick }: Props = $props();
+	let retrying = $state(false);
+
+	const recording = $derived($recordings.find(r => r.id === event.recordingId));
+
+	const canRetry = $derived.by(() => {
+		if (!recording || recording.status !== 'failed') return false;
+
+		// Only allow retry within 7 days
+		const ageInDays = (Date.now() - new Date(recording.createdAt).getTime()) / (1000 * 60 * 60 * 24);
+		return ageInDays < 7;
+	});
+
+	async function handleRetry(e: MouseEvent) {
+		e.stopPropagation();
+		if (!event.recordingId || retrying) return;
+
+		retrying = true;
+		try {
+			const response = await fetch(`/api/recordings/${event.recordingId}/retry`, {
+				method: 'POST'
+			});
+			const data = await response.json();
+
+			if (data.success) {
+				// Reload recordings to get updated status
+				const { fetchRecordings } = await import('$lib/stores/recordings');
+				await fetchRecordings();
+			} else {
+				alert(data.error || 'Failed to retry recording');
+			}
+		} catch (error) {
+			console.error('Failed to retry recording:', error);
+			alert('Failed to retry recording');
+		} finally {
+			retrying = false;
+		}
+	}
 
 	const eventIcons: Record<string, { icon: string; color: string }> = {
 		motion: { icon: 'M13 10V3L4 14h7v7l9-11h-7z', color: 'text-yellow-500' },
@@ -27,22 +65,24 @@
 		device_online: 'Device Online'
 	};
 
-	function formatTime(date: Date): string {
-		return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+	function formatTime(date: Date | string): string {
+		const dateObj = typeof date === 'string' ? new Date(date) : date;
+		return dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 	}
 
-	function formatDate(date: Date): string {
+	function formatDate(date: Date | string): string {
+		const dateObj = typeof date === 'string' ? new Date(date) : date;
 		const today = new Date();
 		const yesterday = new Date(today);
 		yesterday.setDate(yesterday.getDate() - 1);
 
-		if (date.toDateString() === today.toDateString()) {
+		if (dateObj.toDateString() === today.toDateString()) {
 			return 'Today';
 		}
-		if (date.toDateString() === yesterday.toDateString()) {
+		if (dateObj.toDateString() === yesterday.toDateString()) {
 			return 'Yesterday';
 		}
-		return date.toLocaleDateString();
+		return dateObj.toLocaleDateString();
 	}
 
 	const eventInfo = eventIcons[event.eventType] ?? eventIcons.motion;
@@ -60,13 +100,32 @@
 		</div>
 
 		<div class="min-w-0 flex-1">
-			<div class="flex items-center justify-between">
+			<div class="flex items-center justify-between gap-2">
 				<p class="font-medium text-zinc-900 dark:text-white truncate">
 					{eventLabels[event.eventType] ?? event.eventType}
 				</p>
-				{#if event.recordingId}
-					<Badge variant="info">Video</Badge>
-				{/if}
+				<div class="flex items-center gap-2 flex-shrink-0">
+					{#if event.recordingId}
+						{#if recording?.status === 'completed'}
+							<Badge variant="success">Video</Badge>
+						{:else if recording?.status === 'processing'}
+							<Badge variant="warning">Processing</Badge>
+						{:else if recording?.status === 'failed'}
+							<Badge variant="danger">Failed</Badge>
+						{:else}
+							<Badge variant="info">Pending</Badge>
+						{/if}
+					{/if}
+					{#if canRetry}
+						<button
+							onclick={handleRetry}
+							disabled={retrying}
+							class="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							{retrying ? 'Retrying...' : 'Retry'}
+						</button>
+					{/if}
+				</div>
 			</div>
 			<p class="text-sm text-zinc-500 dark:text-zinc-400 truncate">
 				{event.deviceName}

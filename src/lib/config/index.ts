@@ -19,6 +19,7 @@ const configSchema = z.object({
 	// Storage
 	recordingsPath: z.string().default('./data/recordings'),
 	thumbnailsPath: z.string().default('./data/thumbnails'),
+	logsPath: z.string().default('./data/logs'),
 
 	// Retention
 	retentionDays: z.coerce.number().default(30),
@@ -36,7 +37,8 @@ const configSchema = z.object({
 	logLevel: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
 
 	// FFmpeg
-	ffmpegPath: z.string().optional()
+	ffmpegPath: z.string().optional(),
+	ffprobePath: z.string().optional()
 });
 
 function loadConfig() {
@@ -49,6 +51,7 @@ function loadConfig() {
 		redisUrl: env.REDIS_URL,
 		recordingsPath: env.RECORDINGS_PATH,
 		thumbnailsPath: env.THUMBNAILS_PATH,
+		logsPath: env.LOGS_PATH,
 		retentionDays: env.RETENTION_DAYS,
 		port: env.PORT,
 		host: env.HOST,
@@ -56,7 +59,8 @@ function loadConfig() {
 		authUsername: env.AUTH_USERNAME,
 		authPasswordHash: env.AUTH_PASSWORD_HASH,
 		logLevel: env.LOG_LEVEL,
-		ffmpegPath: env.FFMPEG_PATH
+		ffmpegPath: env.FFMPEG_PATH,
+		ffprobePath: env.FFPROBE_PATH
 	});
 
 	if (!result.success) {

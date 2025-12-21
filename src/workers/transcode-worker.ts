@@ -124,6 +124,48 @@ function parseDuration(ffmpegOutput: string): number {
 	return 0;
 }
 
+async function getVideoDuration(videoPath: string): Promise<number> {
+	const ffprobePath = config.ffprobePath || 'ffprobe';
+
+	return new Promise((resolve, reject) => {
+		const args = [
+			'-v', 'error',
+			'-show_entries', 'format=duration',
+			'-of', 'default=noprint_wrappers=1:nokey=1',
+			videoPath
+		];
+
+		const ffprobe = spawn(ffprobePath, args);
+
+		let stdout = '';
+		let stderr = '';
+
+		ffprobe.stdout.on('data', (data) => {
+			stdout += data.toString();
+		});
+
+		ffprobe.stderr.on('data', (data) => {
+			stderr += data.toString();
+		});
+
+		ffprobe.on('close', (code) => {
+			if (code !== 0) {
+				logger.error({ code, stderr }, 'ffprobe failed');
+				resolve(0); // Return 0 on error
+				return;
+			}
+
+			const duration = parseFloat(stdout.trim());
+			resolve(isNaN(duration) ? 0 : Math.floor(duration));
+		});
+
+		ffprobe.on('error', (error) => {
+			logger.error({ error }, 'ffprobe error');
+			resolve(0); // Return 0 on error
+		});
+	});
+}
+
 async function generateThumbnail(videoPath: string, thumbnailPath: string): Promise<void> {
 	await ensureDir(thumbnailPath);
 
@@ -169,7 +211,9 @@ async function processTranscodeJob(job: Job<TranscodeJobData>): Promise<Transcod
 		throw new Error(`Recording not found: ${recordingId}`);
 	}
 
+	const isLocalFile = !sourceUrl.startsWith('http://') && !sourceUrl.startsWith('https://');
 	const tempPath = `/tmp/ring-${recordingId}.mp4`;
+	const inputPath = isLocalFile ? sourceUrl : tempPath;
 	const outputPath = recording.filePath;
 	const thumbnailPath = getThumbnailPath(deviceId, new Date(timestamp));
 
@@ -177,20 +221,44 @@ async function processTranscodeJob(job: Job<TranscodeJobData>): Promise<Transcod
 		// Update status to processing
 		recordingsRepo.updateRecordingStatus(recordingId, 'processing');
 
-		// Download video from Ring
-		await job.updateProgress(10);
-		await downloadVideo(sourceUrl, tempPath);
+		// Download video from Ring if it's a URL, skip if it's already a local file
+		if (isLocalFile) {
+			logger.info({ recordingId, sourceUrl }, 'Using existing local file');
+			await job.updateProgress(10);
+		} else {
+			logger.info({ recordingId, sourceUrl }, 'Downloading from URL');
+			await job.updateProgress(10);
+			await downloadVideo(sourceUrl, tempPath);
+		}
 
-		// Transcode video
+		// Transcode video (or just copy if already in correct format)
 		await job.updateProgress(30);
-		const { duration, fileSize } = await transcodeVideo(tempPath, outputPath);
+		let duration: number;
+		let fileSize: number;
+
+		if (isLocalFile && sourceUrl === outputPath) {
+			// File is already in the final location, just get metadata
+			logger.info({ recordingId }, 'File already in correct location, extracting metadata');
+			const stats = await fs.stat(outputPath);
+			fileSize = stats.size;
+
+			// Get duration from ffprobe
+			duration = await getVideoDuration(outputPath);
+		} else {
+			// Transcode video
+			const result = await transcodeVideo(inputPath, outputPath);
+			duration = result.duration;
+			fileSize = result.fileSize;
+		}
 
 		// Generate thumbnail
 		await job.updateProgress(80);
 		await generateThumbnail(outputPath, thumbnailPath);
 
-		// Clean up temp file
-		await fs.unlink(tempPath).catch(() => {});
+		// Clean up temp file if we downloaded
+		if (!isLocalFile) {
+			await fs.unlink(tempPath).catch(() => {});
+		}
 
 		// Update recording in database
 		recordingsRepo.updateRecordingStatus(recordingId, 'completed', {
@@ -212,7 +280,9 @@ async function processTranscodeJob(job: Job<TranscodeJobData>): Promise<Transcod
 		};
 	} catch (error) {
 		// Clean up temp file on error
-		await fs.unlink(tempPath).catch(() => {});
+		if (!isLocalFile) {
+			await fs.unlink(tempPath).catch(() => {});
+		}
 
 		const errorMessage = error instanceof Error ? error.message : String(error);
 		logger.error({ error: errorMessage, recordingId }, 'Transcode job failed');

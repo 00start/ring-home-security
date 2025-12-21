@@ -16,7 +16,7 @@ import { initDatabase, devicesRepo, eventsRepo, recordingsRepo } from '../lib/db
 import { getRingApi, getCameras, getDevices, mapCameraType, mapDeviceType } from '../lib/ring/index.js';
 import { addTranscodeJob } from '../lib/queue/index.js';
 import { createLogger, retry, sleep } from '../lib/utils/index.js';
-import { getRecordingPath } from '../lib/utils/paths.js';
+import { getRecordingPath, ensureDir } from '../lib/utils/paths.js';
 import type { EventType, TranscodeJobData } from '../lib/types/index.js';
 
 const logger = createLogger('ring-listener');
@@ -57,74 +57,225 @@ async function handleMotionOrDing(
 	});
 
 	// Create event record
+	const dingId = notification?.data?.event?.ding?.id || notification?.ding?.id || 'unknown';
+	const dingKind = notification?.data?.event?.ding?.subtype || notification?.ding?.kind || eventType;
+
 	const event = eventsRepo.createEvent({
 		deviceId: camera.id.toString(),
 		deviceName: camera.name,
 		eventType,
 		timestamp,
 		metadata: {
-			notificationId: notification.ding.id,
-			kind: notification.ding.kind
+			notificationId: dingId,
+			kind: dingKind
 		}
 	});
 
-	// Create recording record
-	const filePath = getRecordingPath(camera.id.toString(), timestamp);
-	const recording = recordingsRepo.createRecording({
-		deviceId: camera.id.toString(),
-		eventId: event.id,
-		filePath
+	logger.info({ eventId: event.id, dingId }, 'Event created successfully');
+
+	// Process recording in background (don't block event creation)
+	processRecording(camera, event.id, dingId, timestamp).catch((error) => {
+		logger.error({ error, eventId: event.id }, 'Background recording processing failed');
 	});
+}
 
-	// Link recording to event
-	eventsRepo.updateEventRecording(event.id, recording.id);
-
-	// Get video URL and enqueue transcode job
+async function recordLiveStream(
+	camera: RingCamera,
+	recordingId: string,
+	filePath: string,
+	eventId: string
+): Promise<void> {
 	try {
-		// Wait briefly for Ring to process the video
-		await sleep(5000);
+		recordingsRepo.updateRecordingStatus(recordingId, 'processing');
 
-		// Get the recording URL from Ring
-		const recordingUrl = await getRecordingUrl(camera, notification.ding.id);
+		logger.info({ recordingId, cameraId: camera.id }, 'Starting live stream capture');
+		console.log(`\n📹 Recording live stream for ${camera.name}...`);
 
-		if (recordingUrl) {
-			const jobData: TranscodeJobData = {
-				recordingId: recording.id,
-				sourceUrl: recordingUrl,
-				deviceId: camera.id.toString(),
-				eventId: event.id,
-				timestamp: timestamp.toISOString()
-			};
+		// Ensure the directory exists
+		await ensureDir(filePath);
 
-			await addTranscodeJob(jobData);
-			recordingsRepo.updateRecordingStatus(recording.id, 'processing');
+		// Stream video to file for 60 seconds (adjustable)
+		const RECORDING_DURATION = 60 * 1000; // 60 seconds
 
-			logger.info({ recordingId: recording.id }, 'Transcode job enqueued');
-		} else {
-			logger.warn({ cameraId: camera.id }, 'No recording URL available');
-			recordingsRepo.updateRecordingStatus(recording.id, 'failed');
-		}
+		const streamSession = await camera.streamVideo({
+			output: [
+				'-t', '60', // Record for 60 seconds
+				'-f', 'mp4',
+				'-movflags', 'frag_keyframe+empty_moov',
+				'-reset_timestamps', '1',
+				filePath
+			]
+		});
+
+		logger.info({ recordingId }, 'Stream session started, recording...');
+
+		// Wait for recording to complete or timeout
+		await Promise.race([
+			new Promise((resolve) => {
+				streamSession.onCallEnded.subscribe(() => {
+					logger.info({ recordingId }, 'Stream ended');
+					resolve(undefined);
+				});
+			}),
+			sleep(RECORDING_DURATION + 5000) // Add 5s buffer
+		]);
+
+		// Stop the stream
+		streamSession.stop();
+
+		logger.info({ recordingId, filePath }, 'Live stream recording completed');
+		console.log(`✅ Recording saved: ${filePath}\n`);
+
+		// Enqueue transcode job to generate thumbnail and get metadata
+		const jobData: TranscodeJobData = {
+			recordingId,
+			sourceUrl: filePath, // Use local file instead of URL
+			deviceId: camera.id.toString(),
+			eventId,
+			timestamp: new Date().toISOString()
+		};
+
+		await addTranscodeJob(jobData);
+
 	} catch (error) {
-		logger.error({ error, cameraId: camera.id }, 'Failed to process recording');
-		recordingsRepo.updateRecordingStatus(recording.id, 'failed');
+		logger.error({ error, recordingId }, 'Failed to record live stream');
+		recordingsRepo.updateRecordingStatus(recordingId, 'failed');
+	}
+}
+
+async function processRecording(
+	camera: RingCamera,
+	eventId: string,
+	dingId: string,
+	timestamp: Date
+): Promise<void> {
+	try {
+		// Create recording record
+		const filePath = getRecordingPath(camera.id.toString(), timestamp);
+		const recording = recordingsRepo.createRecording({
+			deviceId: camera.id.toString(),
+			eventId,
+			filePath
+		});
+
+		// Link recording to event
+		eventsRepo.updateEventRecording(eventId, recording.id);
+
+		logger.info({ eventId, cameraId: camera.id }, 'Starting live stream recording...');
+
+		// Record live stream instead of downloading from cloud
+		await recordLiveStream(camera, recording.id, filePath, eventId);
+
+	} catch (error) {
+		logger.error({ error, eventId, cameraId: camera.id }, 'Failed to process recording');
 	}
 }
 
 async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<string | null> {
 	try {
-		// Try to get the recording URL with retries
+		// First, check if this camera has recording capability
+		const cameraData = (camera as any).data || {};
+		logger.info({
+			cameraId: camera.id,
+			cameraName: camera.name,
+			hasSnapshotWithinSeconds: camera.hasSnapshotWithinSeconds,
+			operatingOnBattery: camera.operatingOnBattery,
+			subscribed: cameraData.subscribed,
+			subscriptionStatus: cameraData.subscription_status,
+			features: cameraData.features,
+			settings: {
+				recordingEnabled: cameraData.settings?.motion_detection_enabled,
+				videoRecordingEnabled: cameraData.settings?.video_settings?.recording_enabled
+			}
+		}, 'Camera recording capability check');
+
+		// Note: Even without a subscription, we'll try the share/play endpoint
+		// which may work for recent recordings
+		if (cameraData.subscribed === false) {
+			logger.warn('No active subscription - will try share/play endpoint anyway');
+			console.log('\n⚠️  No Ring Protect subscription - attempting share/play endpoint...\n');
+		}
+
+		// Try to get the recording URL with retries (up to 2 minutes of retries)
+		let attemptCount = 0;
 		const url = await retry(
 			async () => {
-				// Ring API method to get recording URL
-				const recordings = await camera.getRecordingUrl(dingId);
-				return recordings;
+				attemptCount++;
+				logger.info({ dingId, attemptCount }, 'Attempting to fetch recording URL');
+
+				try {
+					// Try with transcoded: false first (raw video)
+					logger.info({ dingId }, 'Trying getRecordingUrl with transcoded: false');
+					let recordingUrl = await camera.getRecordingUrl(dingId, { transcoded: false });
+
+					if (!recordingUrl) {
+						logger.info({ dingId }, 'Trying getRecordingUrl with transcoded: true');
+						recordingUrl = await camera.getRecordingUrl(dingId, { transcoded: true });
+					}
+
+					if (!recordingUrl) {
+						logger.warn({ dingId, attemptCount }, 'getRecordingUrl returned null/undefined');
+
+						// Alternative: Try fetching recent events and finding this one
+						if (attemptCount % 3 === 0) {
+							logger.info({ attemptCount }, 'Trying alternative approach: fetching recent events');
+							try {
+								const events = await camera.getEvents({ limit: 10 });
+								logger.info({
+									eventCount: events.length,
+									eventIds: events.map(e => e.id),
+									lookingFor: dingId
+								}, 'Recent events fetched');
+
+								const matchingEvent = events.find(e => e.id === dingId);
+								if (matchingEvent) {
+									logger.info({ event: matchingEvent }, 'Found matching event');
+
+									// Try to get URL from the event object if it has one
+									if ((matchingEvent as any).recording?.url) {
+										logger.info('Found URL in event.recording.url');
+										return (matchingEvent as any).recording.url;
+									}
+									if ((matchingEvent as any).cv_properties?.video_url) {
+										logger.info('Found URL in event.cv_properties.video_url');
+										return (matchingEvent as any).cv_properties.video_url;
+									}
+								}
+							} catch (eventsErr) {
+								logger.warn({ error: eventsErr }, 'Failed to fetch events for debugging');
+							}
+						}
+
+						throw new Error('Recording not yet available');
+					}
+
+					// Log the URL to terminal
+					console.log('\n=================================');
+					console.log('RECORDING URL FOUND:');
+					console.log(recordingUrl);
+					console.log('=================================\n');
+
+					logger.info({ dingId, url: recordingUrl, attemptCount }, 'Recording URL obtained successfully!');
+					return recordingUrl;
+				} catch (err) {
+					logger.warn({
+						dingId,
+						attemptCount,
+						error: err instanceof Error ? err.message : String(err)
+					}, 'Attempt failed');
+					throw err;
+				}
 			},
-			{ maxRetries: 5, baseDelay: 2000 }
+			{ maxRetries: 15, baseDelay: 4000, maxDelay: 8000 } // Try for ~2 minutes total
 		);
 
 		return url;
 	} catch (error) {
-		logger.error({ error, dingId }, 'Failed to get recording URL');
+		logger.error({
+			error: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+			dingId,
+			cameraId: camera.id
+		}, 'Failed to get recording URL after all retries');
 		return null;
 	}
 }
@@ -214,6 +365,8 @@ async function subscribeToCamera(camera: RingCamera): Promise<void> {
 				// New notification format (notification.data.event.ding.subtype)
 				if (notification.data?.event?.ding?.subtype === 'motion') {
 					eventType = 'motion';
+				} else if (notification.data?.event?.ding?.subtype === 'button_press') {
+					eventType = 'ding';
 				} else if (notification.data?.event?.ding?.subtype === 'on_demand') {
 					eventType = 'ding';
 				} else if (notification.data?.event?.ding?.detection_type === 'motion') {

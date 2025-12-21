@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import { logout, user } from '$lib/stores';
 
 	let locationName = $state<string>('Ring Security');

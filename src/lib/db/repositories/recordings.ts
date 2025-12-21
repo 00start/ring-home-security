@@ -2,6 +2,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { getDatabase } from '../client';
 import type { Recording, RecordingRow, RecordingStatus } from '$lib/types';
 import { config } from '$lib/config';
+import { promises as fs } from 'fs';
+import { join } from 'path';
 
 function rowToRecording(row: RecordingRow): Recording {
 	return {
@@ -126,6 +128,53 @@ export function getTotalStorageUsed(): number {
 	const db = getDatabase();
 	const result = db.prepare('SELECT COALESCE(SUM(file_size), 0) as total FROM recordings').get() as { total: number };
 	return result.total;
+}
+
+async function getDirectorySize(dirPath: string): Promise<number> {
+	try {
+		const stats = await fs.stat(dirPath);
+		if (!stats.isDirectory()) {
+			return stats.size;
+		}
+
+		const files = await fs.readdir(dirPath, { withFileTypes: true });
+		const sizes = await Promise.all(
+			files.map(async (file) => {
+				const path = join(dirPath, file.name);
+				return getDirectorySize(path);
+			})
+		);
+
+		return sizes.reduce((acc, size) => acc + size, 0);
+	} catch (error) {
+		return 0;
+	}
+}
+
+export async function getTotalStorageUsedWithSystemFiles(): Promise<number> {
+	// Get recording file sizes from database
+	const recordingStorage = getTotalStorageUsed();
+
+	// Get database file size
+	let dbSize = 0;
+	try {
+		const dbPath = config.databasePath || './data/ring-security.db';
+		const dbStats = await fs.stat(dbPath);
+		dbSize = dbStats.size;
+	} catch (error) {
+		// Database file doesn't exist yet or can't be accessed
+	}
+
+	// Get logs directory size
+	let logsSize = 0;
+	try {
+		const logsPath = config.logsPath || './data/logs';
+		logsSize = await getDirectorySize(logsPath);
+	} catch (error) {
+		// Logs directory doesn't exist yet
+	}
+
+	return recordingStorage + dbSize + logsSize;
 }
 
 export function getStorageByDevice(): { deviceId: string; total: number }[] {
