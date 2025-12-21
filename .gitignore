@@ -137,3 +137,38 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# ==================================
+# Ring Home Security - Project Specific
+# ==================================
+
+# SvelteKit build output
+build/
+.svelte-kit/
+
+# Worker build output (compiled TypeScript)
+dist/
+
+# Database files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Local data directories
+data/
+recordings/
+
+# PM2 logs
+logs/
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db

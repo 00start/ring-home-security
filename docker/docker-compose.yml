@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  # Redis for BullMQ job queue
+  redis:
+    image: redis:7-alpine
+    container_name: ring-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # SvelteKit web server (dashboard + API)
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ring-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_PATH=/app/data/ring-security.db
+      - RECORDINGS_PATH=/app/data/recordings
+    volumes:
+      - app_data:/app/data
+      - app_logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Ring listener worker
+  ring-listener:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ring-listener
+    restart: unless-stopped
+    command: ["node", "dist/workers/ring-listener.js"]
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_PATH=/app/data/ring-security.db
+      - RECORDINGS_PATH=/app/data/recordings
+      - RING_REFRESH_TOKEN=${RING_REFRESH_TOKEN}
+    volumes:
+      - app_data:/app/data
+      - app_logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # Transcode worker
+  transcode-worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ring-transcode
+    restart: unless-stopped
+    command: ["node", "dist/workers/transcode-worker.js"]
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_PATH=/app/data/ring-security.db
+      - TRANSCODE_CONCURRENCY=2
+    volumes:
+      - app_data:/app/data
+      - app_logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  redis_data:
+  app_data:
+  app_logs:

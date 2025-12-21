@@ -1,0 +1,46 @@
+{
+  "name": "ring-home-security",
+  "version": "1.0.0",
+  "description": "Self-hosted home surveillance system for Ring devices",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "build:workers": "tsc -p tsconfig.workers.json",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "start": "node build/index.js",
+    "start:ring-listener": "node dist/workers/ring-listener.js",
+    "start:transcode-worker": "node dist/workers/transcode-worker.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:31546/git/stef-the/ring-home-security"
+  },
+  "keywords": [
+    "ring",
+    "surveillance",
+    "home-security",
+    "sveltekit"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sveltejs/adapter-node": "^5.4.0",
+    "@sveltejs/kit": "^2.49.2",
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@tailwindcss/vite": "^4.1.18",
+    "svelte": "^5.46.0",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.3",
+    "svelte-check": "^4.3.5"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
