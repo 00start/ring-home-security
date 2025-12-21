@@ -8,7 +8,12 @@ export const GET: RequestHandler = async ({ request }) => {
 	const stream = new ReadableStream({
 		async start(controller) {
 			// Send initial connection message
-			controller.enqueue(encoder.encode('event: connected\ndata: {}\n\n'));
+			try {
+				controller.enqueue(encoder.encode('event: connected\ndata: {}\n\n'));
+			} catch (error) {
+				closed = true;
+				return;
+			}
 
 			// Keep track of the last event ID we've seen
 			let lastEventCount = eventsRepo.getEventsCount();
@@ -30,18 +35,34 @@ export const GET: RequestHandler = async ({ request }) => {
 						});
 
 						for (const event of newEvents) {
+							if (closed) break;
+
 							const data = JSON.stringify({
 								type: 'event',
 								payload: event
 							});
-							controller.enqueue(encoder.encode(`event: event\ndata: ${data}\n\n`));
+
+							try {
+								controller.enqueue(encoder.encode(`event: event\ndata: ${data}\n\n`));
+							} catch (error) {
+								closed = true;
+								clearInterval(interval);
+								return;
+							}
 						}
 
 						lastEventCount = currentCount;
 					}
 
 					// Send heartbeat
-					controller.enqueue(encoder.encode(': heartbeat\n\n'));
+					if (!closed) {
+						try {
+							controller.enqueue(encoder.encode(': heartbeat\n\n'));
+						} catch (error) {
+							closed = true;
+							clearInterval(interval);
+						}
+					}
 				} catch (error) {
 					console.error('SSE error:', error);
 				}
@@ -49,6 +70,7 @@ export const GET: RequestHandler = async ({ request }) => {
 
 			// Clean up on close
 			request.signal.addEventListener('abort', () => {
+				if (closed) return;
 				closed = true;
 				clearInterval(interval);
 				try {

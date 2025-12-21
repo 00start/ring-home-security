@@ -1,7 +1,7 @@
 import { Queue, Worker, Job } from 'bullmq';
 import { getRedisConnection } from './connection';
 import type { TranscodeJobData, TranscodeJobResult } from '$lib/types';
-import { createLogger } from '$lib/utils';
+import { createLogger } from '$lib/utils/logger.server';
 
 const logger = createLogger('transcode-queue');
 

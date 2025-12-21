@@ -14,8 +14,9 @@
 
 	let showLiveViewModal = $state(false);
 	let liveViewDevice = $state<Device | null>(null);
-	let liveViewLoading = $state(false);
+	let liveViewLoading = $state(true);
 	let liveViewError = $state<string | null>(null);
+	let videoElement = $state<HTMLVideoElement | null>(null);
 
 	// Prioritized devices: doorbells first, then cameras, then sensors
 	let prioritizedDevices = $derived.by(() => {
@@ -36,12 +37,28 @@
 		liveViewDevice = device;
 		showLiveViewModal = true;
 		liveViewError = null;
+		liveViewLoading = true;
 	}
 
 	function closeLiveView() {
 		showLiveViewModal = false;
 		liveViewDevice = null;
 		liveViewError = null;
+		liveViewLoading = true;
+		if (videoElement) {
+			videoElement.pause();
+			videoElement.src = '';
+			videoElement = null;
+		}
+	}
+
+	function handleVideoLoaded() {
+		liveViewLoading = false;
+	}
+
+	function handleVideoError() {
+		liveViewLoading = false;
+		liveViewError = 'Failed to load live stream. Please try again.';
 	}
 </script>
 
@@ -172,20 +189,34 @@
 						</div>
 					{:else}
 						<video
+							bind:this={videoElement}
 							id="liveViewVideo"
 							class="w-full h-full"
+							src="/api/devices/{liveViewDevice.id}/live"
 							autoplay
 							muted
 							playsinline
 							controls
+							onloadeddata={handleVideoLoaded}
+							onerror={handleVideoError}
 						>
-							<source src="/api/devices/{liveViewDevice.id}/live" type="video/mp4" />
 							Your browser does not support video playback.
 						</video>
-						<div class="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
-							<span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-							LIVE
-						</div>
+
+						{#if liveViewLoading}
+							<div class="absolute top-4 right-4 bg-zinc-700 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
+								<svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+								</svg>
+								LOADING...
+							</div>
+						{:else}
+							<div class="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
+								<span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+								LIVE
+							</div>
+						{/if}
 					{/if}
 				</div>
 				<div class="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400">

@@ -112,6 +112,7 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
 export interface EventFilters {
 	deviceId?: string;
 	eventType?: EventType;
+	hasRecording?: boolean;
 	startDate?: Date;
 	endDate?: Date;
 	limit?: number;

@@ -7,6 +7,8 @@ export const GET: RequestHandler = async ({ url }) => {
 	try {
 		const deviceId = url.searchParams.get('deviceId') ?? undefined;
 		const eventType = url.searchParams.get('eventType') as EventType | undefined;
+		const hasRecordingParam = url.searchParams.get('hasRecording');
+		const hasRecording = hasRecordingParam ? hasRecordingParam === 'true' : undefined;
 		const startDate = url.searchParams.get('startDate');
 		const endDate = url.searchParams.get('endDate');
 		const limit = parseInt(url.searchParams.get('limit') ?? '50', 10);
@@ -15,6 +17,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		const filters: EventFilters = {
 			deviceId,
 			eventType,
+			hasRecording,
 			startDate: startDate ? new Date(startDate) : undefined,
 			endDate: endDate ? new Date(endDate) : undefined,
 			limit,

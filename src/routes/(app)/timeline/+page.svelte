@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { EventCard, Button, Select, Modal, VideoPlayer } from '$lib/components';
+	import { EventCard, Button, Select, Modal, VideoPlayer, LogViewer } from '$lib/components';
 	import {
 		events,
 		fetchEvents,
@@ -51,6 +51,8 @@
 			setFilters({ deviceId: value || undefined });
 		} else if (key === 'eventType') {
 			setFilters({ eventType: value as any || undefined });
+		} else if (key === 'hasRecording') {
+			setFilters({ hasRecording: value ? value === 'true' : undefined });
 		}
 		fetchEvents();
 	}
@@ -76,16 +78,19 @@
 
 <div class="space-y-6">
 	<!-- Page header -->
-	<div>
-		<h1 class="text-2xl font-bold text-zinc-900 dark:text-white">Event Timeline</h1>
-		<p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-			View and filter all security events
-		</p>
+	<div class="flex items-start justify-between">
+		<div>
+			<h1 class="text-2xl font-bold text-zinc-900 dark:text-white">Event Timeline</h1>
+			<p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+				View and filter all security events
+			</p>
+		</div>
+		<LogViewer compact defaultFile="ring-listener.log" />
 	</div>
 
 	<!-- Filters -->
 	<div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-		<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+		<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
 			<Select
 				label="Device"
 				value={$filters.deviceId ?? ''}
@@ -112,6 +117,18 @@
 					<option value="door_close">Door Close</option>
 					<option value="device_online">Device Online</option>
 					<option value="device_offline">Device Offline</option>
+				{/snippet}
+			</Select>
+
+			<Select
+				label="Video Status"
+				value={$filters.hasRecording ?? ''}
+				onchange={(e) => handleFilterChange('hasRecording', (e.target as HTMLSelectElement).value)}
+			>
+				{#snippet children()}
+					<option value="">All Events</option>
+					<option value="true">Has Recording</option>
+					<option value="false">No Recording</option>
 				{/snippet}
 			</Select>
 

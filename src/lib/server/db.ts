@@ -2,7 +2,7 @@
  * Database initialization for SvelteKit server
  */
 import { initDatabase } from '$lib/db';
-import { createLogger } from '$lib/utils';
+import { createLogger } from '$lib/utils/logger.server';
 
 const logger = createLogger('server-db');
 

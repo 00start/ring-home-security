@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { config } from '$lib/config';
-import { createLogger } from '$lib/utils';
+import { createLogger } from '$lib/utils/logger.server';
 import { ensureDir } from '$lib/utils/paths';
 
 const logger = createLogger('database');

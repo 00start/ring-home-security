@@ -1,6 +1,6 @@
 import { Redis } from 'ioredis';
 import { config } from '$lib/config';
-import { createLogger } from '$lib/utils';
+import { createLogger } from '$lib/utils/logger.server';
 
 const logger = createLogger('redis');
 

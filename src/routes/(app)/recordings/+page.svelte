@@ -89,11 +89,7 @@
 		}
 	}
 
-	$effect(() => {
-		if (filterDevice !== undefined || filterStatus !== undefined) {
-			handleFilter();
-		}
-	});
+	// Remove the $effect - we'll call handleFilter directly from onchange events
 </script>
 
 <svelte:head>

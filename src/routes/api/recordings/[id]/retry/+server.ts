@@ -4,7 +4,8 @@ import { recordingsRepo, eventsRepo } from '$lib/db';
 import { getCameras } from '$lib/ring';
 import { addTranscodeJob } from '$lib/queue';
 import type { TranscodeJobData } from '$lib/types';
-import { createLogger, retry } from '$lib/utils';
+import { createLogger } from '$lib/utils/logger.server';
+import { retry } from '$lib/utils';
 
 const logger = createLogger('retry-recording');
 

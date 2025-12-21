@@ -5,12 +5,15 @@ A self-hosted Node.js/TypeScript application for recording Ring doorbell and cam
 ## Features
 
 - **Ring Integration**: Connect to Ring API to monitor doorbells, cameras, and sensors
-- **Video Recording**: Automatic recording on motion and doorbell events
+- **Live View**: Watch real-time video streams from your cameras and doorbells
+- **Video Recording**: Automatic recording on motion and doorbell events (no Ring Protect subscription required)
 - **Event Logging**: Log all sensor events (door/window, motion) with timestamps
 - **Web Dashboard**: Responsive web UI for monitoring devices and viewing events
 - **Video Playback**: Watch recordings directly in the browser
+- **Advanced Filtering**: Filter events by device, type, date range, and video availability
 - **Retention Policy**: Automatic cleanup of old recordings
 - **Real-time Updates**: Server-sent events for live updates
+- **Comprehensive Logging**: Separate log files for each process with console and file output
 
 ## Architecture
 
@@ -256,6 +259,7 @@ docker-compose up -d
 | `/api/recordings/:id` | GET | Get recording details |
 | `/api/recordings/:id/video` | GET | Stream video file |
 | `/api/recordings/:id/thumbnail` | GET | Get thumbnail image |
+| `/api/devices/:id/live` | GET | Stream live video from camera/doorbell |
 | `/api/stats` | GET | Dashboard statistics |
 
 ## Configuration Options
@@ -267,12 +271,72 @@ docker-compose up -d
 | `REDIS_URL` | Redis connection URL | `redis://localhost:6379` |
 | `RECORDINGS_PATH` | Video storage path | `./data/recordings` |
 | `THUMBNAILS_PATH` | Thumbnail storage path | `./data/thumbnails` |
+| `LOGS_PATH` | Log files directory | `./data/logs` |
 | `RETENTION_DAYS` | Days to keep recordings | `30` |
 | `PORT` | Web server port | `3000` |
 | `HOST` | Web server host | `0.0.0.0` |
 | `AUTH_SECRET` | Session encryption key | Required |
-| `LOG_LEVEL` | Logging level | `info` |
+| `LOG_LEVEL` | Logging level (trace, debug, info, warn, error, fatal) | `info` |
 | `FFMPEG_PATH` | Custom ffmpeg path | System ffmpeg |
+| `FFPROBE_PATH` | Custom ffprobe path | System ffprobe |
+
+## Logging
+
+The application maintains separate log files for each process, making it easy to debug issues and monitor activity.
+
+### Log Files Location
+
+By default, logs are stored in `./data/logs/`:
+
+- `web.log` - SvelteKit web server logs (HTTP requests, API calls, errors)
+- `ring-listener.log` - Ring API connection, device discovery, event notifications
+- `transcode-worker.log` - Video transcoding, thumbnail generation, metadata extraction
+- `retention-worker.log` - Cleanup operations, storage management
+
+### Log Format
+
+Each log entry includes:
+- **Timestamp**: ISO 8601 format with timezone
+- **Level**: trace, debug, info, warn, error, or fatal
+- **Component**: The specific module or function generating the log
+- **Message**: Human-readable description
+- **Context**: Structured data (device IDs, file paths, error details, etc.)
+
+### Viewing Logs
+
+**In Terminal (Real-time)**:
+All processes output colored logs to the console for easy monitoring during development.
+
+**Log Files (Persistent)**:
+```bash
+# View latest logs from a specific process
+tail -f ./data/logs/ring-listener.log
+
+# View last 100 lines
+tail -n 100 ./data/logs/web.log
+
+# Search for errors
+grep ERROR ./data/logs/*.log
+
+# View logs from specific date
+grep "2025-12-21" ./data/logs/web.log
+```
+
+**In the Dashboard** (coming soon):
+Log files will be accessible through the Settings page and Timeline page for easy viewing without terminal access.
+
+### Adjusting Log Level
+
+Set the `LOG_LEVEL` environment variable to control verbosity:
+
+```env
+LOG_LEVEL=debug  # For detailed troubleshooting
+LOG_LEVEL=info   # Normal operation (default)
+LOG_LEVEL=warn   # Only warnings and errors
+LOG_LEVEL=error  # Only errors
+```
+
+Changes require restarting all processes to take effect.
 
 ## Development
 
@@ -287,25 +351,73 @@ npm run format
 npm run lint
 ```
 
+## Processes and Restart Guide
+
+The application consists of multiple independent processes. Here's when you need to restart each one:
+
+| Process | Restart Needed When... | How to Restart |
+|---------|------------------------|----------------|
+| **Web Server** | - Code changes to routes, components, or API<br>- Environment variable changes<br>- Logging configuration changes | Stop with `Ctrl+C`, then `npm run dev` |
+| **Ring Listener** | - Ring refresh token updated<br>- Logging configuration changes<br>- Ring API connection issues | Stop with `Ctrl+C`, then `npm run worker:ring` |
+| **Transcode Worker** | - FFmpeg path changes<br>- Logging configuration changes<br>- Video processing issues | Stop with `Ctrl+C`, then `npm run worker:transcode` |
+| **Retention Worker** | - Retention days configuration changes<br>- Logging configuration changes | Stop with `Ctrl+C`, then `npm run worker:retention` |
+
+**Note**: After updating the logging configuration in this release, you must restart ALL processes for log file separation to take effect.
+
 ## Troubleshooting
 
 ### Ring Connection Issues
 
 1. Verify your refresh token is valid
 2. Check if Ring API is accessible
-3. Review logs: `pm2 logs ring-listener`
+3. Review logs:
+   ```bash
+   tail -f ./data/logs/ring-listener.log
+   # or with PM2:
+   pm2 logs ring-listener
+   ```
+
+### Live View Not Working
+
+1. Ensure ffmpeg is installed and in PATH: `ffmpeg -version`
+2. Check web server logs for errors:
+   ```bash
+   tail -f ./data/logs/web.log
+   ```
+3. Verify camera is online in the dashboard
+4. Check browser console for playback errors
 
 ### Video Not Recording
 
 1. Ensure ffmpeg is installed: `ffmpeg -version`
-2. Check transcode worker logs: `pm2 logs transcode-worker`
+2. Check transcode worker logs:
+   ```bash
+   tail -f ./data/logs/transcode-worker.log
+   # or with PM2:
+   pm2 logs transcode-worker
+   ```
 3. Verify Redis is running: `redis-cli ping`
+4. Check Ring listener logs for recording start events
 
 ### Database Issues
 
 1. Ensure data directory exists
-2. Check file permissions
+2. Check file permissions on `./data/ring-security.db`
 3. Re-run migrations: `npm run db:migrate`
+4. Check web server logs for database errors
+
+### High Storage Usage
+
+1. Check current storage in dashboard Stats card
+2. Adjust retention policy: Set `RETENTION_DAYS` in `.env`
+3. Manually run retention worker:
+   ```bash
+   npm run worker:retention
+   ```
+4. Check retention worker logs:
+   ```bash
+   tail -f ./data/logs/retention-worker.log
+   ```
 
 ## License
 

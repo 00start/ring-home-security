@@ -1,7 +1,8 @@
 import { RingApi, RingCamera, RingDevice } from 'ring-client-api';
 import { config } from '$lib/config';
 import { tokensRepo } from '$lib/db';
-import { createLogger, retry } from '$lib/utils';
+import { createLogger } from '$lib/utils/logger.server';
+import { retry } from '$lib/utils';
 
 const logger = createLogger('ring-client');
 

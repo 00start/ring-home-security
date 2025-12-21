@@ -1,4 +1,5 @@
-export { logger, createLogger } from './logger';
+// Logger is server-only - import directly from './logger.server' when needed on server
+// export { logger, createLogger } from './logger.server';
 // Path utilities are server-only - import directly from './paths' when needed on server
 
 /**

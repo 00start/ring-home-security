@@ -66,6 +66,14 @@ export function getEvents(filters: EventFilters = {}): EventLog[] {
 		params.push(filters.eventType);
 	}
 
+	if (filters.hasRecording !== undefined) {
+		if (filters.hasRecording) {
+			query += ' AND recording_id IS NOT NULL';
+		} else {
+			query += ' AND recording_id IS NULL';
+		}
+	}
+
 	if (filters.startDate) {
 		query += ' AND timestamp >= ?';
 		params.push(filters.startDate.toISOString());
@@ -106,6 +114,14 @@ export function getEventsCount(filters: Omit<EventFilters, 'limit' | 'offset'> =
 	if (filters.eventType) {
 		query += ' AND event_type = ?';
 		params.push(filters.eventType);
+	}
+
+	if (filters.hasRecording !== undefined) {
+		if (filters.hasRecording) {
+			query += ' AND recording_id IS NOT NULL';
+		} else {
+			query += ' AND recording_id IS NULL';
+		}
 	}
 
 	if (filters.startDate) {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Card, Button, Input } from '$lib/components';
+	import { Card, Button, Input, LogViewer } from '$lib/components';
 	import { user } from '$lib/stores';
 	import { formatBytes } from '$lib/utils';
 
@@ -151,6 +151,9 @@
 			</div>
 		{/snippet}
 	</Card>
+
+	<!-- Log Viewer -->
+	<LogViewer />
 
 	<!-- Danger Zone -->
 	<Card title="Danger Zone">
