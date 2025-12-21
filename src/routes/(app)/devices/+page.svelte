@@ -1,16 +1,34 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { DeviceCard, Badge } from '$lib/components';
+	import { DeviceCard, Badge, LiveViewModal } from '$lib/components';
 	import { devices, fetchDevices, devicesByType, onlineDevices, offlineDevices } from '$lib/stores/devices';
 	import type { Device } from '$lib/types';
+
+	let showLiveViewModal = $state(false);
+	let liveViewDevice = $state<Device | null>(null);
+
+	// Sort sensors with contact sensors first
+	let sortedSensors = $derived.by(() => {
+		return [...$devicesByType.sensors].sort((a, b) => {
+			// Contact sensors first, then others
+			if (a.subtype === 'contact' && b.subtype !== 'contact') return -1;
+			if (a.subtype !== 'contact' && b.subtype === 'contact') return 1;
+			return 0;
+		});
+	});
 
 	onMount(() => {
 		fetchDevices();
 	});
 
 	function handleLiveView(device: Device) {
-		// Navigate to home page with device ID to open live view modal
-		window.location.href = `/?device=${device.id}#liveview`;
+		liveViewDevice = device;
+		showLiveViewModal = true;
+	}
+
+	function closeLiveView() {
+		showLiveViewModal = false;
+		liveViewDevice = null;
 	}
 </script>
 
@@ -97,13 +115,13 @@
 		{/if}
 
 		<!-- Sensors -->
-		{#if $devicesByType.sensors.length > 0}
+		{#if sortedSensors.length > 0}
 			<div>
 				<h2 class="mb-4 text-lg font-medium text-zinc-900 dark:text-white">
-					Sensors ({$devicesByType.sensors.length})
+					Sensors ({sortedSensors.length})
 				</h2>
 				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{#each $devicesByType.sensors as device}
+					{#each sortedSensors as device}
 						<DeviceCard {device} onclick={() => window.location.href = `/devices/${device.id}`} />
 					{/each}
 				</div>
@@ -125,3 +143,10 @@
 		{/if}
 	{/if}
 </div>
+
+<!-- Live View Modal -->
+<LiveViewModal
+	device={liveViewDevice}
+	bind:open={showLiveViewModal}
+	onclose={closeLiveView}
+/>
