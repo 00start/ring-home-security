@@ -1,8 +1,6 @@
 import type { RequestHandler } from './$types';
 import { getCameras } from '$lib/ring';
 import { createLogger } from '$lib/utils/logger.server';
-import { spawn } from 'child_process';
-import { PassThrough } from 'stream';
 
 const logger = createLogger('live-view-api');
 
@@ -22,108 +20,78 @@ export const GET: RequestHandler = async ({ params }) => {
 
 		logger.info({ deviceId: id, cameraName: camera.name }, 'Starting live stream');
 
-		// Create PassThrough stream for video data
-		const videoOutput = new PassThrough();
+		// Create a ReadableStream that will receive video data from the stdoutCallback
+		let streamController: ReadableStreamDefaultController<Uint8Array> | null = null;
+		let sipCall: Awaited<ReturnType<typeof camera.streamVideo>> | null = null;
 
-		// Spawn FFmpeg to convert RTP to MP4
-		const ffmpeg = spawn('ffmpeg', [
-			'-i', 'pipe:0', // Read from stdin
-			'-f', 'mp4',
-			'-movflags', 'frag_keyframe+empty_moov+default_base_moof',
-			'-frag_duration', '1000000',
-			'-reset_timestamps', '1',
-			'pipe:1' // Write to stdout
-		]);
-
-		logger.info({ deviceId: id }, 'FFmpeg process spawned');
-
-		// Start the live stream and pipe RTP data to FFmpeg
-		const sipCall = await camera.streamVideo({
-			output: ffmpeg.stdin
-		});
-
-		logger.info({ deviceId: id }, 'Stream session created, piping to FFmpeg');
-
-		// Pipe FFmpeg output to our PassThrough stream
-		ffmpeg.stdout.pipe(videoOutput);
-
-		// Handle FFmpeg errors
-		ffmpeg.stderr.on('data', (data) => {
-			logger.debug({ deviceId: id, stderr: data.toString() }, 'FFmpeg stderr');
-		});
-
-		ffmpeg.on('error', (error) => {
-			logger.error({ deviceId: id, error }, 'FFmpeg process error');
-		});
-
-		// Convert PassThrough stream to web ReadableStream
 		const stream = new ReadableStream({
-			start(controller) {
-				let isClosed = false;
+			async start(controller) {
+				streamController = controller;
 
-				const closeController = (reason: string) => {
-					if (isClosed) return;
-					isClosed = true;
-
-					try {
-						controller.close();
-						logger.info({ deviceId: id, reason }, 'Stream controller closed');
-					} catch (error) {
-						// Controller already closed, ignore
-					}
-				};
-
-				videoOutput.on('data', (chunk: Buffer) => {
-					if (!isClosed) {
-						try {
-							controller.enqueue(new Uint8Array(chunk));
-						} catch (error) {
-							logger.error({ deviceId: id, error }, 'Error enqueuing data');
-							closeController('enqueue-error');
+				try {
+					// Start the live stream with stdoutCallback to receive MPEGTS data
+					// Transcode to H.264 baseline profile for maximum browser compatibility
+					sipCall = await camera.streamVideo({
+						output: [
+							'-f', 'mpegts',
+							'-codec:v', 'libx264',
+							'-preset', 'ultrafast',
+							'-tune', 'zerolatency',
+							'-profile:v', 'baseline',
+							'-level', '3.0',
+							'-pix_fmt', 'yuv420p',
+							'-g', '30',
+							'-codec:a', 'aac',
+							'-ar', '44100',
+							'-ac', '2',
+							'pipe:1'
+						],
+						stdoutCallback: (data: Buffer) => {
+							try {
+								if (streamController && data.length > 0) {
+									controller.enqueue(new Uint8Array(data));
+								}
+							} catch (error) {
+								logger.error({ deviceId: id, error }, 'Error enqueuing video data');
+							}
 						}
-					}
-				});
+					});
 
-				videoOutput.on('end', () => {
-					logger.info({ deviceId: id }, 'Video output ended');
-					closeController('stream-end');
-				});
+					logger.info({ deviceId: id }, 'Stream session created');
 
-				videoOutput.on('error', (error: Error) => {
-					logger.error({ deviceId: id, error }, 'Video output error');
-					if (!isClosed) {
-						isClosed = true;
+					// Clean up when SIP call ends
+					sipCall.onCallEnded.subscribe(() => {
+						logger.info({ deviceId: id }, 'SIP call ended');
 						try {
-							controller.error(error);
+							controller.close();
 						} catch (e) {
 							// Controller already closed, ignore
 						}
+						streamController = null;
+					});
+				} catch (error) {
+					logger.error({ deviceId: id, error }, 'Error starting stream');
+					try {
+						controller.error(error);
+					} catch (e) {
+						// Controller already closed, ignore
 					}
-				});
-
-				ffmpeg.on('exit', (code: number) => {
-					logger.info({ deviceId: id, exitCode: code }, 'FFmpeg exited');
-					closeController('ffmpeg-exit');
-				});
-
-				// Clean up when SIP call ends
-				sipCall.onCallEnded.subscribe(() => {
-					logger.info({ deviceId: id }, 'SIP call ended');
-					ffmpeg.kill();
-					closeController('sip-call-ended');
-				});
+					streamController = null;
+				}
 			},
 			cancel() {
 				logger.info({ deviceId: id }, 'Stream cancelled by client');
-				sipCall.stop();
-				ffmpeg.kill();
+				if (sipCall) {
+					sipCall.stop();
+				}
+				streamController = null;
 			}
 		});
 
 		// Return the stream with appropriate headers
 		return new Response(stream, {
 			headers: {
-				'Content-Type': 'video/mp4',
+				'Content-Type': 'video/mp2t',
 				'Cache-Control': 'no-cache',
 				'Connection': 'keep-alive'
 			}

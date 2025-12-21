@@ -17,6 +17,7 @@ import { getRingApi, getCameras, getDevices, mapCameraType, mapDeviceType } from
 import { addTranscodeJob } from '../lib/queue/index.js';
 import { createLogger, retry, sleep } from '../lib/utils/index.js';
 import { getRecordingPath, ensureDir } from '../lib/utils/paths.js';
+import { getBufferManager } from '../lib/utils/camera-buffer.js';
 import type { EventType, TranscodeJobData } from '../lib/types/index.js';
 
 const logger = createLogger('ring-listener');
@@ -161,11 +162,54 @@ async function processRecording(
 		// Link recording to event
 		eventsRepo.updateEventRecording(eventId, recording.id);
 
-		logger.info({ eventId, cameraId: camera.id }, 'Starting live stream recording...');
+		// Try to use pre-event buffer if available
+		const bufferManager = getBufferManager();
+		const cameraBuffer = bufferManager.getBuffer(camera.id.toString());
 
-		// Record live stream instead of downloading from cloud
-		await recordLiveStream(camera, recording.id, filePath, eventId);
+		if (cameraBuffer) {
+			const status = cameraBuffer.getStatus();
+			logger.info(
+				{
+					eventId,
+					cameraId: camera.id,
+					bufferActive: status.isActive,
+					bufferDuration: status.bufferDuration.toFixed(1),
+					bufferSize: status.bufferSize
+				},
+				'Using pre-event buffer for recording'
+			);
 
+			recordingsRepo.updateRecordingStatus(recording.id, 'processing');
+
+			// Ensure the directory exists
+			await ensureDir(filePath);
+
+			// Capture recording with pre-event buffer
+			const success = await cameraBuffer.captureEventRecording(eventId, filePath);
+
+			if (success) {
+				logger.info({ eventId, cameraId: camera.id, filePath }, 'Buffered recording completed');
+				console.log(`✅ Recording with pre-event buffer saved: ${filePath}\n`);
+
+				// Enqueue transcode job to generate thumbnail and get metadata
+				const jobData: TranscodeJobData = {
+					recordingId: recording.id,
+					sourceUrl: filePath,
+					deviceId: camera.id.toString(),
+					eventId,
+					timestamp: new Date().toISOString()
+				};
+
+				await addTranscodeJob(jobData);
+			} else {
+				logger.warn({ eventId, cameraId: camera.id }, 'Buffer capture failed, falling back to live stream');
+				await recordLiveStream(camera, recording.id, filePath, eventId);
+			}
+		} else {
+			// No buffer available, fall back to live stream recording
+			logger.info({ eventId, cameraId: camera.id }, 'No buffer available, using live stream recording');
+			await recordLiveStream(camera, recording.id, filePath, eventId);
+		}
 	} catch (error) {
 		logger.error({ error, eventId, cameraId: camera.id }, 'Failed to process recording');
 	}

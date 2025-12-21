@@ -2,10 +2,16 @@
 	import { onMount } from 'svelte';
 	import { DeviceCard, Badge } from '$lib/components';
 	import { devices, fetchDevices, devicesByType, onlineDevices, offlineDevices } from '$lib/stores/devices';
+	import type { Device } from '$lib/types';
 
 	onMount(() => {
 		fetchDevices();
 	});
+
+	function handleLiveView(device: Device) {
+		// Navigate to home page with device ID to open live view modal
+		window.location.href = `/?device=${device.id}#liveview`;
+	}
 </script>
 
 <svelte:head>
@@ -62,7 +68,11 @@
 				</h2>
 				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{#each $devicesByType.doorbells as device}
-						<DeviceCard {device} onclick={() => window.location.href = `/devices/${device.id}`} />
+						<DeviceCard
+							{device}
+							onclick={() => window.location.href = `/devices/${device.id}`}
+							onLiveView={() => handleLiveView(device)}
+						/>
 					{/each}
 				</div>
 			</div>
@@ -76,7 +86,11 @@
 				</h2>
 				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{#each $devicesByType.cameras as device}
-						<DeviceCard {device} onclick={() => window.location.href = `/devices/${device.id}`} />
+						<DeviceCard
+							{device}
+							onclick={() => window.location.href = `/devices/${device.id}`}
+							onLiveView={() => handleLiveView(device)}
+						/>
 					{/each}
 				</div>
 			</div>

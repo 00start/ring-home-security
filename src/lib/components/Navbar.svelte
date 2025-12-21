@@ -61,13 +61,13 @@
 			</div>
 			<div class="flex items-center">
 				{#if $user}
-					<span class="mr-4 text-sm text-zinc-500 dark:text-zinc-400">
+					<span class="mr-4 text-sm text-zinc-500 dark:text-zinc-400 cursor-default">
 						{$user.username}
 					</span>
 				{/if}
 				<button
 					onclick={handleLogout}
-					class="rounded-md px-3 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-300"
+					class="rounded-md px-3 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-300 cursor-pointer"
 				>
 					Logout
 				</button>

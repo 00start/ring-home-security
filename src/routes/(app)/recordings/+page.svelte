@@ -17,7 +17,7 @@
 		await fetchRecordings();
 	});
 
-	function handleFilter() {
+	function handleFilterChange() {
 		fetchRecordings({
 			deviceId: filterDevice || undefined,
 			status: filterStatus || undefined
@@ -110,8 +110,11 @@
 		<div class="grid gap-4 sm:grid-cols-3">
 			<Select
 				label="Device"
-				bind:value={filterDevice}
-				onchange={handleFilter}
+				value={filterDevice}
+				onchange={(e) => {
+					filterDevice = (e.target as HTMLSelectElement).value;
+					handleFilterChange();
+				}}
 			>
 				{#snippet children()}
 					<option value="">All Devices</option>
@@ -123,8 +126,11 @@
 
 			<Select
 				label="Status"
-				bind:value={filterStatus}
-				onchange={handleFilter}
+				value={filterStatus}
+				onchange={(e) => {
+					filterStatus = (e.target as HTMLSelectElement).value as RecordingStatus | '';
+					handleFilterChange();
+				}}
 			>
 				{#snippet children()}
 					<option value="">All Status</option>

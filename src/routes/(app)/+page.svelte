@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { StatCard, DeviceCard, EventCard, Modal } from '$lib/components';
 	import {
 		stats,
@@ -11,12 +11,16 @@
 	} from '$lib/stores';
 	import { formatBytes } from '$lib/utils';
 	import type { Device } from '$lib/types';
+	import type mpegtsType from 'mpegts.js';
 
 	let showLiveViewModal = $state(false);
 	let liveViewDevice = $state<Device | null>(null);
 	let liveViewLoading = $state(true);
 	let liveViewError = $state<string | null>(null);
 	let videoElement = $state<HTMLVideoElement | null>(null);
+	let mpegtsReady = $state(false);
+	let mpegtsPlayer: mpegtsType.Player | null = null;
+	let mpegtsModule: typeof mpegtsType | null = null;
 
 	// Prioritized devices: doorbells first, then cameras, then sensors
 	let prioritizedDevices = $derived.by(() => {
@@ -27,10 +31,21 @@
 		return sorted;
 	});
 
-	onMount(() => {
+	onMount(async () => {
 		fetchStats();
 		fetchDevices();
 		fetchEvents();
+
+		// Dynamically import mpegts.js (requires window)
+		mpegtsModule = (await import('mpegts.js')).default;
+		mpegtsReady = true;
+	});
+
+	// Start mpegts player when video element and device are ready
+	$effect(() => {
+		if (showLiveViewModal && videoElement && liveViewDevice && mpegtsReady) {
+			untrack(() => startMpegtsPlayer());
+		}
 	});
 
 	function handleLiveView(device: Device) {
@@ -40,16 +55,66 @@
 		liveViewLoading = true;
 	}
 
+	function startMpegtsPlayer() {
+		if (!videoElement || !liveViewDevice || !mpegtsModule) return;
+
+		// Clean up existing player
+		if (mpegtsPlayer) {
+			mpegtsPlayer.destroy();
+			mpegtsPlayer = null;
+		}
+
+		if (!mpegtsModule.isSupported()) {
+			liveViewError = 'MPEG-TS playback is not supported in this browser.';
+			liveViewLoading = false;
+			return;
+		}
+
+		// Use absolute URL for Web Worker compatibility
+		const streamUrl = new URL(`/api/devices/${liveViewDevice.id}/live`, window.location.origin).href;
+
+		mpegtsPlayer = mpegtsModule.createPlayer({
+			type: 'mpegts',
+			isLive: true,
+			url: streamUrl
+		}, {
+			enableWorker: true,
+			liveBufferLatencyChasing: true,
+			liveBufferLatencyMaxLatency: 1.5,
+			liveBufferLatencyMinRemain: 0.3
+		});
+
+		mpegtsPlayer.attachMediaElement(videoElement);
+
+		mpegtsPlayer.on(mpegtsModule.Events.ERROR, (errorType: string, errorDetail: string) => {
+			console.error('mpegts.js error:', errorType, errorDetail);
+			liveViewError = `Stream error: ${errorDetail}`;
+			liveViewLoading = false;
+		});
+
+		mpegtsPlayer.on(mpegtsModule.Events.LOADING_COMPLETE, () => {
+			console.log('Loading complete');
+		});
+
+		mpegtsPlayer.load();
+		mpegtsPlayer.play();
+	}
+
 	function closeLiveView() {
+		if (mpegtsPlayer) {
+			mpegtsPlayer.destroy();
+			mpegtsPlayer = null;
+		}
+
+		if (videoElement) {
+			videoElement.pause();
+			videoElement.src = '';
+		}
+
 		showLiveViewModal = false;
 		liveViewDevice = null;
 		liveViewError = null;
 		liveViewLoading = true;
-		if (videoElement) {
-			videoElement.pause();
-			videoElement.src = '';
-			videoElement = null;
-		}
 	}
 
 	function handleVideoLoaded() {
@@ -57,8 +122,11 @@
 	}
 
 	function handleVideoError() {
-		liveViewLoading = false;
-		liveViewError = 'Failed to load live stream. Please try again.';
+		// Only show error if mpegts player didn't already set one
+		if (!liveViewError) {
+			liveViewLoading = false;
+			liveViewError = 'Failed to load live stream. Please try again.';
+		}
 	}
 </script>
 
@@ -173,7 +241,7 @@
 </div>
 
 <!-- Live View Modal -->
-<Modal bind:open={showLiveViewModal} title="Live View - {liveViewDevice?.name ?? ''}">
+<Modal bind:open={showLiveViewModal} title="Live View - {liveViewDevice?.name ?? ''}" onclose={closeLiveView}>
 	{#snippet children()}
 		{#if liveViewDevice}
 			<div class="space-y-4">
@@ -188,20 +256,18 @@
 							</div>
 						</div>
 					{:else}
+						<!-- svelte-ignore a11y_media_has_caption -->
 						<video
 							bind:this={videoElement}
 							id="liveViewVideo"
 							class="w-full h-full"
-							src="/api/devices/{liveViewDevice.id}/live"
 							autoplay
 							muted
 							playsinline
 							controls
 							onloadeddata={handleVideoLoaded}
 							onerror={handleVideoError}
-						>
-							Your browser does not support video playback.
-						</video>
+						></video>
 
 						{#if liveViewLoading}
 							<div class="absolute top-4 right-4 bg-zinc-700 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">

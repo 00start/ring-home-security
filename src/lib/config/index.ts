@@ -38,7 +38,15 @@ const configSchema = z.object({
 
 	// FFmpeg
 	ffmpegPath: z.string().optional(),
-	ffprobePath: z.string().optional()
+	ffprobePath: z.string().optional(),
+
+	// Video Buffer
+	bufferPreEventSeconds: z.coerce.number().default(15),
+	bufferLatencyCompensationSeconds: z.coerce.number().default(10),
+	bufferSafetyMarginSeconds: z.coerce.number().default(5),
+	bufferPostEventSeconds: z.coerce.number().default(60),
+	bufferReconnectDelayMs: z.coerce.number().default(5000),
+	bufferMaxReconnectDelayMs: z.coerce.number().default(60000)
 });
 
 function loadConfig() {
@@ -60,7 +68,13 @@ function loadConfig() {
 		authPasswordHash: env.AUTH_PASSWORD_HASH,
 		logLevel: env.LOG_LEVEL,
 		ffmpegPath: env.FFMPEG_PATH,
-		ffprobePath: env.FFPROBE_PATH
+		ffprobePath: env.FFPROBE_PATH,
+		bufferPreEventSeconds: env.BUFFER_PRE_EVENT_SECONDS,
+		bufferLatencyCompensationSeconds: env.BUFFER_LATENCY_COMPENSATION_SECONDS,
+		bufferSafetyMarginSeconds: env.BUFFER_SAFETY_MARGIN_SECONDS,
+		bufferPostEventSeconds: env.BUFFER_POST_EVENT_SECONDS,
+		bufferReconnectDelayMs: env.BUFFER_RECONNECT_DELAY_MS,
+		bufferMaxReconnectDelayMs: env.BUFFER_MAX_RECONNECT_DELAY_MS
 	});
 
 	if (!result.success) {
