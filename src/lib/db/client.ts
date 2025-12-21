@@ -48,19 +48,28 @@ async function runMigrations(database: Database.Database): Promise<void> {
 	try {
 		const schema = readFileSync(schemaPath, 'utf-8');
 
-		// Split by semicolons and execute each statement
+		// Remove comments and split by semicolons
 		const statements = schema
+			.split('\n')
+			.filter((line) => !line.trim().startsWith('--'))
+			.join('\n')
 			.split(';')
 			.map((s) => s.trim())
-			.filter((s) => s.length > 0 && !s.startsWith('--'));
+			.filter((s) => s.length > 0);
+
+		logger.debug({ statementCount: statements.length }, 'Parsed statements');
 
 		for (const statement of statements) {
 			try {
+				logger.debug({ statement: statement.substring(0, 80) + '...' }, 'Executing statement');
 				database.exec(statement);
 			} catch (error) {
 				// Ignore "table already exists" errors for CREATE TABLE IF NOT EXISTS
 				if (error instanceof Error && !error.message.includes('already exists')) {
+					logger.error({ error, statement }, 'Failed to execute statement');
 					throw error;
+				} else {
+					logger.debug({ error }, 'Skipping statement (already exists)');
 				}
 			}
 		}

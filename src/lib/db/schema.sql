@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS devices (
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Events table
+-- Events table (without recording_id foreign key initially)
 CREATE TABLE IF NOT EXISTS events (
     id TEXT PRIMARY KEY,
     device_id TEXT NOT NULL,
@@ -25,8 +25,7 @@ CREATE TABLE IF NOT EXISTS events (
     metadata TEXT NOT NULL DEFAULT '{}',
     recording_id TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (device_id) REFERENCES devices(id),
-    FOREIGN KEY (recording_id) REFERENCES recordings(id)
+    FOREIGN KEY (device_id) REFERENCES devices(id)
 );
 
 -- Recordings table
