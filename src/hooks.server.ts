@@ -16,6 +16,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// Check authentication for protected routes
 	const auth = validateSession(event.cookies);
+	console.log('[AUTH] Path:', event.url.pathname, 'Auth:', !!auth);
 	event.locals.user = auth?.user ?? null;
 	event.locals.session = auth?.session ?? null;
 
@@ -25,6 +26,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		event.url.pathname.startsWith('/api/auth');
 
 	if (!isPublicRoute && !auth) {
+		console.log('[AUTH] Unauthorized access to:', event.url.pathname, 'Redirecting to login');
 		// Redirect to login for page requests
 		if (!event.url.pathname.startsWith('/api/')) {
 			return new Response(null, {

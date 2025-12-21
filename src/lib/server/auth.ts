@@ -16,7 +16,7 @@ export function setSessionCookie(cookies: Cookies, sessionId: string): void {
 		path: '/',
 		httpOnly: true,
 		sameSite: 'lax',
-		secure: process.env.NODE_ENV === 'production',
+		secure: import.meta.env.PROD,
 		maxAge: 60 * 60 * 24 * 7 // 1 week
 	});
 }
@@ -27,12 +27,15 @@ export function clearSessionCookie(cookies: Cookies): void {
 
 export function validateSession(cookies: Cookies): { user: User; session: Session } | null {
 	const sessionId = getSessionId(cookies);
+	console.log('[VALIDATE_SESSION] Session ID from cookie:', sessionId);
 	if (!sessionId) return null;
 
 	const session = authRepo.getSession(sessionId);
+	console.log('[VALIDATE_SESSION] Session found:', !!session);
 	if (!session) return null;
 
 	const user = authRepo.getUserById(session.userId);
+	console.log('[VALIDATE_SESSION] User found:', !!user);
 	if (!user) {
 		authRepo.deleteSession(sessionId);
 		return null;

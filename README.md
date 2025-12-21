@@ -28,7 +28,93 @@ This system uses a **single codebase, multiple processes** architecture:
 - ffmpeg (for video transcoding)
 - Ring account with refresh token
 
-## Getting Started
+## Quick Start Guide
+
+This guide assumes you have all prerequisites installed. Follow these steps to get your Ring Home Security system running:
+
+### Step 1: Install Dependencies
+
+```bash
+npm install
+```
+
+### Step 2: Start Redis
+
+**Option A: Using Docker (Recommended for Windows)**
+```bash
+docker compose -f docker/docker-compose.yml up -d redis
+```
+
+**Option B: Using Redis Server (Linux/macOS)**
+```bash
+redis-server
+```
+
+Verify Redis is running:
+```bash
+docker exec ring-security-redis redis-cli ping
+# Should return: PONG
+```
+
+### Step 3: Initialize the Database
+
+```bash
+npm run db:migrate
+```
+
+This creates the SQLite database and tables at `./data/ring-security.db` and sets up the default admin user.
+
+### Step 4: Get Your Ring Refresh Token
+
+```bash
+npx -p ring-client-api ring-auth-cli
+```
+
+Follow the prompts to:
+1. Enter your Ring email and password
+2. Complete 2FA if enabled
+3. Copy the refresh token that's displayed
+
+### Step 5: Configure Environment Variables
+
+Create a `.env` file (or edit the existing one) and add your Ring token:
+
+```env
+RING_REFRESH_TOKEN=your_refresh_token_here
+```
+
+All other settings have sensible defaults and are optional.
+
+### Step 6: Start the Application
+
+**Terminal 1 - Web Server:**
+```bash
+npm run dev
+```
+
+**Terminal 2 - Ring Listener (optional, only if you want to connect Ring devices):**
+```bash
+npm run worker:ring
+```
+
+**Terminal 3 - Transcode Worker (optional, only needed for video processing):**
+```bash
+npm run worker:transcode
+```
+
+### Step 7: Access the Dashboard
+
+1. Open your browser to http://localhost:5173 (development) or http://localhost:3000 (production)
+2. Log in with the default credentials:
+   - Username: `admin`
+   - Password: `admin`
+3. **Important:** Change your password in Settings!
+
+Your Ring devices should now appear on the dashboard, and events will be logged automatically.
+
+---
+
+## Getting Started (Detailed)
 
 ### 1. Clone and Install
 

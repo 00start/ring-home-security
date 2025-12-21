@@ -15,12 +15,13 @@
 		sensor: 'M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z'
 	};
 
-	function formatLastSeen(date: Date): string {
-		const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+	function formatLastSeen(date: Date | string): string {
+		const dateObj = typeof date === 'string' ? new Date(date) : date;
+		const seconds = Math.floor((Date.now() - dateObj.getTime()) / 1000);
 		if (seconds < 60) return 'Just now';
 		if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
 		if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-		return date.toLocaleDateString();
+		return dateObj.toLocaleDateString();
 	}
 </script>
 

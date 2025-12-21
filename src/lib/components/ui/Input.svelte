@@ -4,9 +4,10 @@
 	interface Props extends HTMLInputAttributes {
 		label?: string;
 		error?: string;
+		value?: string;
 	}
 
-	let { label, error, class: className = '', id, ...rest }: Props = $props();
+	let { label, error, class: className = '', id, value = $bindable(''), ...rest }: Props = $props();
 
 	const inputId = id ?? `input-${Math.random().toString(36).substr(2, 9)}`;
 </script>
@@ -19,6 +20,7 @@
 	{/if}
 	<input
 		id={inputId}
+		bind:value
 		class="block w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors
 			{error
 				? 'border-red-300 focus:border-red-500 focus:ring-red-500'

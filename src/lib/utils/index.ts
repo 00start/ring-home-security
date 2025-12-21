@@ -1,5 +1,5 @@
 export { logger, createLogger } from './logger';
-export { getRecordingPath, getThumbnailPath, ensureDir, getRelativePath } from './paths';
+// Path utilities are server-only - import directly from './paths' when needed on server
 
 /**
  * Sleep for a given number of milliseconds

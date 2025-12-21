@@ -51,7 +51,11 @@ export const GET: RequestHandler = async ({ request }) => {
 			request.signal.addEventListener('abort', () => {
 				closed = true;
 				clearInterval(interval);
-				controller.close();
+				try {
+					controller.close();
+				} catch (error) {
+					// Ignore errors if controller is already closed
+				}
 			});
 		}
 	});

@@ -26,15 +26,21 @@ export async function fetchDevices(): Promise<void> {
 	error.set(null);
 
 	try {
+		console.log('[DEVICES] Fetching devices...');
 		const response = await fetch('/api/devices');
+		console.log('[DEVICES] Response status:', response.status);
 		const data = await response.json();
+		console.log('[DEVICES] Response data:', data);
 
 		if (data.success) {
+			console.log('[DEVICES] Setting devices:', data.data.length, 'devices');
 			devices.set(data.data);
 		} else {
+			console.error('[DEVICES] Failed:', data.error);
 			error.set(data.error || 'Failed to fetch devices');
 		}
 	} catch (err) {
+		console.error('[DEVICES] Error:', err);
 		error.set('Failed to fetch devices');
 	} finally {
 		loading.set(false);

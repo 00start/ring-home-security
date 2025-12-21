@@ -10,6 +10,16 @@
 		fetchEvents
 	} from '$lib/stores';
 	import { formatBytes } from '$lib/utils';
+	import type { Device } from '$lib/types';
+
+	// Prioritized devices: doorbells first, then cameras, then sensors
+	let prioritizedDevices = $derived.by(() => {
+		const sorted = [...$devices].sort((a, b) => {
+			const priority = { doorbell: 0, camera: 1, sensor: 2 };
+			return priority[a.type] - priority[b.type];
+		});
+		return sorted;
+	});
 
 	onMount(() => {
 		fetchStats();
@@ -86,7 +96,7 @@
 						</p>
 					</div>
 				{:else}
-					{#each $devices.slice(0, 4) as device}
+					{#each prioritizedDevices.slice(0, 4) as device}
 						<DeviceCard {device} onclick={() => window.location.href = `/devices/${device.id}`} />
 					{/each}
 				{/if}

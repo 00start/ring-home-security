@@ -16,7 +16,8 @@ import type { Job } from 'bullmq';
 import { initDatabase, recordingsRepo } from '../lib/db/index.js';
 import { createTranscodeWorker, closeRedisConnection } from '../lib/queue/index.js';
 import { config } from '../lib/config/index.js';
-import { createLogger, ensureDir, getThumbnailPath } from '../lib/utils/index.js';
+import { createLogger } from '../lib/utils/index.js';
+import { ensureDir, getThumbnailPath } from '../lib/utils/paths.js';
 import type { TranscodeJobData, TranscodeJobResult } from '../lib/types/index.js';
 
 const logger = createLogger('transcode-worker');

@@ -68,10 +68,16 @@ export function getUserByUsername(username: string): UserRow | null {
 }
 
 export async function validatePassword(username: string, password: string): Promise<User | null> {
+	console.log('[VALIDATE] Username:', username, 'Password length:', password?.length);
 	const user = getUserByUsername(username);
-	if (!user) return null;
+	if (!user) {
+		console.log('[VALIDATE] User not found:', username);
+		return null;
+	}
 
+	console.log('[VALIDATE] User found, verifying password...');
 	const isValid = await verify(user.password_hash, password, HASH_OPTIONS);
+	console.log('[VALIDATE] Password valid:', isValid);
 	if (!isValid) return null;
 
 	return {

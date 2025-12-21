@@ -1,8 +1,10 @@
-import { config as dotenvConfig } from 'dotenv';
 import { z } from 'zod';
 
-// Load environment variables
-dotenvConfig();
+// Only load dotenv on server-side (Node.js environment)
+if (typeof process !== 'undefined' && process.versions?.node) {
+	const { config: dotenvConfig } = await import('dotenv');
+	dotenvConfig();
+}
 
 const configSchema = z.object({
 	// Ring
@@ -38,20 +40,23 @@ const configSchema = z.object({
 });
 
 function loadConfig() {
+	// Only access process.env on server-side
+	const env = typeof process !== 'undefined' ? process.env : {};
+
 	const result = configSchema.safeParse({
-		ringRefreshToken: process.env.RING_REFRESH_TOKEN,
-		databasePath: process.env.DATABASE_PATH,
-		redisUrl: process.env.REDIS_URL,
-		recordingsPath: process.env.RECORDINGS_PATH,
-		thumbnailsPath: process.env.THUMBNAILS_PATH,
-		retentionDays: process.env.RETENTION_DAYS,
-		port: process.env.PORT,
-		host: process.env.HOST,
-		authSecret: process.env.AUTH_SECRET,
-		authUsername: process.env.AUTH_USERNAME,
-		authPasswordHash: process.env.AUTH_PASSWORD_HASH,
-		logLevel: process.env.LOG_LEVEL,
-		ffmpegPath: process.env.FFMPEG_PATH
+		ringRefreshToken: env.RING_REFRESH_TOKEN,
+		databasePath: env.DATABASE_PATH,
+		redisUrl: env.REDIS_URL,
+		recordingsPath: env.RECORDINGS_PATH,
+		thumbnailsPath: env.THUMBNAILS_PATH,
+		retentionDays: env.RETENTION_DAYS,
+		port: env.PORT,
+		host: env.HOST,
+		authSecret: env.AUTH_SECRET,
+		authUsername: env.AUTH_USERNAME,
+		authPasswordHash: env.AUTH_PASSWORD_HASH,
+		logLevel: env.LOG_LEVEL,
+		ffmpegPath: env.FFMPEG_PATH
 	});
 
 	if (!result.success) {

@@ -11,21 +11,30 @@
 import { config as dotenvConfig } from 'dotenv';
 dotenvConfig();
 
-import { RingCamera, PushNotification, RingDeviceData } from 'ring-client-api';
+import { RingCamera } from 'ring-client-api';
 import { initDatabase, devicesRepo, eventsRepo, recordingsRepo } from '../lib/db/index.js';
 import { getRingApi, getCameras, getDevices, mapCameraType, mapDeviceType } from '../lib/ring/index.js';
 import { addTranscodeJob } from '../lib/queue/index.js';
-import { createLogger, retry, sleep, getRecordingPath } from '../lib/utils/index.js';
+import { createLogger, retry, sleep } from '../lib/utils/index.js';
+import { getRecordingPath } from '../lib/utils/paths.js';
 import type { EventType, TranscodeJobData } from '../lib/types/index.js';
 
 const logger = createLogger('ring-listener');
 
 let isShuttingDown = false;
 
+// Type for Ring device data (not exported in newer versions)
+interface RingDeviceData {
+	zid: string;
+	name: string;
+	faulted?: boolean;
+	[key: string]: any;
+}
+
 async function handleMotionOrDing(
 	camera: RingCamera,
 	eventType: 'motion' | 'ding',
-	notification: PushNotification
+	notification?: any
 ): Promise<void> {
 	const timestamp = new Date();
 
@@ -198,8 +207,38 @@ async function subscribeToCamera(camera: RingCamera): Promise<void> {
 		next: async (notification) => {
 			if (isShuttingDown) return;
 
-			const eventType = notification.ding.kind === 'ding' ? 'ding' : 'motion';
-			await handleMotionOrDing(camera, eventType, notification);
+			try {
+				// Handle different notification structures
+				let eventType: 'motion' | 'ding' = 'motion';
+
+				// New notification format (notification.data.event.ding.subtype)
+				if (notification.data?.event?.ding?.subtype === 'motion') {
+					eventType = 'motion';
+				} else if (notification.data?.event?.ding?.subtype === 'on_demand') {
+					eventType = 'ding';
+				} else if (notification.data?.event?.ding?.detection_type === 'motion') {
+					eventType = 'motion';
+				} else if (notification.data?.event?.ding?.detection_type === 'ding') {
+					eventType = 'ding';
+				}
+				// Old notification format (notification.ding.kind)
+				else if (notification.ding?.kind === 'ding') {
+					eventType = 'ding';
+				} else if (notification.ding?.kind === 'motion') {
+					eventType = 'motion';
+				}
+				// Fallback to action field
+				else if (notification.action === 'com.ring.push.HANDLE_NEW_DING') {
+					eventType = 'ding';
+				} else if (notification.action === 'com.ring.push.HANDLE_NEW_motion') {
+					eventType = 'motion';
+				}
+
+				logger.info({ deviceName: camera.name, eventType }, 'Received notification');
+				await handleMotionOrDing(camera, eventType, notification);
+			} catch (error) {
+				logger.error({ error, notification, cameraId: camera.id }, 'Error handling notification');
+			}
 		},
 		error: (error) => {
 			logger.error({ error, cameraId: camera.id }, 'Notification subscription error');
@@ -225,7 +264,9 @@ async function subscribeToSensors(): Promise<void> {
 			logger.info({ locationId: location.id, locationName: location.name }, 'Subscribing to location');
 
 			// Get all devices at this location
+			logger.debug('Fetching devices for location...');
 			const devices = await location.getDevices();
+			logger.info({ deviceCount: devices.length }, 'Found devices at location');
 
 			for (const device of devices) {
 				const deviceData = device.data as RingDeviceData;
@@ -262,6 +303,8 @@ async function subscribeToSensors(): Promise<void> {
 				}
 			});
 		}
+
+		logger.info('Sensor subscription completed');
 	} catch (error) {
 		logger.error({ error }, 'Failed to subscribe to sensors');
 	}
@@ -284,8 +327,10 @@ async function startListener(): Promise<void> {
 		await subscribeToCamera(camera);
 	}
 
-	// Subscribe to sensors
-	await subscribeToSensors();
+	// Subscribe to sensors (non-blocking, runs in background)
+	subscribeToSensors().catch((error) => {
+		logger.error({ error }, 'Sensor subscription failed, continuing without sensors');
+	});
 
 	logger.info('Ring listener started successfully');
 
