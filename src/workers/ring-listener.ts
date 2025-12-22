@@ -90,8 +90,7 @@ async function recordLiveStream(
 	try {
 		recordingsRepo.updateRecordingStatus(recordingId, 'processing');
 
-		logger.info({ recordingId, cameraId: camera.id }, 'Starting live stream capture');
-		console.log(`\n📹 Recording live stream for ${camera.name}...`);
+		logger.info({ recordingId, cameraId: camera.id, cameraName: camera.name }, 'Starting live stream capture');
 
 		// Ensure the directory exists
 		await ensureDir(filePath);
@@ -126,7 +125,6 @@ async function recordLiveStream(
 		streamSession.stop();
 
 		logger.info({ recordingId, filePath }, 'Live stream recording completed');
-		console.log(`✅ Recording saved: ${filePath}\n`);
 
 		// Enqueue transcode job to generate thumbnail and get metadata
 		const jobData: TranscodeJobData = {
@@ -190,7 +188,6 @@ async function processRecording(
 
 			if (success) {
 				logger.info({ eventId, cameraId: camera.id, filePath }, 'Buffered recording completed');
-				console.log(`✅ Recording with pre-event buffer saved: ${filePath}\n`);
 
 				// Enqueue transcode job to generate thumbnail and get metadata
 				const jobData: TranscodeJobData = {
@@ -237,8 +234,7 @@ async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<stri
 		// Note: Even without a subscription, we'll try the share/play endpoint
 		// which may work for recent recordings
 		if (cameraData.subscribed === false) {
-			logger.warn('No active subscription - will try share/play endpoint anyway');
-			console.log('\n⚠️  No Ring Protect subscription - attempting share/play endpoint...\n');
+			logger.warn({ cameraId: camera.id }, 'No active subscription - will try share/play endpoint anyway');
 		}
 
 		// Try to get the recording URL with retries (up to 2 minutes of retries)
@@ -293,12 +289,6 @@ async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<stri
 
 						throw new Error('Recording not yet available');
 					}
-
-					// Log the URL to terminal
-					console.log('\n=================================');
-					console.log('RECORDING URL FOUND:');
-					console.log(recordingUrl);
-					console.log('=================================\n');
 
 					logger.info({ dingId, url: recordingUrl, attemptCount }, 'Recording URL obtained successfully!');
 					return recordingUrl;
@@ -459,7 +449,6 @@ async function subscribeToSensors(): Promise<void> {
 		const locations = await api.getLocations();
 
 		logger.info({ locationCount: locations.length }, 'Found Ring locations');
-		console.log(`\n🏠 Found ${locations.length} Ring location(s)\n`);
 
 		for (const location of locations) {
 			logger.info({
@@ -469,21 +458,14 @@ async function subscribeToSensors(): Promise<void> {
 				hasHubs: location.hasHubs
 			}, 'Subscribing to location');
 
-			console.log(`📍 Location: ${location.name}`);
-			console.log(`   - Has Alarm Base Station: ${location.hasAlarmBaseStation}`);
-			console.log(`   - Has Hubs: ${location.hasHubs}`);
-
 			// Skip if no hubs (getDevices will return empty anyway)
 			if (!location.hasHubs) {
-				console.log('   ⚠️ Location has no hubs, skipping device fetch');
+				logger.warn({ locationName: location.name }, 'Location has no hubs, skipping device fetch');
 				continue;
 			}
 
 			// Get all devices at this location with a timeout
-			console.log('   🔄 Fetching Ring Alarm devices (may take up to 30s)...');
-			// Force flush stdout to ensure message is visible
-			process.stdout.write('');
-			logger.debug('Fetching devices for location...');
+			logger.debug({ locationName: location.name }, 'Fetching Ring Alarm devices (may take up to 30s)');
 			let devices;
 			try {
 				// Add a timeout to prevent hanging forever
@@ -495,30 +477,23 @@ async function subscribeToSensors(): Promise<void> {
 					location.getDevices(),
 					timeoutPromise
 				]);
-				console.log(`   ✅ getDevices() returned ${devices?.length ?? 'null'} devices`);
+				logger.debug({ deviceCount: devices?.length ?? 0, locationName: location.name }, 'getDevices() completed');
 			} catch (deviceError) {
+				const errorMessage = String(deviceError);
 				logger.error({ error: deviceError, locationName: location.name }, 'Failed to get devices for location');
-				console.log(`   ❌ Failed to get devices: ${deviceError}`);
 
-				if (String(deviceError).includes('Timeout')) {
-					console.log('   ℹ️ The Ring Alarm base station may be offline or taking too long to respond.');
-					console.log('   ℹ️ All Ring Alarm hubs must be online for device discovery to complete.');
-					console.log('   ℹ️ Try checking your Ring app to ensure all devices show as online.');
+				if (errorMessage.includes('Timeout')) {
+					logger.warn({ locationName: location.name }, 'Ring Alarm base station may be offline or taking too long to respond');
 				}
 				continue;
 			}
 
 			if (!devices || devices.length === 0) {
-				console.log('   ⚠️ No devices returned from getDevices()');
-				console.log('   ℹ️ This could mean:');
-				console.log('      - No Ring Alarm sensors are configured');
-				console.log('      - The Ring Alarm base station is offline');
-				console.log('      - A hub failed to respond in time');
+				logger.warn({ locationName: location.name }, 'No devices returned from getDevices() - sensors may not be configured or base station offline');
 				continue;
 			}
 
-			logger.info({ deviceCount: devices.length }, 'Found devices at location');
-			console.log(`   📱 Found ${devices.length} device(s)\n`);
+			logger.info({ deviceCount: devices.length, locationName: location.name }, 'Found devices at location');
 
 			for (const device of devices) {
 				const deviceData = device.data as RingDeviceData;
@@ -535,17 +510,6 @@ async function subscribeToSensors(): Promise<void> {
 					hasFaulted: 'faulted' in deviceData,
 					deviceData: JSON.stringify(deviceData).substring(0, 500)
 				}, 'Found device');
-
-				const statusIcon = deviceTypeInfo.type === 'sensor' ? '🔸' :
-					deviceTypeInfo.type === 'misc' ? '⚙️' : '🔹';
-				console.log(`      ${statusIcon} ${deviceData.name || 'Unknown'}`);
-				console.log(`         Ring Type: ${ringDeviceType}`);
-				console.log(`         Category: ${deviceTypeInfo.type}${deviceTypeInfo.subtype ? ` (${deviceTypeInfo.subtype})` : ''}`);
-				console.log(`         ID: ${deviceData.zid}`);
-				if ('faulted' in deviceData) {
-					const state = deviceData.faulted ? '🔓 OPEN' : '🔒 CLOSED';
-					console.log(`         State: ${state}`);
-				}
 
 				// Register device in database with type and subtype
 				devicesRepo.upsertDevice({
@@ -668,17 +632,8 @@ async function subscribeToSensors(): Promise<void> {
 		}
 
 		logger.info('Sensor subscription completed');
-		console.log('\n✅ Sensor subscription completed\n');
 	} catch (error) {
 		logger.error({ error }, 'Failed to subscribe to sensors');
-		console.error('\n❌ Failed to subscribe to sensors:', error);
-
-		// Log more details
-		if (error instanceof Error) {
-			console.error('   Error name:', error.name);
-			console.error('   Error message:', error.message);
-			console.error('   Stack:', error.stack);
-		}
 	}
 }
 
@@ -708,20 +663,13 @@ async function startListener(): Promise<void> {
 		await subscribeToCamera(camera);
 	}
 
-	// Subscribe to sensors (await to see full output for debugging)
-	console.log('\n' + '='.repeat(50));
-	console.log('🔍 STARTING SENSOR SUBSCRIPTION');
-	console.log('='.repeat(50) + '\n');
+	// Subscribe to sensors
+	logger.info('Starting sensor subscription');
 	try {
 		await subscribeToSensors();
-		console.log('\n' + '='.repeat(50));
-		console.log('✅ SENSOR SUBSCRIPTION COMPLETE');
-		console.log('='.repeat(50) + '\n');
+		logger.info('Sensor subscription complete');
 	} catch (error) {
 		logger.error({ error }, 'Sensor subscription failed, continuing without sensors');
-		console.error('\n' + '='.repeat(50));
-		console.error('❌ SENSOR SUBSCRIPTION FAILED:', error);
-		console.error('='.repeat(50) + '\n');
 	}
 
 	logger.info('Ring listener started successfully');

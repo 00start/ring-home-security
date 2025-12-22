@@ -8,22 +8,25 @@ import { config as dotenvConfig } from 'dotenv';
 dotenvConfig();
 
 import { initDatabase, closeDatabase, authRepo } from './index.js';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('db-migrate');
 
 async function migrate() {
-	console.log('Starting database migration...');
+	logger.info('Starting database migration');
 
 	try {
 		// Initialize database (runs schema creation)
 		await initDatabase();
-		console.log('Database schema created/updated');
+		logger.info('Database schema created/updated');
 
 		// Ensure default admin user exists
 		await authRepo.ensureDefaultUser();
-		console.log('Default user ensured');
+		logger.info('Default user ensured');
 
-		console.log('Migration completed successfully');
+		logger.info('Migration completed successfully');
 	} catch (error) {
-		console.error('Migration failed:', error);
+		logger.error({ error }, 'Migration failed');
 		process.exit(1);
 	} finally {
 		closeDatabase();

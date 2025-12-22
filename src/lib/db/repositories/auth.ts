@@ -2,6 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { hash, verify } from '@node-rs/argon2';
 import { getDatabase } from '../client';
 import type { User, Session } from '$lib/types';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('auth-repo');
 
 interface UserRow {
 	id: string;
@@ -68,16 +71,16 @@ export function getUserByUsername(username: string): UserRow | null {
 }
 
 export async function validatePassword(username: string, password: string): Promise<User | null> {
-	console.log('[VALIDATE] Username:', username, 'Password length:', password?.length);
+	logger.debug({ username }, 'Validating password');
 	const user = getUserByUsername(username);
 	if (!user) {
-		console.log('[VALIDATE] User not found:', username);
+		logger.debug({ username }, 'User not found');
 		return null;
 	}
 
-	console.log('[VALIDATE] User found, verifying password...');
+	logger.trace({ username }, 'User found, verifying password');
 	const isValid = await verify(user.password_hash, password, HASH_OPTIONS);
-	console.log('[VALIDATE] Password valid:', isValid);
+	logger.debug({ username, isValid }, 'Password verification complete');
 	if (!isValid) return null;
 
 	return {

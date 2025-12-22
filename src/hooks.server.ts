@@ -2,6 +2,9 @@ import type { Handle } from '@sveltejs/kit';
 import { ensureDatabase } from '$lib/server/db';
 import { validateSession } from '$lib/server/auth';
 import { authRepo } from '$lib/db';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('hooks');
 
 // Initialize database on first request
 let dbInitialized = false;
@@ -16,7 +19,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// Check authentication for protected routes
 	const auth = validateSession(event.cookies);
-	console.log('[AUTH] Path:', event.url.pathname, 'Auth:', !!auth);
+	logger.debug({ path: event.url.pathname, authenticated: !!auth }, 'Request authentication check');
 	event.locals.user = auth?.user ?? null;
 	event.locals.session = auth?.session ?? null;
 
@@ -27,7 +30,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		event.url.pathname === '/api/auth/logout';
 
 	if (!isPublicRoute && !auth) {
-		console.log('[AUTH] Unauthorized access to:', event.url.pathname, 'Redirecting to login');
+		logger.debug({ path: event.url.pathname }, 'Unauthorized access, redirecting to login');
 		// Redirect to login for page requests
 		if (!event.url.pathname.startsWith('/api/')) {
 			return new Response(null, {

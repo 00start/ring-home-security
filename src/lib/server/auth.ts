@@ -4,7 +4,9 @@
 import type { Cookies } from '@sveltejs/kit';
 import { authRepo } from '$lib/db';
 import type { User, Session } from '$lib/types';
+import { createLogger } from '$lib/utils/logger.server';
 
+const logger = createLogger('auth');
 const SESSION_COOKIE_NAME = 'session';
 
 export function getSessionId(cookies: Cookies): string | null {
@@ -27,15 +29,15 @@ export function clearSessionCookie(cookies: Cookies): void {
 
 export function validateSession(cookies: Cookies): { user: User; session: Session } | null {
 	const sessionId = getSessionId(cookies);
-	console.log('[VALIDATE_SESSION] Session ID from cookie:', sessionId);
+	logger.trace({ hasSessionId: !!sessionId }, 'Validating session');
 	if (!sessionId) return null;
 
 	const session = authRepo.getSession(sessionId);
-	console.log('[VALIDATE_SESSION] Session found:', !!session);
+	logger.trace({ sessionFound: !!session }, 'Session lookup');
 	if (!session) return null;
 
 	const user = authRepo.getUserById(session.userId);
-	console.log('[VALIDATE_SESSION] User found:', !!user);
+	logger.trace({ userFound: !!user }, 'User lookup');
 	if (!user) {
 		authRepo.deleteSession(sessionId);
 		return null;

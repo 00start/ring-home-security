@@ -1,0 +1,5 @@
+# Verbose logging override - use with: docker compose -f docker-compose.yml -f docker-compose.verbose.yml up -d
+services:
+  app:
+    environment:
+      - LOG_LEVEL=debug

@@ -1,26 +1,29 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { login } from '$lib/server/auth';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-login');
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	try {
 		const { username, password } = await request.json();
 
-		console.log('[LOGIN] Attempt:', { username, passwordLength: password?.length });
+		logger.debug({ username }, 'Login attempt');
 
 		if (!username || !password) {
-			console.log('[LOGIN] Missing credentials');
+			logger.debug({ username }, 'Missing credentials');
 			return json({ success: false, error: 'Username and password required' }, { status: 400 });
 		}
 
 		const user = await login(username, password, cookies);
 
 		if (!user) {
-			console.log('[LOGIN] Invalid credentials for username:', username);
+			logger.info({ username }, 'Invalid credentials');
 			return json({ success: false, error: 'Invalid credentials' }, { status: 401 });
 		}
 
-		console.log('[LOGIN] Success for user:', username);
+		logger.info({ username }, 'Login successful');
 
 		return json({
 			success: true,
@@ -30,7 +33,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			}
 		});
 	} catch (error) {
-		console.error('Login error:', error);
+		logger.error({ error }, 'Login error');
 		return json({ success: false, error: 'Internal server error' }, { status: 500 });
 	}
 };

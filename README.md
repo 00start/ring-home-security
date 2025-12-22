@@ -2,6 +2,67 @@
 
 A self-hosted Node.js/TypeScript application for recording Ring doorbell and camera video feeds, logging sensor events, and providing a web-based dashboard for viewing and searching historical data.
 
+## Quick Start with Docker (Recommended)
+
+The easiest way to get started is with Docker:
+
+```bash
+# 1. Create a directory and download the config files
+mkdir ring-security && cd ring-security
+curl -O https://raw.githubusercontent.com/stef-the/ring-home-security/main/docker-compose.yml
+curl -O https://raw.githubusercontent.com/stef-the/ring-home-security/main/.env.example
+mv .env.example .env
+
+# 2. Get your Ring refresh token
+npx -p ring-client-api ring-auth-cli
+
+# 3. Edit .env with your token and generate a secure AUTH_SECRET
+# RING_REFRESH_TOKEN=your_token_here
+# AUTH_SECRET=$(openssl rand -hex 32)
+
+# 4. Start the application
+docker compose up -d
+```
+
+Then open http://localhost:3000 and log in with `admin` / `admin` (change this immediately in Settings).
+
+**Requirements:** Docker and Docker Compose
+
+### Docker Commands
+
+```bash
+# Start normally
+docker compose up -d
+
+# Start with verbose/debug logging
+docker compose -f docker-compose.yml -f docker-compose.verbose.yml up -d
+
+# View logs
+docker compose logs -f
+
+# Stop
+docker compose down
+
+# Update to latest version
+docker compose pull && docker compose up -d
+```
+
+Or use the helper scripts (if you cloned the repo):
+
+```bash
+# Linux/macOS
+./start.sh              # Start normally
+./start.sh --verbose    # Start with debug logging
+./start.sh --logs       # Follow logs
+./start.sh --stop       # Stop containers
+
+# Windows PowerShell
+.\start.ps1             # Start normally
+.\start.ps1 -Verbose    # Start with debug logging
+.\start.ps1 -Logs       # Follow logs
+.\start.ps1 -Stop       # Stop containers
+```
+
 ## Features
 
 - **Ring Integration**: Connect to Ring API to monitor doorbells, cameras, and sensors
@@ -32,7 +93,21 @@ This system uses a **single codebase, multiple processes** architecture:
 - ffmpeg (for video transcoding)
 - Ring account with refresh token
 
-## Quick Start Guide
+## Alternative: Clone and Build
+
+If you want to modify the code or run without Docker:
+
+```bash
+# Clone the repository
+git clone https://github.com/stef-the/ring-home-security.git
+cd ring-home-security
+
+# Copy and configure environment
+cp .env.example .env
+# Edit .env with your RING_REFRESH_TOKEN and AUTH_SECRET
+```
+
+### Manual Setup Guide
 
 This guide assumes you have all prerequisites installed. Follow these steps to get your Ring Home Security system running:
 
