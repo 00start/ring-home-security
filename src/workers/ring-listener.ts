@@ -19,6 +19,7 @@ import { retry, sleep } from '../lib/utils/index.js';
 import { createLogger } from '../lib/utils/logger.server.js';
 import { getRecordingPath, ensureDir } from '../lib/utils/paths.js';
 import { getBufferManager } from '../lib/utils/camera-buffer.js';
+import { config } from '../lib/config/index.js';
 import type { EventType, TranscodeJobData } from '../lib/types/index.js';
 
 const logger = createLogger('ring-listener');
@@ -90,17 +91,20 @@ async function recordLiveStream(
 	try {
 		recordingsRepo.updateRecordingStatus(recordingId, 'processing');
 
-		logger.info({ recordingId, cameraId: camera.id, cameraName: camera.name }, 'Starting live stream capture');
+		// Use configurable recording duration (battery-friendly default: 30s)
+		const recordingDuration = config.recordingDurationSeconds;
+
+		logger.info(
+			{ recordingId, cameraId: camera.id, cameraName: camera.name, durationSeconds: recordingDuration },
+			'Starting live stream capture'
+		);
 
 		// Ensure the directory exists
 		await ensureDir(filePath);
 
-		// Stream video to file for 60 seconds (adjustable)
-		const RECORDING_DURATION = 60 * 1000; // 60 seconds
-
 		const streamSession = await camera.streamVideo({
 			output: [
-				'-t', '60', // Record for 60 seconds
+				'-t', recordingDuration.toString(),
 				'-f', 'mp4',
 				'-movflags', 'frag_keyframe+empty_moov',
 				'-reset_timestamps', '1',
@@ -108,7 +112,7 @@ async function recordLiveStream(
 			]
 		});
 
-		logger.info({ recordingId }, 'Stream session started, recording...');
+		logger.info({ recordingId, durationSeconds: recordingDuration }, 'Stream session started, recording...');
 
 		// Wait for recording to complete or timeout
 		await Promise.race([
@@ -118,7 +122,7 @@ async function recordLiveStream(
 					resolve(undefined);
 				});
 			}),
-			sleep(RECORDING_DURATION + 5000) // Add 5s buffer
+			sleep((recordingDuration * 1000) + 5000) // Add 5s buffer
 		]);
 
 		// Stop the stream
@@ -640,6 +644,15 @@ async function subscribeToSensors(): Promise<void> {
 async function startListener(): Promise<void> {
 	logger.info('Starting Ring listener worker');
 
+	// Log battery optimization settings
+	logger.info({
+		bufferEnabled: config.bufferEnabled,
+		ringPollingIntervalSeconds: config.ringPollingIntervalSeconds,
+		batteryLowThreshold: config.batteryLowThreshold,
+		liveViewTimeoutSeconds: config.liveViewTimeoutSeconds,
+		recordingDurationSeconds: config.recordingDurationSeconds
+	}, 'Battery optimization settings');
+
 	// Initialize database
 	await initDatabase();
 
@@ -652,7 +665,11 @@ async function startListener(): Promise<void> {
 
 	// Initialize camera buffer manager for pre-event recording
 	const bufferManager = getBufferManager();
-	logger.info('Initializing camera buffer manager for pre-event recording');
+	if (config.bufferEnabled) {
+		logger.info('Pre-event buffering ENABLED - continuous streaming will drain battery faster');
+	} else {
+		logger.info('Pre-event buffering DISABLED - battery-friendly mode active');
+	}
 	await bufferManager.initialize(cameras);
 
 	// Log buffer status

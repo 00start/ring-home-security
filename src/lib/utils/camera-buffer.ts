@@ -107,11 +107,14 @@ export class CameraBuffer {
 	private isCapturing = false;
 	private reconnectAttempts = 0;
 	private shouldReconnect = true;
+	private isPausedForBattery = false;
+	private batteryLevel: number | null = null;
 
 	constructor(camera: RingCamera) {
 		this.camera = camera;
 		this.cameraId = camera.id.toString();
 		this.cameraName = camera.name;
+		this.batteryLevel = camera.batteryLevel ?? null;
 
 		// Total buffer time = pre-event + latency compensation + safety margin
 		const totalBufferSeconds =
@@ -120,6 +123,65 @@ export class CameraBuffer {
 			config.bufferSafetyMarginSeconds;
 
 		this.buffer = new CircularBuffer(totalBufferSeconds);
+
+		// Subscribe to battery level updates
+		if (camera.onBatteryLevel) {
+			camera.onBatteryLevel.subscribe({
+				next: (level) => {
+					if (level !== undefined && level !== null) {
+						this.handleBatteryUpdate(level);
+					}
+				}
+			});
+		}
+	}
+
+	/**
+	 * Handle battery level updates and pause/resume buffering accordingly
+	 */
+	private handleBatteryUpdate(level: number): void {
+		const previousLevel = this.batteryLevel;
+		this.batteryLevel = level;
+
+		const threshold = config.batteryLowThreshold;
+		if (threshold <= 0) return; // Battery optimization disabled
+
+		const wasLow = previousLevel !== null && previousLevel < threshold;
+		const isLow = level < threshold;
+
+		if (isLow && !wasLow && this.isActive) {
+			// Battery dropped below threshold, pause streaming
+			logger.info(
+				{ cameraId: this.cameraId, batteryLevel: level, threshold },
+				'Battery low - pausing buffer stream to conserve power'
+			);
+			this.isPausedForBattery = true;
+			this.stop();
+		} else if (!isLow && wasLow && this.isPausedForBattery && config.bufferEnabled) {
+			// Battery recovered above threshold, resume if buffering is enabled
+			logger.info(
+				{ cameraId: this.cameraId, batteryLevel: level, threshold },
+				'Battery recovered - resuming buffer stream'
+			);
+			this.isPausedForBattery = false;
+			this.start();
+		}
+	}
+
+	/**
+	 * Check if buffering should be active based on battery level
+	 */
+	private shouldBuffer(): boolean {
+		if (!config.bufferEnabled) {
+			return false;
+		}
+
+		const threshold = config.batteryLowThreshold;
+		if (threshold > 0 && this.batteryLevel !== null && this.batteryLevel < threshold) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -128,6 +190,19 @@ export class CameraBuffer {
 	async start(): Promise<void> {
 		if (this.isActive) {
 			logger.warn({ cameraId: this.cameraId }, 'Buffer already active');
+			return;
+		}
+
+		if (!this.shouldBuffer()) {
+			logger.info(
+				{
+					cameraId: this.cameraId,
+					bufferEnabled: config.bufferEnabled,
+					batteryLevel: this.batteryLevel,
+					threshold: config.batteryLowThreshold
+				},
+				'Buffer not started - disabled or battery too low'
+			);
 			return;
 		}
 
@@ -201,6 +276,15 @@ export class CameraBuffer {
 	}
 
 	private scheduleReconnect(): void {
+		// Don't reconnect if battery is low or buffering is disabled
+		if (!this.shouldBuffer()) {
+			logger.info(
+				{ cameraId: this.cameraId, batteryLevel: this.batteryLevel },
+				'Skipping reconnect - buffering disabled or battery low'
+			);
+			return;
+		}
+
 		const delay = Math.min(
 			config.bufferReconnectDelayMs * Math.pow(2, this.reconnectAttempts),
 			config.bufferMaxReconnectDelayMs
@@ -213,7 +297,7 @@ export class CameraBuffer {
 		);
 
 		setTimeout(async () => {
-			if (this.shouldReconnect && !this.isActive) {
+			if (this.shouldReconnect && !this.isActive && this.shouldBuffer()) {
 				await this.startStream();
 			}
 		}, delay);
@@ -240,12 +324,23 @@ export class CameraBuffer {
 	/**
 	 * Get buffer status
 	 */
-	getStatus(): { isActive: boolean; isCapturing: boolean; bufferDuration: number; bufferSize: number } {
+	getStatus(): {
+		isActive: boolean;
+		isCapturing: boolean;
+		bufferDuration: number;
+		bufferSize: number;
+		batteryLevel: number | null;
+		isPausedForBattery: boolean;
+		bufferEnabled: boolean;
+	} {
 		return {
 			isActive: this.isActive,
 			isCapturing: this.isCapturing,
 			bufferDuration: this.buffer.getBufferedDuration(),
-			bufferSize: this.buffer.getSize()
+			bufferSize: this.buffer.getSize(),
+			batteryLevel: this.batteryLevel,
+			isPausedForBattery: this.isPausedForBattery,
+			bufferEnabled: config.bufferEnabled
 		};
 	}
 
