@@ -19,6 +19,7 @@ import { retry, sleep } from '../lib/utils/index.js';
 import { createLogger } from '../lib/utils/logger.server.js';
 import { getRecordingPath, ensureDir } from '../lib/utils/paths.js';
 import { getBufferManager } from '../lib/utils/camera-buffer.js';
+import { getZoneManager } from '../lib/utils/camera-zones.js';
 import { config } from '../lib/config/index.js';
 import type { EventType, TranscodeJobData } from '../lib/types/index.js';
 
@@ -76,7 +77,24 @@ async function handleMotionOrDing(
 
 	logger.info({ eventId: event.id, dingId }, 'Event created successfully');
 
+	// Check if this camera triggers zone-based recording
+	if (eventType === 'motion') {
+		const zoneManager = getZoneManager();
+		const zoneResult = await zoneManager.handleMotion(camera);
+
+		if (zoneResult.triggered) {
+			logger.info({
+				cameraName: camera.name,
+				zones: zoneResult.zones
+			}, 'Zone recording triggered by motion');
+			// Zone recordings are handled by the zone manager callback
+			// The original camera recording will be started by the zone manager
+			return;
+		}
+	}
+
 	// Process recording in background (don't block event creation)
+	// This handles cameras not part of a zone, or doorbell events
 	processRecording(camera, event.id, dingId, timestamp).catch((error) => {
 		logger.error({ error, eventId: event.id }, 'Background recording processing failed');
 	});
@@ -215,6 +233,50 @@ async function processRecording(
 	} catch (error) {
 		logger.error({ error, eventId, cameraId: camera.id }, 'Failed to process recording');
 	}
+}
+
+/**
+ * Handle zone-triggered recording for a camera
+ * Called by the zone manager when motion is detected on an edge camera
+ */
+async function handleZoneRecording(
+	camera: RingCamera,
+	triggeredBy: string,
+	zoneName: string
+): Promise<void> {
+	const timestamp = new Date();
+
+	logger.info({
+		cameraId: camera.id,
+		cameraName: camera.name,
+		triggeredBy,
+		zoneName
+	}, 'Zone-triggered recording started');
+
+	// Ensure device exists in database
+	devicesRepo.upsertDevice({
+		id: camera.id.toString(),
+		name: camera.name,
+		type: mapCameraType(camera),
+		batteryLevel: camera.batteryLevel ?? undefined,
+		isOnline: true
+	});
+
+	// Create event record for zone-triggered recording
+	const event = eventsRepo.createEvent({
+		deviceId: camera.id.toString(),
+		deviceName: camera.name,
+		eventType: 'motion',
+		timestamp,
+		metadata: {
+			zoneTriggered: true,
+			triggeredBy,
+			zoneName
+		}
+	});
+
+	// Process the recording
+	await processRecording(camera, event.id, `zone-${zoneName}-${Date.now()}`, timestamp);
 }
 
 async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<string | null> {
@@ -676,6 +738,15 @@ async function startListener(): Promise<void> {
 	const bufferStatus = bufferManager.getStatus();
 	logger.info({ bufferStatus }, 'Camera buffers initialized');
 
+	// Initialize camera zone manager for zone-based recording
+	const zoneManager = getZoneManager();
+	zoneManager.initialize(cameras);
+	zoneManager.setRecordingCallback(handleZoneRecording);
+
+	// Log zone status
+	const zoneStatus = zoneManager.getStatus();
+	logger.info({ zoneStatus }, 'Camera zones initialized');
+
 	for (const camera of cameras) {
 		await subscribeToCamera(camera);
 	}
@@ -699,7 +770,10 @@ async function startListener(): Promise<void> {
 
 			logger.info('Shutting down Ring listener');
 
-			// Shutdown buffer manager first
+			// Shutdown zone manager first (stops ongoing zone recordings)
+			zoneManager.shutdown();
+
+			// Shutdown buffer manager
 			bufferManager.shutdown();
 
 			api.disconnect();
