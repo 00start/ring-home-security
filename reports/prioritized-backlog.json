@@ -1,0 +1,143 @@
+{
+  "generated": "2024-12-27",
+  "agent": "Product Owner Sprint Agent v1.0",
+  "sprint_status": "complete",
+  "next_sprint": [
+    {
+      "id": "BLK-001",
+      "type": "blocker",
+      "priority": "P0",
+      "title": "Add remaining data-testid attributes",
+      "description": "Components missing test selectors: EventCard, StatCard, Settings sections, Error messages",
+      "acceptance_criteria": [
+        "All major components have data-testid attributes",
+        "E2E selector failures reduced by 90%"
+      ],
+      "estimated_effort": "2 hours",
+      "dependencies": []
+    },
+    {
+      "id": "BLK-002",
+      "type": "blocker",
+      "priority": "P0",
+      "title": "Fix axe-core CDN dependency",
+      "description": "Switch accessibility tests from CDN to local @axe-core/playwright package",
+      "acceptance_criteria": [
+        "All a11y tests use local axe-core",
+        "No CDN requests in test runs"
+      ],
+      "estimated_effort": "1 hour",
+      "dependencies": []
+    },
+    {
+      "id": "BLK-003",
+      "type": "blocker",
+      "priority": "P0",
+      "title": "Create test database seeding",
+      "description": "Seed test data (devices, events, recordings) for E2E tests",
+      "acceptance_criteria": [
+        "Global setup seeds 3+ devices",
+        "Seeds 10+ events with recordings",
+        "Tests can run without real Ring API"
+      ],
+      "estimated_effort": "2 hours",
+      "dependencies": []
+    },
+    {
+      "id": "GAP-001",
+      "type": "gap",
+      "priority": "P1",
+      "title": "Implement battery warning banner",
+      "description": "Dashboard-level warning when any camera has low battery",
+      "acceptance_criteria": [
+        "Banner appears when battery <20%",
+        "Critical banner when <10%",
+        "Dismissable with snooze option"
+      ],
+      "estimated_effort": "2 hours",
+      "dependencies": []
+    },
+    {
+      "id": "GAP-002",
+      "type": "gap",
+      "priority": "P1",
+      "title": "Implement pre-buffer toggle in settings",
+      "description": "Zone settings should include pre-event buffer toggle",
+      "acceptance_criteria": [
+        "Toggle visible in zone settings",
+        "Shows battery impact warning",
+        "Persists on save"
+      ],
+      "estimated_effort": "2 hours",
+      "dependencies": []
+    },
+    {
+      "id": "GAP-003",
+      "type": "gap",
+      "priority": "P1",
+      "title": "Fix pre-existing type errors",
+      "description": "35 type errors in device page and components",
+      "acceptance_criteria": [
+        "npm run check passes with 0 errors",
+        "All null checks added"
+      ],
+      "estimated_effort": "2 hours",
+      "dependencies": []
+    },
+    {
+      "id": "GAP-004",
+      "type": "gap",
+      "priority": "P1",
+      "title": "Add missing requirement tests",
+      "description": "Tests for BR-3 (retention), BR-4 (auto-terminate), BO-3 (cloud reduction)",
+      "acceptance_criteria": [
+        "BR-3 has 2+ passing tests",
+        "BR-4 has clock mocking for timeout test",
+        "BO-3 verified with storage tests"
+      ],
+      "estimated_effort": "3 hours",
+      "dependencies": []
+    }
+  ],
+  "future": [
+    {
+      "id": "IMP-001",
+      "type": "improvement",
+      "priority": "P2",
+      "title": "Performance optimization",
+      "description": "Dashboard load time exceeding 30 seconds in tests",
+      "estimated_effort": "3 hours"
+    },
+    {
+      "id": "IMP-002",
+      "type": "improvement",
+      "priority": "P2",
+      "title": "Accessibility improvements",
+      "description": "WCAG 2.1 AA compliance, screen reader, keyboard nav",
+      "estimated_effort": "4 hours"
+    }
+  ],
+  "icebox": [
+    {
+      "id": "FTR-001",
+      "type": "feature",
+      "priority": "P3",
+      "title": "Multi-clip download feature",
+      "description": "Download zone-triggered event groups as single file"
+    },
+    {
+      "id": "FTR-002",
+      "type": "feature",
+      "priority": "P3",
+      "title": "Zone trigger latency measurement",
+      "description": "Verify <500ms cascade trigger SLA"
+    }
+  ],
+  "summary": {
+    "p0_blockers": 3,
+    "p1_gaps": 4,
+    "p2_improvements": 2,
+    "p3_features": 2,
+    "total_estimated_hours": 14
+  }
+}
