@@ -4,4 +4,3 @@ export { default as Badge } from './Badge.svelte';
 export { default as Modal } from './Modal.svelte';
 export { default as Input } from './Input.svelte';
 export { default as Select } from './Select.svelte';
-export { default as Accordion } from './Accordion.svelte';
