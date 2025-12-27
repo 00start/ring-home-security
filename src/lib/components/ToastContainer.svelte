@@ -75,6 +75,7 @@
 					data-testid="toast-dismiss"
 					class="flex-shrink-0 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
 					onclick={() => toasts.dismiss(toast.id)}
+					aria-label="Dismiss notification"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

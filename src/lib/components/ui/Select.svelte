@@ -11,7 +11,8 @@
 
 	let { label, error, class: className = '', id, children, 'data-testid': testId, ...rest }: Props = $props();
 
-	const selectId = id ?? `select-${Math.random().toString(36).substr(2, 9)}`;
+	const fallbackId = `select-${Math.random().toString(36).substr(2, 9)}`;
+	const selectId = $derived(id ?? fallbackId);
 </script>
 
 <div class="w-full">

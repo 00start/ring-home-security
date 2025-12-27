@@ -245,7 +245,7 @@
 		{#snippet children()}
 			<div class="space-y-4">
 				<div>
-					<label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Username</label>
+					<div class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Username</div>
 					<p class="mt-1 text-zinc-900 dark:text-white">{$user?.username ?? 'Unknown'}</p>
 				</div>
 			</div>
@@ -389,11 +389,11 @@
 			<div class="space-y-4">
 				<div class="grid gap-4 sm:grid-cols-2">
 					<div>
-						<label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Version</label>
+						<div class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Version</div>
 						<p class="mt-1 text-zinc-900 dark:text-white">0.0.1</p>
 					</div>
 					<div>
-						<label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Environment</label>
+						<div class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Environment</div>
 						<p class="mt-1 text-zinc-900 dark:text-white">Production</p>
 					</div>
 				</div>

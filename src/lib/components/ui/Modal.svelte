@@ -91,10 +91,12 @@
 		data-testid="modal-backdrop"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
 		onclick={handleBackdropClick}
+		onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleBackdropClick(e as unknown as MouseEvent); }}
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby={title ? 'modal-title' : undefined}
 		aria-describedby="modal-content"
+		tabindex="-1"
 	>
 		<div
 			data-testid="modal"

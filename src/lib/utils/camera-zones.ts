@@ -13,6 +13,7 @@
 import type { RingCamera } from 'ring-client-api';
 import { createLogger } from './logger.server.js';
 import { config } from '../config/index.js';
+import { latencyTracker } from '../server/services/latency-tracker.js';
 
 const logger = createLogger('camera-zones');
 
@@ -203,7 +204,11 @@ export class CameraZoneManager {
 			if (!state) continue;
 
 			// Update last motion time
-			state.lastMotionTime = Date.now();
+			const triggerTimestamp = Date.now();
+			state.lastMotionTime = triggerTimestamp;
+
+			// Record trigger timestamp for latency tracking
+			latencyTracker.recordTrigger(zone.name, cameraId, triggerTimestamp);
 
 			// Clear any existing cooldown timer
 			if (state.cooldownTimer) {
@@ -267,6 +272,31 @@ export class CameraZoneManager {
 			state.activeCameraIds.add(cameraId);
 
 			if (this.recordingCallback) {
+				// Record follower start timestamp for latency tracking
+				const followerStartTimestamp = Date.now();
+				const latency = latencyTracker.recordFollowerStart(zone.name, cameraId, followerStartTimestamp);
+
+				// Log latency and check SLA
+				if (latency !== null) {
+					const slaStatus = latencyTracker.checkSLA(latency);
+					logger.info({
+						zoneName: zone.name,
+						cameraName,
+						latency,
+						slaBreached: slaStatus.breached
+					}, 'Zone follower recording started');
+
+					if (slaStatus.breached) {
+						logger.warn({
+							zoneName: zone.name,
+							cameraName,
+							latency,
+							threshold: slaStatus.threshold,
+							message: slaStatus.message
+						}, 'Zone recording latency SLA breached');
+					}
+				}
+
 				recordingPromises.push(
 					this.recordingCallback(camera, triggeredBy, zone.name).catch(error => {
 						logger.error({ error, cameraName, zoneName: zone.name }, 'Failed to start zone recording for camera');

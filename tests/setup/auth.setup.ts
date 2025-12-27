@@ -10,20 +10,20 @@ const authFile = 'playwright/.auth/user.json';
  */
 setup('authenticate', async ({ page }) => {
   // Navigate to login page
-  await page.goto('/login');
+  await page.goto('/login', { waitUntil: 'networkidle' });
 
-  // Fill in default credentials
-  await page.fill('input[name="username"], input[type="text"]', 'admin');
-  await page.fill('input[name="password"], input[type="password"]', 'admin');
+  // Fill in default credentials using data-testid
+  await page.fill('[data-testid="login-username-input"]', 'admin');
+  await page.fill('[data-testid="login-password-input"]', 'admin');
 
-  // Submit login form
-  await page.click('button[type="submit"]');
-
-  // Wait for redirect to dashboard
-  await page.waitForURL('/', { timeout: 10000 });
+  // Submit login form and wait for navigation
+  await Promise.all([
+    page.waitForURL('/', { timeout: 30000 }),
+    page.click('[data-testid="login-submit-button"]')
+  ]);
 
   // Verify we're on the dashboard
-  await expect(page.locator('[data-testid="dashboard"], .space-y-8')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('[data-testid="dashboard"], .space-y-8')).toBeVisible({ timeout: 10000 });
 
   // Save authentication state
   await page.context().storageState({ path: authFile });

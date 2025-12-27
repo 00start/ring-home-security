@@ -103,7 +103,8 @@
 				<div class="flex flex-col items-end gap-1">
 					<Badge variant={device.isOnline ? 'success' : 'danger'}>
 						<span data-testid="status-indicator" data-status={device.isOnline ? 'online' : 'offline'}>
-						{device.isOnline ? 'Online' : 'Offline'}
+							{device.isOnline ? 'Online' : 'Offline'}
+						</span>
 					</Badge>
 					{#if device.type === 'sensor' && device.subtype === 'contact' && device.faulted !== undefined}
 						<Badge variant={device.faulted ? 'warning' : 'info'}>
