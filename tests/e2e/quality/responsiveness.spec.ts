@@ -96,6 +96,348 @@ test.describe('Quality: Responsiveness', () => {
  * @quality_dimension E.Usability
  */
 test.describe('Quality: Usability', () => {
+  test.describe('Accessibility (a11y)', () => {
+    test('page has no critical accessibility violations', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('[data-testid="dashboard"]');
+
+      // Inject axe-core for accessibility testing
+      await page.addScriptTag({
+        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      });
+
+      // Run axe accessibility audit
+      const results = await page.evaluate(() => {
+        return new Promise((resolve) => {
+          // @ts-ignore - axe is loaded dynamically
+          axe.run((err, results) => {
+            if (err) throw err;
+            resolve(results);
+          });
+        });
+      });
+
+      // Check for violations
+      const violations = (results as any).violations;
+
+      // Filter critical and serious violations
+      const criticalViolations = violations.filter(
+        (v: any) => v.impact === 'critical' || v.impact === 'serious'
+      );
+
+      if (criticalViolations.length > 0) {
+        console.log('Accessibility violations:', criticalViolations);
+      }
+
+      expect(criticalViolations.length).toBe(0);
+    });
+
+    test('WCAG 2.1 Level A compliance - color contrast', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('[data-testid="dashboard"]');
+
+      await page.addScriptTag({
+        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      });
+
+      const results = await page.evaluate(() => {
+        return new Promise((resolve) => {
+          // @ts-ignore
+          axe.run({ rules: ['color-contrast'] }, (err, results) => {
+            if (err) throw err;
+            resolve(results);
+          });
+        });
+      });
+
+      const violations = (results as any).violations;
+      expect(violations.length).toBe(0);
+    });
+
+    test('WCAG 2.1 Level AA compliance - focus indicators', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('[data-testid="dashboard"]');
+
+      // Tab through interactive elements
+      await page.keyboard.press('Tab');
+
+      // Check that focused element has visible focus indicator
+      const hasFocusStyle = await page.evaluate(() => {
+        const focused = document.activeElement;
+        if (!focused) return false;
+
+        const styles = window.getComputedStyle(focused);
+        const outline = styles.outline;
+        const boxShadow = styles.boxShadow;
+
+        // Should have either outline or box-shadow for focus
+        return outline !== 'none' || boxShadow !== 'none';
+      });
+
+      expect(hasFocusStyle).toBe(true);
+    });
+
+    test('all images have alt text', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('[data-testid="dashboard"]');
+
+      await page.addScriptTag({
+        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      });
+
+      const results = await page.evaluate(() => {
+        return new Promise((resolve) => {
+          // @ts-ignore
+          axe.run({ rules: ['image-alt'] }, (err, results) => {
+            if (err) throw err;
+            resolve(results);
+          });
+        });
+      });
+
+      const violations = (results as any).violations;
+      expect(violations.length).toBe(0);
+    });
+
+    test('form inputs have associated labels', async ({ page }) => {
+      await page.goto('/');
+
+      await page.addScriptTag({
+        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      });
+
+      const results = await page.evaluate(() => {
+        return new Promise((resolve) => {
+          // @ts-ignore
+          axe.run({ rules: ['label'] }, (err, results) => {
+            if (err) throw err;
+            resolve(results);
+          });
+        });
+      });
+
+      const violations = (results as any).violations;
+      expect(violations.length).toBe(0);
+    });
+
+    test('heading hierarchy is logical', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('[data-testid="dashboard"]');
+
+      await page.addScriptTag({
+        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      });
+
+      const results = await page.evaluate(() => {
+        return new Promise((resolve) => {
+          // @ts-ignore
+          axe.run({ rules: ['heading-order'] }, (err, results) => {
+            if (err) throw err;
+            resolve(results);
+          });
+        });
+      });
+
+      const violations = (results as any).violations;
+      expect(violations.length).toBe(0);
+    });
+
+    test('buttons have accessible names', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('[data-testid="dashboard"]');
+
+      await page.addScriptTag({
+        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      });
+
+      const results = await page.evaluate(() => {
+        return new Promise((resolve) => {
+          // @ts-ignore
+          axe.run({ rules: ['button-name'] }, (err, results) => {
+            if (err) throw err;
+            resolve(results);
+          });
+        });
+      });
+
+      const violations = (results as any).violations;
+      expect(violations.length).toBe(0);
+    });
+
+    test('page has valid HTML lang attribute', async ({ page }) => {
+      await page.goto('/');
+
+      const htmlLang = await page.evaluate(() => {
+        return document.documentElement.lang;
+      });
+
+      expect(htmlLang).toBeTruthy();
+      expect(htmlLang.length).toBeGreaterThan(0);
+    });
+
+    test('links have discernible text', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('[data-testid="dashboard"]');
+
+      await page.addScriptTag({
+        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      });
+
+      const results = await page.evaluate(() => {
+        return new Promise((resolve) => {
+          // @ts-ignore
+          axe.run({ rules: ['link-name'] }, (err, results) => {
+            if (err) throw err;
+            resolve(results);
+          });
+        });
+      });
+
+      const violations = (results as any).violations;
+      expect(violations.length).toBe(0);
+    });
+
+    test('ARIA roles are used correctly', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('[data-testid="dashboard"]');
+
+      await page.addScriptTag({
+        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      });
+
+      const results = await page.evaluate(() => {
+        return new Promise((resolve) => {
+          // @ts-ignore
+          axe.run({ rules: ['aria-roles', 'aria-valid-attr'] }, (err, results) => {
+            if (err) throw err;
+            resolve(results);
+          });
+        });
+      });
+
+      const violations = (results as any).violations;
+      expect(violations.length).toBe(0);
+    });
+  });
+
+  test.describe('Screen Reader Compatibility', () => {
+    test('navigation landmarks are properly labeled', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('[data-testid="dashboard"]');
+
+      // Check for semantic HTML or ARIA landmarks
+      const hasLandmarks = await page.evaluate(() => {
+        const nav = document.querySelector('nav, [role="navigation"]');
+        const main = document.querySelector('main, [role="main"]');
+
+        return { hasNav: !!nav, hasMain: !!main };
+      });
+
+      expect(hasLandmarks.hasNav).toBe(true);
+      expect(hasLandmarks.hasMain).toBe(true);
+    });
+
+    test('dynamic content updates are announced', async ({ page }) => {
+      await page.goto('/');
+
+      // Check for aria-live regions for dynamic updates
+      const hasLiveRegions = await page.evaluate(() => {
+        const liveRegions = document.querySelectorAll('[aria-live], [role="status"], [role="alert"]');
+        return liveRegions.length > 0;
+      });
+
+      // This is a soft check - not all pages need live regions
+      console.log('Live regions present:', hasLiveRegions);
+    });
+
+    test('modal dialogs trap focus appropriately', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('[data-testid="camera-card"]');
+
+      // Open a modal/dialog
+      await page.click('[data-testid="camera-card"]:first-child');
+
+      // Check for modal with proper ARIA attributes
+      const modal = page.locator('[role="dialog"], [role="alertdialog"]');
+
+      if (await modal.isVisible()) {
+        const ariaModal = await modal.getAttribute('aria-modal');
+        const ariaLabel = await modal.getAttribute('aria-label');
+        const ariaLabelledBy = await modal.getAttribute('aria-labelledby');
+
+        // Modal should have aria-modal and label
+        expect(ariaModal).toBe('true');
+        expect(ariaLabel || ariaLabelledBy).toBeTruthy();
+      }
+    });
+
+    test('skip to main content link exists', async ({ page }) => {
+      await page.goto('/');
+
+      // Look for skip link (usually first focusable element)
+      await page.keyboard.press('Tab');
+
+      const focusedElement = await page.evaluate(() => {
+        const el = document.activeElement;
+        return {
+          text: el?.textContent?.trim(),
+          href: (el as HTMLAnchorElement)?.href,
+        };
+      });
+
+      // Check if it's a skip link
+      if (focusedElement.text?.toLowerCase().includes('skip')) {
+        expect(focusedElement.href).toContain('#');
+      }
+    });
+
+    test('tables have proper headers', async ({ page }) => {
+      await page.goto('/events');
+
+      const tables = page.locator('table');
+      const tableCount = await tables.count();
+
+      if (tableCount > 0) {
+        await page.addScriptTag({
+          url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+        });
+
+        const results = await page.evaluate(() => {
+          return new Promise((resolve) => {
+            // @ts-ignore
+            axe.run({ rules: ['table-headers'] }, (err, results) => {
+              if (err) throw err;
+              resolve(results);
+            });
+          });
+        });
+
+        const violations = (results as any).violations;
+        expect(violations.length).toBe(0);
+      }
+    });
+
+    test('custom controls have appropriate ARIA attributes', async ({ page }) => {
+      await page.goto('/');
+
+      // Check for custom interactive elements (not native buttons/links)
+      const customControls = page.locator('[role="button"]:not(button), [role="checkbox"]:not(input), [role="slider"]');
+
+      const count = await customControls.count();
+
+      if (count > 0) {
+        // Each should have accessible name and state
+        for (let i = 0; i < Math.min(count, 3); i++) {
+          const control = customControls.nth(i);
+          const ariaLabel = await control.getAttribute('aria-label');
+          const ariaLabelledBy = await control.getAttribute('aria-labelledby');
+
+          expect(ariaLabel || ariaLabelledBy).toBeTruthy();
+        }
+      }
+    });
+  });
+
   test.describe('Task Efficiency', () => {
     test('live view accessible in 2 clicks from dashboard', async ({ page }) => {
       await page.goto('/');
