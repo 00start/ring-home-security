@@ -168,22 +168,24 @@
 							<button
 								onclick={() => handleRecordingClick(recording)}
 								class="absolute inset-0 w-full h-full cursor-pointer"
+								aria-label="Play recording from {getDeviceName(recording.deviceId)}"
 							>
 								{#if recording.thumbnailPath}
 									<img
-										src={getThumbnailUrl(recording.id)}
-										alt="Recording thumbnail"
-										class="h-full w-full object-cover"
+										data-src={getThumbnailUrl(recording.id)}
+										alt="Recording thumbnail for {getDeviceName(recording.deviceId)}"
+										class="h-full w-full object-cover bg-zinc-800"
+										loading="lazy"
 									/>
 								{:else}
 									<div class="flex h-full items-center justify-center">
-										<svg class="h-12 w-12 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<svg class="h-12 w-12 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
 										</svg>
 									</div>
 								{/if}
 								<div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity hover:opacity-100">
-									<svg class="h-16 w-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+									<svg class="h-16 w-16 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 										<path d="M8 5v14l11-7z" />
 									</svg>
 								</div>

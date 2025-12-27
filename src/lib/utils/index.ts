@@ -2,6 +2,20 @@
 // export { logger, createLogger } from './logger.server';
 // Path utilities are server-only - import directly from './paths' when needed on server
 
+// Performance utilities
+export {
+	ApiCache,
+	createCachedFetch,
+	debounce,
+	throttle,
+	lazyLoad,
+	preloadImage,
+	preloadImages,
+	measurePerformance,
+	mark,
+	measure
+} from './performance';
+
 /**
  * Sleep for a given number of milliseconds
  */

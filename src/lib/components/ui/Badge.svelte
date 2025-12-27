@@ -7,9 +7,11 @@
 		variant?: Variant;
 		class?: string;
 		children: Snippet;
+		'data-testid'?: string;
+		'data-status'?: string;
 	}
 
-	let { variant = 'default', class: className = '', children }: Props = $props();
+	let { variant = 'default', class: className = '', children, ...rest }: Props = $props();
 
 	const variantClasses: Record<Variant, string> = {
 		default: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300',
@@ -20,6 +22,6 @@
 	};
 </script>
 
-<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {variantClasses[variant]} {className}">
+<span data-testid={rest['data-testid'] || 'badge'} data-status={rest['data-status']} class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {variantClasses[variant]} {className}">
 	{@render children()}
 </span>

@@ -142,7 +142,7 @@
 		</Button>
 	</div>
 {:else}
-	<Card title="Log Viewer">
+	<Card title="Log Viewer" data-testid="log-viewer">
 		{#snippet children()}
 			<div class="space-y-4">
 				<!-- Controls -->
@@ -182,7 +182,7 @@
 				</div>
 
 				{#if error}
-					<p class="text-sm text-red-600">{error}</p>
+					<p data-testid="error-message" data-error-type="log-viewer" class="text-sm text-red-600">{error}</p>
 				{/if}
 
 				<!-- Log content -->

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { StatCard, DeviceCard, EventCard, LiveViewModal } from '$lib/components';
+	import { StatCard, DeviceCard, EventCard, LiveViewModal, BatteryWarningBanner } from '$lib/components';
 	import {
 		stats,
 		fetchStats,
@@ -51,7 +51,7 @@
 	<title>Dashboard - Ring Security</title>
 </svelte:head>
 
-<div class="space-y-8">
+<div class="space-y-8" data-testid="dashboard">
 	<!-- Page header -->
 	<div>
 		<h1 class="text-2xl font-bold text-zinc-900 dark:text-white">Dashboard</h1>
@@ -59,6 +59,9 @@
 			Monitor your home security devices and events
 		</p>
 	</div>
+
+	<!-- Battery Warning Banner -->
+	<BatteryWarningBanner devices={$devices} />
 
 	<!-- Stats -->
 	{#if $stats}
@@ -85,9 +88,9 @@
 			/>
 		</div>
 	{:else}
-		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4" data-testid="loading-skeleton">
 			{#each Array(4) as _}
-				<div class="h-32 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-700"></div>
+				<div class="h-32 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-700" data-testid="camera-skeleton"></div>
 			{/each}
 		</div>
 	{/if}

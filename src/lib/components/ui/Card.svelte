@@ -7,12 +7,13 @@
 		children: Snippet;
 		header?: Snippet;
 		footer?: Snippet;
+		'data-testid'?: string;
 	}
 
-	let { title, class: className = '', children, header, footer }: Props = $props();
+	let { title, class: className = '', children, header, footer, ...rest }: Props = $props();
 </script>
 
-<div class="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-800 {className}">
+<div class="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-800 {className}" {...rest}>
 	{#if header}
 		<div class="border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
 			{@render header()}

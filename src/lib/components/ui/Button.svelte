@@ -10,6 +10,7 @@
 		size?: Size;
 		loading?: boolean;
 		children: Snippet;
+		'data-testid'?: string;
 	}
 
 	let {
@@ -19,6 +20,7 @@
 		disabled,
 		class: className = '',
 		children,
+		'data-testid': testId,
 		...rest
 	}: Props = $props();
 
@@ -39,6 +41,8 @@
 </script>
 
 <button
+	data-testid={testId || 'button'}
+	data-loading={loading}
 	class="{baseClasses} {variantClasses[variant]} {sizeClasses[size]} {className}"
 	disabled={disabled || loading}
 	{...rest}

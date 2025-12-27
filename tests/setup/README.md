@@ -1,0 +1,204 @@
+# Test Setup & Seeding
+
+This directory contains the test setup infrastructure for E2E tests, enabling tests to run without real Ring API access.
+
+## Files
+
+- **`seed.ts`** - Seed data definitions (devices, events, recordings, zones)
+- **`global-setup.ts`** - Global setup that seeds database before tests
+- **`mock-api.ts`** - API mocking helpers for E2E tests
+- **`auth.setup.ts`** - Authentication setup for Playwright tests
+
+## Seed Data
+
+### Devices (5 devices)
+
+1. **Front Door Camera** (doorbell)
+   - Battery: 85%
+   - Status: Online
+   - Use for: Normal operation tests
+
+2. **Backyard Camera** (stick_up_cam)
+   - Battery: 15% (LOW - triggers warnings)
+   - Status: Online
+   - Use for: Low battery warning tests
+
+3. **Living Room Camera** (indoor_cam)
+   - Battery: 50%
+   - Status: OFFLINE
+   - Use for: Offline status tests
+
+4. **Garage Camera** (stick_up_cam)
+   - Battery: 95%
+   - Status: Online
+   - Use for: Healthy device tests
+
+5. **Driveway Camera** (floodlight_cam)
+   - Battery: None (wired)
+   - Status: Online
+   - Use for: Wired device tests
+
+### Events (13 events)
+
+- 5 minutes ago: Motion (Front Door)
+- 10 minutes ago: Doorbell ring (Front Door)
+- 15 minutes ago: Motion (Backyard - low battery)
+- 30 minutes ago: Motion (Driveway)
+- 1 hour ago: Motion (Garage)
+- 1 hour ago: Device offline (Living Room)
+- 2 hours ago: Motion without recording (Backyard)
+- 1 day ago: Motion (Front Door)
+- 2-6 days ago: Various motion/ring events
+
+### Recordings (11 recordings)
+
+All recordings are ~5MB, 30 seconds duration, with completed status.
+Mock file paths and thumbnails provided.
+
+### Zones (3 zones)
+
+1. **Front Zone**
+   - Triggers: Front Door, Driveway
+   - Records: Front Door, Driveway
+   - Cooldown: 7 seconds
+
+2. **Backyard Zone**
+   - Triggers: Backyard
+   - Records: Backyard
+   - Cooldown: 7 seconds
+
+3. **Garage Zone**
+   - Triggers: Garage
+   - Records: Garage
+   - Cooldown: 7 seconds
+
+## Usage
+
+### Global Setup (Automatic)
+
+The global setup runs automatically before all tests via `playwright.config.ts`:
+
+```typescript
+export default defineConfig({
+  globalSetup: './tests/setup/global-setup.ts',
+  // ...
+});
+```
+
+This seeds the test database with all data before any tests run.
+
+### API Mocking in Tests
+
+Use the mock API helpers to intercept API calls:
+
+```typescript
+import { test, expect } from '@playwright/test';
+import { setupApiMocks, getSeedData } from '../setup/mock-api';
+
+test('my test', async ({ page }) => {
+  // Setup API mocks to use seeded data
+  await setupApiMocks(page);
+
+  // Navigate to page
+  await page.goto('/');
+
+  // Test will use seeded data instead of real API
+  const seedData = getSeedData();
+  expect(await page.locator('[data-testid="camera-card"]').count())
+    .toBe(seedData.devices.length);
+});
+```
+
+### Advanced Mocking
+
+```typescript
+// Slow API responses (performance testing)
+await setupSlowApiMocks(page, 1000); // 1 second delay
+
+// Error responses (error handling testing)
+await setupErrorApiMocks(page);
+
+// Timeout responses (timeout handling testing)
+await setupTimeoutApiMocks(page);
+
+// Live stream mocking
+await mockLiveStreamUrl(page);
+```
+
+### Direct Database Access
+
+Tests can also access the seeded database directly:
+
+```typescript
+import Database from 'better-sqlite3';
+
+const db = new Database('./data/test-ring-security.db');
+const devices = db.prepare('SELECT * FROM devices').all();
+```
+
+## Acceptance Criteria
+
+✅ **Global setup seeds 3+ devices** - 5 devices seeded
+✅ **Seeds 10+ events with recordings** - 13 events, 11 recordings
+✅ **Tests can run without real Ring API** - Full API mocking provided
+✅ **Zone configurations are seeded** - 3 zones configured
+
+## Extending Seed Data
+
+To add more seed data, edit `seed.ts`:
+
+```typescript
+// Add a new device
+export const seedDevices = [
+  // ... existing devices
+  {
+    id: 'test-camera-6',
+    name: 'New Camera',
+    type: 'camera',
+    isOnline: true,
+    batteryLevel: 75,
+    // ...
+  },
+];
+```
+
+Then the global setup will automatically seed it on next test run.
+
+## Testing the Setup
+
+Run a simple test to verify seeding:
+
+```bash
+# Run tests (global setup runs automatically)
+npm run test:e2e
+
+# Check seeded data
+sqlite3 ./data/test-ring-security.db "SELECT COUNT(*) FROM devices;"
+sqlite3 ./data/test-ring-security.db "SELECT COUNT(*) FROM events;"
+sqlite3 ./data/test-ring-security.db "SELECT COUNT(*) FROM recordings;"
+```
+
+## Troubleshooting
+
+### Database not seeding
+
+- Check that `globalSetup` is configured in `playwright.config.ts`
+- Verify `./data/test-ring-security.db` exists after running tests
+- Check console output for seeding logs
+
+### API mocks not working
+
+- Ensure `setupApiMocks(page)` is called before `page.goto()`
+- Check that route patterns match your API endpoints
+- Use Playwright's route inspection: `page.on('request', req => console.log(req.url()))`
+
+### Wrong data in tests
+
+- Global setup runs once per test session
+- Database is cleared and re-seeded each time
+- If modifying seed data, restart the test session
+
+## Generated by
+
+ORCH-3: Create Test Database Seeding
+Part of Battery Optimization & TDD Sprint

@@ -46,7 +46,19 @@ const configSchema = z.object({
 	bufferSafetyMarginSeconds: z.coerce.number().default(5),
 	bufferPostEventSeconds: z.coerce.number().default(60),
 	bufferReconnectDelayMs: z.coerce.number().default(5000),
-	bufferMaxReconnectDelayMs: z.coerce.number().default(60000)
+	bufferMaxReconnectDelayMs: z.coerce.number().default(60000),
+
+	// Battery Optimization
+	// Enable/disable continuous pre-event buffering (major battery impact)
+	bufferEnabled: z.coerce.boolean().default(false),
+	// Ring API polling interval in seconds (higher = less battery drain)
+	ringPollingIntervalSeconds: z.coerce.number().default(30),
+	// Battery threshold below which to disable streaming (0-100, 0 = disabled)
+	batteryLowThreshold: z.coerce.number().default(20),
+	// Auto-stop live view after this many seconds of inactivity (0 = disabled)
+	liveViewTimeoutSeconds: z.coerce.number().default(300),
+	// Recording duration in seconds (shorter = less battery drain)
+	recordingDurationSeconds: z.coerce.number().default(30)
 });
 
 function loadConfig() {
@@ -74,7 +86,12 @@ function loadConfig() {
 		bufferSafetyMarginSeconds: env.BUFFER_SAFETY_MARGIN_SECONDS,
 		bufferPostEventSeconds: env.BUFFER_POST_EVENT_SECONDS,
 		bufferReconnectDelayMs: env.BUFFER_RECONNECT_DELAY_MS,
-		bufferMaxReconnectDelayMs: env.BUFFER_MAX_RECONNECT_DELAY_MS
+		bufferMaxReconnectDelayMs: env.BUFFER_MAX_RECONNECT_DELAY_MS,
+		bufferEnabled: env.BUFFER_ENABLED,
+		ringPollingIntervalSeconds: env.RING_POLLING_INTERVAL_SECONDS,
+		batteryLowThreshold: env.BATTERY_LOW_THRESHOLD,
+		liveViewTimeoutSeconds: env.LIVE_VIEW_TIMEOUT_SECONDS,
+		recordingDurationSeconds: env.RECORDING_DURATION_SECONDS
 	});
 
 	if (!result.success) {

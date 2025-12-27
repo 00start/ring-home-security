@@ -6,11 +6,13 @@
 		label?: string;
 		error?: string;
 		children: Snippet;
+		'data-testid'?: string;
 	}
 
-	let { label, error, class: className = '', id, children, ...rest }: Props = $props();
+	let { label, error, class: className = '', id, children, 'data-testid': testId, ...rest }: Props = $props();
 
-	const selectId = id ?? `select-${Math.random().toString(36).substr(2, 9)}`;
+	const fallbackId = `select-${Math.random().toString(36).substr(2, 9)}`;
+	const selectId = $derived(id ?? fallbackId);
 </script>
 
 <div class="w-full">
@@ -21,6 +23,7 @@
 	{/if}
 	<select
 		id={selectId}
+		data-testid={testId || `select-${selectId}`}
 		class="block w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors
 			{error
 				? 'border-red-300 focus:border-red-500 focus:ring-red-500'
@@ -34,6 +37,6 @@
 		{@render children()}
 	</select>
 	{#if error}
-		<p class="mt-1 text-sm text-red-600">{error}</p>
+		<p data-testid="select-error" class="mt-1 text-sm text-red-600">{error}</p>
 	{/if}
 </div>

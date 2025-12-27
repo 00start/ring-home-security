@@ -82,6 +82,10 @@
 	{#snippet children()}
 		<button
 			onclick={onclick}
+			data-testid="camera-card"
+			data-device-id={device.id}
+			data-status={device.isOnline ? 'online' : 'offline'}
+			data-battery-low={device.batteryLevel !== undefined && device.batteryLevel <= 20}
 			class="w-full text-left -m-6 p-6 transition-transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg"
 		>
 			<div class="flex items-start justify-between">
@@ -98,7 +102,9 @@
 				</div>
 				<div class="flex flex-col items-end gap-1">
 					<Badge variant={device.isOnline ? 'success' : 'danger'}>
-						{device.isOnline ? 'Online' : 'Offline'}
+						<span data-testid="status-indicator" data-status={device.isOnline ? 'online' : 'offline'}>
+							{device.isOnline ? 'Online' : 'Offline'}
+						</span>
 					</Badge>
 					{#if device.type === 'sensor' && device.subtype === 'contact' && device.faulted !== undefined}
 						<Badge variant={device.faulted ? 'warning' : 'info'}>
@@ -126,6 +132,8 @@
 		{#if supportsLiveView(device.type) && device.isOnline}
 			<div class="mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-700">
 				<button
+					data-testid="live-view-button"
+					data-device-id={device.id}
 					onclick={handleLiveView}
 					type="button"
 					class="w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors cursor-pointer"

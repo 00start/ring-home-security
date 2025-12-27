@@ -36,9 +36,12 @@
 	}
 </script>
 
-<div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+<div data-testid="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
 	{#each $toasts as toast (toast.id)}
 		<div
+			data-testid="toast"
+			data-toast-type={toast.type}
+			data-toast-id={toast.id}
 			class="pointer-events-auto rounded-lg border shadow-lg p-4 {typeStyles[toast.type].bg}"
 			transition:fly={{ x: 100, duration: 200 }}
 		>
@@ -53,12 +56,13 @@
 				</svg>
 
 				<div class="flex-1 min-w-0">
-					<p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{toast.title}</p>
+					<p data-testid="toast-title" class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{toast.title}</p>
 					{#if toast.message}
-						<p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{toast.message}</p>
+						<p data-testid="toast-message" class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{toast.message}</p>
 					{/if}
 					{#if toast.action}
 						<button
+							data-testid="toast-action"
 							class="mt-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
 							onclick={() => handleAction(toast)}
 						>
@@ -68,8 +72,10 @@
 				</div>
 
 				<button
+					data-testid="toast-dismiss"
 					class="flex-shrink-0 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
 					onclick={() => toasts.dismiss(toast.id)}
+					aria-label="Dismiss notification"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

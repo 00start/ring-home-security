@@ -2,17 +2,31 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { EventCard, Badge, Card, Button } from '$lib/components';
+	import { zoneSettings } from '$lib/stores';
 	import type { Device, EventLog } from '$lib/types';
 
 	let device = $state<Device | null>(null);
 	let events = $state<EventLog[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
+	let preBufferEnabled = $state(false);
+	let showTooltip = $state(false);
 
 	onMount(async () => {
 		await fetchDevice();
 		await fetchDeviceEvents();
+		// Load pre-buffer setting for this device
+		const deviceId = $page.params.id ?? '';
+		const settings = zoneSettings.getDeviceSettings(deviceId);
+		preBufferEnabled = settings.preBufferEnabled;
 	});
+
+	function handlePreBufferToggle(event: Event) {
+		const target = event.currentTarget as HTMLInputElement;
+		preBufferEnabled = target.checked;
+		const deviceId = $page.params.id ?? '';
+		zoneSettings.setPreBufferEnabled(deviceId, preBufferEnabled);
+	}
 
 	async function fetchDevice() {
 		loading = true;
@@ -95,6 +109,7 @@
 		</Button>
 	</div>
 {:else if device}
+	{@const currentDevice = device}
 	<div class="space-y-6">
 		<!-- Back button -->
 		<div>
@@ -114,50 +129,117 @@
 			{#snippet children()}
 				<div class="flex items-start justify-between">
 					<div class="flex items-center gap-4">
-						<div class="rounded-full p-3 {device.isOnline ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400' : 'bg-zinc-100 text-zinc-400 dark:bg-zinc-700'}">
+						<div class="rounded-full p-3 {currentDevice.isOnline ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400' : 'bg-zinc-100 text-zinc-400 dark:bg-zinc-700'}">
 							<svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={deviceIcons[device.type] ?? deviceIcons.camera} />
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={deviceIcons[currentDevice.type] ?? deviceIcons.camera} />
 							</svg>
 						</div>
 						<div>
-							<h1 class="text-2xl font-bold text-zinc-900 dark:text-white">{device.name}</h1>
-							<p class="text-sm text-zinc-500 dark:text-zinc-400 capitalize">{device.type}</p>
+							<h1 class="text-2xl font-bold text-zinc-900 dark:text-white">{currentDevice.name}</h1>
+							<p class="text-sm text-zinc-500 dark:text-zinc-400 capitalize">{currentDevice.type}</p>
 						</div>
 					</div>
-					<Badge variant={device.isOnline ? 'success' : 'danger'}>
-						{device.isOnline ? 'Online' : 'Offline'}
+					<Badge variant={currentDevice.isOnline ? 'success' : 'danger'}>
+						{currentDevice.isOnline ? 'Online' : 'Offline'}
 					</Badge>
 				</div>
 
 				<div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 					<div>
 						<p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Device ID</p>
-						<p class="mt-1 font-mono text-sm text-zinc-900 dark:text-white">{device.id}</p>
+						<p class="mt-1 font-mono text-sm text-zinc-900 dark:text-white">{currentDevice.id}</p>
 					</div>
-					{#if device.location}
+					{#if currentDevice.location}
 						<div>
 							<p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Location</p>
-							<p class="mt-1 text-sm text-zinc-900 dark:text-white">{device.location}</p>
+							<p class="mt-1 text-sm text-zinc-900 dark:text-white">{currentDevice.location}</p>
 						</div>
 					{/if}
 					<div>
 						<p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Last Seen</p>
-						<p class="mt-1 text-sm text-zinc-900 dark:text-white">{formatLastSeen(device.lastSeen)}</p>
+						<p class="mt-1 text-sm text-zinc-900 dark:text-white">{formatLastSeen(currentDevice.lastSeen)}</p>
 					</div>
-					{#if device.batteryLevel !== undefined}
+					{#if currentDevice.batteryLevel !== undefined}
 						<div>
 							<p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Battery</p>
 							<div class="mt-1 flex items-center gap-2">
-								<svg class="h-5 w-5 {device.batteryLevel > 20 ? 'text-green-500' : 'text-red-500'}" fill="currentColor" viewBox="0 0 24 24">
+								<svg class="h-5 w-5 {currentDevice.batteryLevel > 20 ? 'text-green-500' : 'text-red-500'}" fill="currentColor" viewBox="0 0 24 24">
 									<path d="M17 6H4a2 2 0 00-2 2v8a2 2 0 002 2h13a2 2 0 002-2V8a2 2 0 00-2-2zm0 10H4V8h13v8zm4-8v8h-1V8h1zm-4 2H6v4h11v-4z" />
 								</svg>
-								<span class="text-sm {device.batteryLevel > 20 ? 'text-zinc-900 dark:text-white' : 'text-red-500'}">{device.batteryLevel}%</span>
+								<span class="text-sm {currentDevice.batteryLevel > 20 ? 'text-zinc-900 dark:text-white' : 'text-red-500'}">{currentDevice.batteryLevel}%</span>
 							</div>
 						</div>
 					{/if}
 				</div>
 			{/snippet}
 		</Card>
+
+		<!-- Camera/Zone Settings -->
+		{#if currentDevice.type === 'camera' || currentDevice.type === 'doorbell'}
+			<Card title="Camera Settings" data-testid="camera-settings-section">
+				{#snippet children()}
+					<div class="space-y-6">
+						<!-- Pre-event Buffer Toggle -->
+						<div class="flex items-start justify-between">
+							<div class="flex-1">
+								<div class="flex items-center gap-2">
+									<h4 class="text-sm font-medium text-zinc-900 dark:text-white">Pre-event buffer</h4>
+									<!-- Tooltip Icon -->
+									<div class="relative">
+										<button
+											type="button"
+											class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+											onmouseenter={() => showTooltip = true}
+											onmouseleave={() => showTooltip = false}
+											onclick={() => showTooltip = !showTooltip}
+											aria-label="Show information about pre-event buffer"
+										>
+											<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+												<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+											</svg>
+										</button>
+										{#if showTooltip}
+											<div class="absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 transform">
+												<div class="w-64 rounded-lg bg-zinc-900 px-3 py-2 text-xs text-white shadow-lg dark:bg-zinc-700">
+													Pre-event buffer continuously records video in memory, allowing the system to capture footage from before a motion event is triggered. This provides better context for security events.
+													<div class="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 transform border-4 border-transparent border-t-zinc-900 dark:border-t-zinc-700"></div>
+												</div>
+											</div>
+										{/if}
+									</div>
+								</div>
+								<p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+									Capture 3 seconds before motion trigger
+								</p>
+								{#if preBufferEnabled}
+									<div class="mt-2 rounded-md bg-amber-50 p-3 dark:bg-amber-900/20" data-testid="battery-impact-warning">
+										<div class="flex">
+											<svg class="h-5 w-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+												<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+											</svg>
+											<div class="ml-3">
+												<p class="text-sm text-amber-800 dark:text-amber-200">
+													Enabling pre-buffer increases battery usage by ~15%
+												</p>
+											</div>
+										</div>
+									</div>
+								{/if}
+							</div>
+							<label class="relative inline-flex cursor-pointer items-center" data-testid="pre-buffer-toggle">
+								<input
+									type="checkbox"
+									class="peer sr-only"
+									checked={preBufferEnabled}
+									onchange={handlePreBufferToggle}
+								/>
+								<div class="peer h-6 w-11 rounded-full bg-zinc-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-zinc-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none dark:border-zinc-600 dark:bg-zinc-700"></div>
+							</label>
+						</div>
+					</div>
+				{/snippet}
+			</Card>
+		{/if}
 
 		<!-- Recent events -->
 		<div>

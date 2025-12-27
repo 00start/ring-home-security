@@ -19,6 +19,8 @@ import { retry, sleep } from '../lib/utils/index.js';
 import { createLogger } from '../lib/utils/logger.server.js';
 import { getRecordingPath, ensureDir } from '../lib/utils/paths.js';
 import { getBufferManager } from '../lib/utils/camera-buffer.js';
+import { getZoneManager } from '../lib/utils/camera-zones.js';
+import { config } from '../lib/config/index.js';
 import type { EventType, TranscodeJobData } from '../lib/types/index.js';
 
 const logger = createLogger('ring-listener');
@@ -75,7 +77,24 @@ async function handleMotionOrDing(
 
 	logger.info({ eventId: event.id, dingId }, 'Event created successfully');
 
+	// Check if this camera triggers zone-based recording
+	if (eventType === 'motion') {
+		const zoneManager = getZoneManager();
+		const zoneResult = await zoneManager.handleMotion(camera);
+
+		if (zoneResult.triggered) {
+			logger.info({
+				cameraName: camera.name,
+				zones: zoneResult.zones
+			}, 'Zone recording triggered by motion');
+			// Zone recordings are handled by the zone manager callback
+			// The original camera recording will be started by the zone manager
+			return;
+		}
+	}
+
 	// Process recording in background (don't block event creation)
+	// This handles cameras not part of a zone, or doorbell events
 	processRecording(camera, event.id, dingId, timestamp).catch((error) => {
 		logger.error({ error, eventId: event.id }, 'Background recording processing failed');
 	});
@@ -90,17 +109,20 @@ async function recordLiveStream(
 	try {
 		recordingsRepo.updateRecordingStatus(recordingId, 'processing');
 
-		logger.info({ recordingId, cameraId: camera.id, cameraName: camera.name }, 'Starting live stream capture');
+		// Use configurable recording duration (battery-friendly default: 30s)
+		const recordingDuration = config.recordingDurationSeconds;
+
+		logger.info(
+			{ recordingId, cameraId: camera.id, cameraName: camera.name, durationSeconds: recordingDuration },
+			'Starting live stream capture'
+		);
 
 		// Ensure the directory exists
 		await ensureDir(filePath);
 
-		// Stream video to file for 60 seconds (adjustable)
-		const RECORDING_DURATION = 60 * 1000; // 60 seconds
-
 		const streamSession = await camera.streamVideo({
 			output: [
-				'-t', '60', // Record for 60 seconds
+				'-t', recordingDuration.toString(),
 				'-f', 'mp4',
 				'-movflags', 'frag_keyframe+empty_moov',
 				'-reset_timestamps', '1',
@@ -108,7 +130,7 @@ async function recordLiveStream(
 			]
 		});
 
-		logger.info({ recordingId }, 'Stream session started, recording...');
+		logger.info({ recordingId, durationSeconds: recordingDuration }, 'Stream session started, recording...');
 
 		// Wait for recording to complete or timeout
 		await Promise.race([
@@ -118,7 +140,7 @@ async function recordLiveStream(
 					resolve(undefined);
 				});
 			}),
-			sleep(RECORDING_DURATION + 5000) // Add 5s buffer
+			sleep((recordingDuration * 1000) + 5000) // Add 5s buffer
 		]);
 
 		// Stop the stream
@@ -213,6 +235,50 @@ async function processRecording(
 	}
 }
 
+/**
+ * Handle zone-triggered recording for a camera
+ * Called by the zone manager when motion is detected on an edge camera
+ */
+async function handleZoneRecording(
+	camera: RingCamera,
+	triggeredBy: string,
+	zoneName: string
+): Promise<void> {
+	const timestamp = new Date();
+
+	logger.info({
+		cameraId: camera.id,
+		cameraName: camera.name,
+		triggeredBy,
+		zoneName
+	}, 'Zone-triggered recording started');
+
+	// Ensure device exists in database
+	devicesRepo.upsertDevice({
+		id: camera.id.toString(),
+		name: camera.name,
+		type: mapCameraType(camera),
+		batteryLevel: camera.batteryLevel ?? undefined,
+		isOnline: true
+	});
+
+	// Create event record for zone-triggered recording
+	const event = eventsRepo.createEvent({
+		deviceId: camera.id.toString(),
+		deviceName: camera.name,
+		eventType: 'motion',
+		timestamp,
+		metadata: {
+			zoneTriggered: true,
+			triggeredBy,
+			zoneName
+		}
+	});
+
+	// Process the recording
+	await processRecording(camera, event.id, `zone-${zoneName}-${Date.now()}`, timestamp);
+}
+
 async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<string | null> {
 	try {
 		// First, check if this camera has recording capability
@@ -220,7 +286,7 @@ async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<stri
 		logger.info({
 			cameraId: camera.id,
 			cameraName: camera.name,
-			hasSnapshotWithinSeconds: camera.hasSnapshotWithinSeconds,
+			hasSnapshotWithinSeconds: (camera as any).hasSnapshotWithinSeconds,
 			operatingOnBattery: camera.operatingOnBattery,
 			subscribed: cameraData.subscribed,
 			subscriptionStatus: cameraData.subscription_status,
@@ -261,14 +327,15 @@ async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<stri
 						if (attemptCount % 3 === 0) {
 							logger.info({ attemptCount }, 'Trying alternative approach: fetching recent events');
 							try {
-								const events = await camera.getEvents({ limit: 10 });
+								const eventsResponse = await camera.getEvents({ limit: 10 });
+								const events = Array.isArray(eventsResponse) ? eventsResponse : (eventsResponse as any).events || [];
 								logger.info({
 									eventCount: events.length,
-									eventIds: events.map(e => e.id),
+									eventIds: events.map((e: any) => e.id),
 									lookingFor: dingId
 								}, 'Recent events fetched');
 
-								const matchingEvent = events.find(e => e.id === dingId);
+								const matchingEvent = events.find((e: any) => e.id === dingId);
 								if (matchingEvent) {
 									logger.info({ event: matchingEvent }, 'Found matching event');
 
@@ -395,6 +462,7 @@ async function subscribeToCamera(camera: RingCamera): Promise<void> {
 				let eventType: 'motion' | 'ding' = 'motion';
 
 				// New notification format (notification.data.event.ding.subtype)
+				const notificationAny = notification as any;
 				if (notification.data?.event?.ding?.subtype === 'motion') {
 					eventType = 'motion';
 				} else if (notification.data?.event?.ding?.subtype === 'button_press') {
@@ -403,19 +471,17 @@ async function subscribeToCamera(camera: RingCamera): Promise<void> {
 					eventType = 'ding';
 				} else if (notification.data?.event?.ding?.detection_type === 'motion') {
 					eventType = 'motion';
-				} else if (notification.data?.event?.ding?.detection_type === 'ding') {
-					eventType = 'ding';
 				}
 				// Old notification format (notification.ding.kind)
-				else if (notification.ding?.kind === 'ding') {
+				else if (notificationAny.ding?.kind === 'ding') {
 					eventType = 'ding';
-				} else if (notification.ding?.kind === 'motion') {
+				} else if (notificationAny.ding?.kind === 'motion') {
 					eventType = 'motion';
 				}
 				// Fallback to action field
-				else if (notification.action === 'com.ring.push.HANDLE_NEW_DING') {
+				else if (notificationAny.action === 'com.ring.push.HANDLE_NEW_DING') {
 					eventType = 'ding';
-				} else if (notification.action === 'com.ring.push.HANDLE_NEW_motion') {
+				} else if (notificationAny.action === 'com.ring.push.HANDLE_NEW_motion') {
 					eventType = 'motion';
 				}
 
@@ -433,7 +499,7 @@ async function subscribeToCamera(camera: RingCamera): Promise<void> {
 	// Subscribe to battery updates
 	camera.onBatteryLevel?.subscribe({
 		next: (batteryLevel) => {
-			if (batteryLevel !== undefined) {
+			if (batteryLevel !== undefined && batteryLevel !== null) {
 				devicesRepo.updateDeviceBattery(camera.id.toString(), batteryLevel);
 			}
 		}
@@ -640,6 +706,15 @@ async function subscribeToSensors(): Promise<void> {
 async function startListener(): Promise<void> {
 	logger.info('Starting Ring listener worker');
 
+	// Log battery optimization settings
+	logger.info({
+		bufferEnabled: config.bufferEnabled,
+		ringPollingIntervalSeconds: config.ringPollingIntervalSeconds,
+		batteryLowThreshold: config.batteryLowThreshold,
+		liveViewTimeoutSeconds: config.liveViewTimeoutSeconds,
+		recordingDurationSeconds: config.recordingDurationSeconds
+	}, 'Battery optimization settings');
+
 	// Initialize database
 	await initDatabase();
 
@@ -652,12 +727,25 @@ async function startListener(): Promise<void> {
 
 	// Initialize camera buffer manager for pre-event recording
 	const bufferManager = getBufferManager();
-	logger.info('Initializing camera buffer manager for pre-event recording');
+	if (config.bufferEnabled) {
+		logger.info('Pre-event buffering ENABLED - continuous streaming will drain battery faster');
+	} else {
+		logger.info('Pre-event buffering DISABLED - battery-friendly mode active');
+	}
 	await bufferManager.initialize(cameras);
 
 	// Log buffer status
 	const bufferStatus = bufferManager.getStatus();
 	logger.info({ bufferStatus }, 'Camera buffers initialized');
+
+	// Initialize camera zone manager for zone-based recording
+	const zoneManager = getZoneManager();
+	zoneManager.initialize(cameras);
+	zoneManager.setRecordingCallback(handleZoneRecording);
+
+	// Log zone status
+	const zoneStatus = zoneManager.getStatus();
+	logger.info({ zoneStatus }, 'Camera zones initialized');
 
 	for (const camera of cameras) {
 		await subscribeToCamera(camera);
@@ -682,7 +770,10 @@ async function startListener(): Promise<void> {
 
 			logger.info('Shutting down Ring listener');
 
-			// Shutdown buffer manager first
+			// Shutdown zone manager first (stops ongoing zone recordings)
+			zoneManager.shutdown();
+
+			// Shutdown buffer manager
 			bufferManager.shutdown();
 
 			api.disconnect();

@@ -34,8 +34,10 @@ export async function getRingApi(): Promise<RingApi> {
 	ringApi = new RingApi({
 		refreshToken,
 		controlCenterDisplayName: 'Ring Home Security',
-		cameraDingsPollingSeconds: 2
+		cameraStatusPollingSeconds: config.ringPollingIntervalSeconds
 	});
+
+	logger.info({ pollingInterval: config.ringPollingIntervalSeconds }, 'Ring API status polling interval configured');
 
 	// Handle token refresh and persist new token
 	ringApi.onRefreshTokenUpdated.subscribe({

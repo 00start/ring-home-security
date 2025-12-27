@@ -133,8 +133,9 @@
 			</Select>
 
 			<div>
-				<label class="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Start Date</label>
+				<label for="timeline-start-date" class="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Start Date</label>
 				<input
+					id="timeline-start-date"
 					type="date"
 					class="block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white"
 					onchange={(e) => handleDateChange('startDate', (e.target as HTMLInputElement).value)}
@@ -142,8 +143,9 @@
 			</div>
 
 			<div>
-				<label class="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">End Date</label>
+				<label for="timeline-end-date" class="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">End Date</label>
 				<input
+					id="timeline-end-date"
 					type="date"
 					class="block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white"
 					onchange={(e) => handleDateChange('endDate', (e.target as HTMLInputElement).value)}

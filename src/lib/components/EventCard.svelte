@@ -2,16 +2,20 @@
 	import type { EventLog } from '$lib/types';
 	import { Badge } from './ui';
 	import { recordings } from '$lib/stores/recordings';
+	import { eventSelection, canSelectMore } from '$lib/stores/event-selection';
 
 	interface Props {
 		event: EventLog;
 		onclick?: () => void;
+		selectionMode?: boolean;
 	}
 
-	let { event, onclick }: Props = $props();
+	let { event, onclick, selectionMode = false }: Props = $props();
 	let retrying = $state(false);
 
 	const recording = $derived($recordings.find(r => r.id === event.recordingId));
+	const isSelected = $derived($eventSelection.has(event.id));
+	const canSelect = $derived($canSelectMore || isSelected);
 
 	const canRetry = $derived.by(() => {
 		if (!recording || recording.status !== 'failed') return false;
@@ -44,6 +48,21 @@
 			alert('Failed to retry recording');
 		} finally {
 			retrying = false;
+		}
+	}
+
+	function handleSelectionToggle(e: MouseEvent) {
+		e.stopPropagation();
+		if (selectionMode && event.recordingId && recording?.status === 'completed') {
+			eventSelection.toggleSelection(event.id);
+		}
+	}
+
+	function handleCardClick() {
+		if (selectionMode && event.recordingId && recording?.status === 'completed') {
+			eventSelection.toggleSelection(event.id);
+		} else if (onclick) {
+			onclick();
 		}
 	}
 
@@ -85,14 +104,34 @@
 		return dateObj.toLocaleDateString();
 	}
 
-	const eventInfo = eventIcons[event.eventType] ?? eventIcons.motion;
+	const eventInfo = $derived(eventIcons[event.eventType] ?? eventIcons.motion);
 </script>
 
-<button
-	onclick={onclick}
-	class="w-full rounded-lg border border-zinc-200 bg-white p-4 text-left transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-750 focus:outline-none focus:ring-2 focus:ring-blue-500"
+<div
+	role="button"
+	tabindex="0"
+	onclick={handleCardClick}
+	onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(); } }}
+	data-testid="event-card"
+	data-event-id={event.id}
+	data-event-type={event.eventType}
+	data-selection-mode={selectionMode}
+	data-selected={isSelected}
+	class="w-full rounded-lg border border-zinc-200 bg-white p-4 text-left transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-750 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer {isSelected ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-950' : ''}"
 >
 	<div class="flex items-center gap-4">
+		{#if selectionMode && event.recordingId && recording?.status === 'completed'}
+			<div class="flex-shrink-0">
+				<input
+					type="checkbox"
+					checked={isSelected}
+					disabled={!canSelect && !isSelected}
+					onclick={handleSelectionToggle}
+					data-testid="event-selection-checkbox"
+					class="h-5 w-5 rounded border-zinc-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+				/>
+			</div>
+		{/if}
 		<div class="flex-shrink-0 rounded-full bg-zinc-100 p-2 dark:bg-zinc-700">
 			<svg class="h-5 w-5 {eventInfo.color}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={eventInfo.icon} />
@@ -120,6 +159,8 @@
 						<button
 							onclick={handleRetry}
 							disabled={retrying}
+							data-testid="retry-recording-button"
+							data-recording-id={event.recordingId}
 							class="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{retrying ? 'Retrying...' : 'Retry'}
@@ -137,4 +178,4 @@
 			<p>{formatDate(event.timestamp)}</p>
 		</div>
 	</div>
-</button>
+</div>

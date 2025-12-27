@@ -1,0 +1,360 @@
+{
+  "blockers": {
+    "timestamp": "2025-12-27T08:20:00Z",
+    "summary": {
+      "total_blockers": 2,
+      "production_blockers": 2,
+      "non_blockers": 1,
+      "a11y_warnings": 15
+    },
+    "production_blockers": [
+      {
+        "blocker_id": "BLK-001",
+        "severity": "HIGH",
+        "title": "E2E Tests Fail When Run with npm test",
+        "description": "All 13 E2E test files (*.spec.ts) fail when executed via 'npm test' because Vitest attempts to run Playwright tests, resulting in 'Playwright Test did not expect test.describe() to be called here' errors. E2E tests use Playwright's API but are being executed by Vitest instead of Playwright test runner.",
+        "impact": "E2E test suite cannot validate end-to-end functionality, risking undetected integration bugs and business logic failures in production.",
+        "root_cause": {
+          "description": "Vitest configuration does not exclude E2E test files (*.spec.ts). When 'npm test' runs 'vitest run', it picks up all test files including E2E tests in tests/e2e/, which are Playwright tests incompatible with Vitest.",
+          "technical_details": [
+            "Vitest runs all .test.ts and .spec.ts files by default",
+            "E2E tests import from '@playwright/test' and use test.describe(), test(), page fixtures",
+            "Playwright's test API is incompatible with Vitest's test runner",
+            "No vitest.config.ts exists to configure test file patterns",
+            "Package.json has separate commands (test vs test:e2e) but Vitest picks up both file types"
+          ]
+        },
+        "affected_files": [
+          "/home/user/ring-home-security/tests/e2e/business/battery-optimization.spec.ts",
+          "/home/user/ring-home-security/tests/e2e/business/zone-recording.spec.ts",
+          "/home/user/ring-home-security/tests/e2e/ux/dashboard.spec.ts",
+          "/home/user/ring-home-security/tests/e2e/ux/events.spec.ts",
+          "/home/user/ring-home-security/tests/e2e/dependencies/ring-api.spec.ts",
+          "/home/user/ring-home-security/tests/e2e/ux/downloads.spec.ts",
+          "/home/user/ring-home-security/tests/e2e/dependencies/infrastructure.spec.ts",
+          "/home/user/ring-home-security/tests/e2e/quality/comprehension.spec.ts",
+          "/home/user/ring-home-security/tests/e2e/ux/settings.spec.ts",
+          "/home/user/ring-home-security/tests/e2e/dependencies/ffmpeg.spec.ts",
+          "/home/user/ring-home-security/tests/e2e/ux/alerts.spec.ts",
+          "/home/user/ring-home-security/tests/e2e/quality/responsiveness.spec.ts",
+          "/home/user/ring-home-security/tests/e2e/examples/seeded-data.spec.ts"
+        ],
+        "fix_specification": {
+          "approach": "Create vitest.config.ts to exclude E2E test files from Vitest execution",
+          "files_to_create": [
+            {
+              "file": "/home/user/ring-home-security/vitest.config.ts",
+              "purpose": "Configure Vitest to only run unit tests, excluding E2E tests"
+            }
+          ],
+          "changes_required": [
+            {
+              "action": "Create vitest.config.ts",
+              "details": "Add configuration to exclude tests/e2e/** and tests/**/*.spec.ts files",
+              "code_template": "import { defineConfig } from 'vitest/config';\nimport { sveltekit } from '@sveltejs/kit/vite';\n\nexport default defineConfig({\n  plugins: [sveltekit()],\n  test: {\n    include: ['tests/unit/**/*.test.ts'],\n    exclude: ['tests/e2e/**', 'tests/**/*.spec.ts', 'node_modules/**'],\n    globals: true,\n    environment: 'jsdom'\n  }\n});"
+            }
+          ],
+          "validation": [
+            "Run 'npm test' and verify all unit tests pass (139 tests)",
+            "Verify no E2E test files are executed",
+            "Run 'npm run test:e2e' separately to execute Playwright tests",
+            "Verify test count matches: unit tests only via npm test"
+          ]
+        }
+      },
+      {
+        "blocker_id": "BLK-002",
+        "severity": "MEDIUM",
+        "title": "CDN Verification Test Uses Wrong Test Framework",
+        "description": "The file tests/helpers/verify-no-cdn.test.ts uses Playwright's test API (test.describe, page fixture) but has .test.ts extension, causing Vitest to attempt execution and fail.",
+        "impact": "CDN dependency verification test cannot run, preventing validation that the application doesn't rely on external CDN resources for accessibility testing.",
+        "root_cause": {
+          "description": "File uses .test.ts extension (unit test convention) but contains Playwright E2E test code with browser automation.",
+          "technical_details": [
+            "File imports from '@playwright/test' but has .test.ts extension",
+            "Uses Playwright-specific features (page fixture, page.goto, page.on)",
+            "Vitest cannot execute Playwright browser automation code",
+            "Should either be moved to E2E tests or rewritten as unit test"
+          ]
+        },
+        "affected_files": [
+          "/home/user/ring-home-security/tests/helpers/verify-no-cdn.test.ts"
+        ],
+        "fix_specification": {
+          "approach": "Rename file to .spec.ts and move to E2E test directory",
+          "files_to_modify": [
+            {
+              "action": "rename",
+              "from": "/home/user/ring-home-security/tests/helpers/verify-no-cdn.test.ts",
+              "to": "/home/user/ring-home-security/tests/e2e/quality/verify-no-cdn.spec.ts"
+            }
+          ],
+          "changes_required": [
+            {
+              "action": "Move file to E2E directory",
+              "details": "Rename tests/helpers/verify-no-cdn.test.ts to tests/e2e/quality/verify-no-cdn.spec.ts to match E2E test conventions"
+            },
+            {
+              "action": "Update import path",
+              "details": "Update import of a11y.js helper to correct relative path: '../../../helpers/a11y.js'"
+            }
+          ],
+          "validation": [
+            "Run 'npm test' and verify file is not executed by Vitest",
+            "Run 'npm run test:e2e' and verify CDN verification test executes",
+            "Verify test passes and no CDN requests are detected"
+          ]
+        }
+      }
+    ],
+    "non_blockers": [
+      {
+        "blocker_id": "NBL-001",
+        "severity": "LOW",
+        "title": "Accessibility Warnings in Components",
+        "description": "15 accessibility warnings found across 10 Svelte components during svelte-check. These are non-blocking but should be addressed to improve accessibility compliance.",
+        "impact": "Reduced accessibility for users with disabilities. Does not block core functionality but affects user experience and WCAG compliance.",
+        "component_count": 10,
+        "warning_count": 15,
+        "details": "See a11y_warnings section below for full breakdown"
+      }
+    ],
+    "a11y_warnings": [
+      {
+        "file": "/home/user/ring-home-security/src/lib/components/ui/Modal.svelte",
+        "line": 89,
+        "warning_count": 2,
+        "warnings": [
+          {
+            "code": "a11y_interactive_supports_focus",
+            "severity": "warn",
+            "message": "Elements with the 'dialog' interactive role must have a tabindex value",
+            "url": "https://svelte.dev/e/a11y_interactive_supports_focus",
+            "fix": "Add tabindex=\"-1\" or tabindex=\"0\" to the dialog div element"
+          },
+          {
+            "code": "a11y_click_events_have_key_events",
+            "severity": "warn",
+            "message": "Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler",
+            "url": "https://svelte.dev/e/a11y_click_events_have_key_events",
+            "fix": "Add onkeydown or onkeyup handler to the backdrop div, or use a button element"
+          }
+        ]
+      },
+      {
+        "file": "/home/user/ring-home-security/src/lib/components/ui/Input.svelte",
+        "line": 13,
+        "warning_count": 1,
+        "warnings": [
+          {
+            "code": "state_referenced_locally",
+            "severity": "warn",
+            "message": "This reference only captures the initial value of `id`. Did you mean to reference it inside a closure instead?",
+            "url": "https://svelte.dev/e/state_referenced_locally",
+            "fix": "Use $derived or move inputId generation inside a reactive statement"
+          }
+        ]
+      },
+      {
+        "file": "/home/user/ring-home-security/src/lib/components/ui/Select.svelte",
+        "line": 14,
+        "warning_count": 1,
+        "warnings": [
+          {
+            "code": "state_referenced_locally",
+            "severity": "warn",
+            "message": "This reference only captures the initial value of `id`. Did you mean to reference it inside a closure instead?",
+            "url": "https://svelte.dev/e/state_referenced_locally",
+            "fix": "Use $derived or move selectId generation inside a reactive statement"
+          }
+        ]
+      },
+      {
+        "file": "/home/user/ring-home-security/src/lib/components/DeviceCard.svelte",
+        "line": 105,
+        "warning_count": 1,
+        "warnings": [
+          {
+            "code": "element_implicitly_closed",
+            "severity": "warn",
+            "message": "This element is implicitly closed by the following `</Badge>`, which can cause an unexpected DOM structure",
+            "url": "https://svelte.dev/e/element_implicitly_closed",
+            "fix": "Add explicit </span> closing tag before </Badge>"
+          }
+        ]
+      },
+      {
+        "file": "/home/user/ring-home-security/src/lib/components/EventCard.svelte",
+        "line": 88,
+        "warning_count": 2,
+        "warnings": [
+          {
+            "code": "state_referenced_locally",
+            "severity": "warn",
+            "message": "This reference only captures the initial value of `event`. Did you mean to reference it inside a closure instead?",
+            "url": "https://svelte.dev/e/state_referenced_locally",
+            "fix": "Use $derived or move eventInfo into a reactive statement"
+          },
+          {
+            "code": "node_invalid_placement_ssr",
+            "severity": "warn",
+            "line": 123,
+            "message": "`<button>` cannot be a descendant of `<button>`. When rendering on server, HTML will be modified by browser",
+            "url": "https://svelte.dev/e/node_invalid_placement_ssr",
+            "fix": "Restructure component to avoid nested buttons - use div with onclick or separate button placement"
+          }
+        ]
+      },
+      {
+        "file": "/home/user/ring-home-security/src/lib/components/VideoPlayer.svelte",
+        "line": 115,
+        "warning_count": 1,
+        "warnings": [
+          {
+            "code": "a11y_consider_explicit_label",
+            "severity": "warn",
+            "message": "Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute",
+            "url": "https://svelte.dev/e/a11y_consider_explicit_label",
+            "fix": "Add aria-label=\"Toggle fullscreen\" to the fullscreen button"
+          }
+        ]
+      },
+      {
+        "file": "/home/user/ring-home-security/src/lib/components/ToastContainer.svelte",
+        "line": 74,
+        "warning_count": 1,
+        "warnings": [
+          {
+            "code": "a11y_consider_explicit_label",
+            "severity": "warn",
+            "message": "Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute",
+            "url": "https://svelte.dev/e/a11y_consider_explicit_label",
+            "fix": "Add aria-label=\"Dismiss notification\" to the dismiss button"
+          }
+        ]
+      },
+      {
+        "file": "/home/user/ring-home-security/src/routes/(app)/devices/[id]/+page.svelte",
+        "line": 189,
+        "warning_count": 1,
+        "warnings": [
+          {
+            "code": "a11y_consider_explicit_label",
+            "severity": "warn",
+            "message": "Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute",
+            "url": "https://svelte.dev/e/a11y_consider_explicit_label",
+            "fix": "Add aria-label=\"Show tooltip\" or aria-label=\"Information\" to the info button"
+          }
+        ]
+      },
+      {
+        "file": "/home/user/ring-home-security/src/routes/(app)/settings/+page.svelte",
+        "line": 248,
+        "warning_count": 3,
+        "warnings": [
+          {
+            "code": "a11y_label_has_associated_control",
+            "severity": "warn",
+            "message": "A form label must be associated with a control",
+            "url": "https://svelte.dev/e/a11y_label_has_associated_control",
+            "fix": "Change <label> to <div> or <span> for read-only display fields (Username, Version, Environment)"
+          },
+          {
+            "code": "a11y_label_has_associated_control",
+            "severity": "warn",
+            "line": 392,
+            "message": "A form label must be associated with a control",
+            "url": "https://svelte.dev/e/a11y_label_has_associated_control",
+            "fix": "Change <label> to <div> or <span> for Version field"
+          },
+          {
+            "code": "a11y_label_has_associated_control",
+            "severity": "warn",
+            "line": 396,
+            "message": "A form label must be associated with a control",
+            "url": "https://svelte.dev/e/a11y_label_has_associated_control",
+            "fix": "Change <label> to <div> or <span> for Environment field"
+          }
+        ]
+      },
+      {
+        "file": "/home/user/ring-home-security/src/routes/(app)/timeline/+page.svelte",
+        "line": 136,
+        "warning_count": 2,
+        "warnings": [
+          {
+            "code": "a11y_label_has_associated_control",
+            "severity": "warn",
+            "message": "A form label must be associated with a control",
+            "url": "https://svelte.dev/e/a11y_label_has_associated_control",
+            "fix": "Add for=\"start-date-input\" to the label and id=\"start-date-input\" to the input element"
+          },
+          {
+            "code": "a11y_label_has_associated_control",
+            "severity": "warn",
+            "line": 145,
+            "message": "A form label must be associated with a control",
+            "url": "https://svelte.dev/e/a11y_label_has_associated_control",
+            "fix": "Add for=\"end-date-input\" to the label and id=\"end-date-input\" to the input element"
+          }
+        ]
+      }
+    ],
+    "test_results": {
+      "unit_tests": {
+        "status": "PASSED",
+        "total": 139,
+        "passed": 139,
+        "failed": 0,
+        "suites_passed": 8,
+        "suites_failed": 0,
+        "execution_time_ms": 495
+      },
+      "e2e_tests": {
+        "status": "BLOCKED",
+        "reason": "E2E tests fail when run with npm test due to framework incompatibility",
+        "suites_failed": 14,
+        "affected_test_files": 14,
+        "note": "Tests should be run with 'npm run test:e2e' using Playwright runner"
+      }
+    },
+    "recommendations": {
+      "immediate_actions": [
+        {
+          "priority": "P0",
+          "action": "Create vitest.config.ts to exclude E2E tests from Vitest execution",
+          "blocker": "BLK-001",
+          "estimated_effort": "5 minutes"
+        },
+        {
+          "priority": "P0",
+          "action": "Move tests/helpers/verify-no-cdn.test.ts to tests/e2e/quality/verify-no-cdn.spec.ts",
+          "blocker": "BLK-002",
+          "estimated_effort": "5 minutes"
+        }
+      ],
+      "follow_up_actions": [
+        {
+          "priority": "P2",
+          "action": "Address 15 accessibility warnings to improve WCAG compliance",
+          "blocker": "NBL-001",
+          "estimated_effort": "2-3 hours",
+          "note": "Can be done incrementally, not blocking release"
+        }
+      ],
+      "ci_cd_improvements": [
+        {
+          "action": "Update CI pipeline to run unit and E2E tests separately",
+          "commands": [
+            "npm test (unit tests only)",
+            "npm run test:e2e (E2E tests)"
+          ]
+        },
+        {
+          "action": "Add test count validation to ensure all tests are executed",
+          "details": "Verify expected test counts match actual execution"
+        }
+      ]
+    }
+  }
+}
