@@ -25,11 +25,19 @@
 </script>
 
 <div class="relative min-h-screen">
+	<!-- Skip to main content link for keyboard navigation -->
+	<a
+		href="#main-content"
+		class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-blue-600 focus:px-4 focus:py-2 focus:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+	>
+		Skip to main content
+	</a>
+
 	<!-- Background that extends beyond viewport -->
 	<div class="fixed inset-0 -z-10 bg-zinc-50 dark:bg-zinc-900"></div>
 
 	<Navbar />
-	<main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+	<main id="main-content" class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8" tabindex="-1">
 		{@render children()}
 	</main>
 </div>

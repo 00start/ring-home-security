@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { checkAccessibility } from '../../helpers/a11y.js';
 
 /**
  * Quality Dimension Tests: C. Responsiveness
@@ -101,28 +102,12 @@ test.describe('Quality: Usability', () => {
       await page.goto('/');
       await page.waitForSelector('[data-testid="dashboard"]');
 
-      // Inject axe-core for accessibility testing
-      await page.addScriptTag({
-        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
-      });
-
-      // Run axe accessibility audit
-      const results = await page.evaluate(() => {
-        return new Promise((resolve) => {
-          // @ts-ignore - axe is loaded dynamically
-          axe.run((err, results) => {
-            if (err) throw err;
-            resolve(results);
-          });
-        });
-      });
-
-      // Check for violations
-      const violations = (results as any).violations;
+      // Run axe accessibility audit using local package
+      const results = await checkAccessibility(page, { autoAssert: false });
 
       // Filter critical and serious violations
-      const criticalViolations = violations.filter(
-        (v: any) => v.impact === 'critical' || v.impact === 'serious'
+      const criticalViolations = results.violations.filter(
+        (v) => v.impact === 'critical' || v.impact === 'serious'
       );
 
       if (criticalViolations.length > 0) {
@@ -136,22 +121,10 @@ test.describe('Quality: Usability', () => {
       await page.goto('/');
       await page.waitForSelector('[data-testid="dashboard"]');
 
-      await page.addScriptTag({
-        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      // Check color contrast using local axe-core
+      await checkAccessibility(page, {
+        includeOnly: ['color-contrast']
       });
-
-      const results = await page.evaluate(() => {
-        return new Promise((resolve) => {
-          // @ts-ignore
-          axe.run({ rules: ['color-contrast'] }, (err, results) => {
-            if (err) throw err;
-            resolve(results);
-          });
-        });
-      });
-
-      const violations = (results as any).violations;
-      expect(violations.length).toBe(0);
     });
 
     test('WCAG 2.1 Level AA compliance - focus indicators', async ({ page }) => {
@@ -181,87 +154,39 @@ test.describe('Quality: Usability', () => {
       await page.goto('/');
       await page.waitForSelector('[data-testid="dashboard"]');
 
-      await page.addScriptTag({
-        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      // Check image alt text using local axe-core
+      await checkAccessibility(page, {
+        includeOnly: ['image-alt']
       });
-
-      const results = await page.evaluate(() => {
-        return new Promise((resolve) => {
-          // @ts-ignore
-          axe.run({ rules: ['image-alt'] }, (err, results) => {
-            if (err) throw err;
-            resolve(results);
-          });
-        });
-      });
-
-      const violations = (results as any).violations;
-      expect(violations.length).toBe(0);
     });
 
     test('form inputs have associated labels', async ({ page }) => {
       await page.goto('/');
 
-      await page.addScriptTag({
-        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      // Check form labels using local axe-core
+      await checkAccessibility(page, {
+        includeOnly: ['label']
       });
-
-      const results = await page.evaluate(() => {
-        return new Promise((resolve) => {
-          // @ts-ignore
-          axe.run({ rules: ['label'] }, (err, results) => {
-            if (err) throw err;
-            resolve(results);
-          });
-        });
-      });
-
-      const violations = (results as any).violations;
-      expect(violations.length).toBe(0);
     });
 
     test('heading hierarchy is logical', async ({ page }) => {
       await page.goto('/');
       await page.waitForSelector('[data-testid="dashboard"]');
 
-      await page.addScriptTag({
-        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      // Check heading order using local axe-core
+      await checkAccessibility(page, {
+        includeOnly: ['heading-order']
       });
-
-      const results = await page.evaluate(() => {
-        return new Promise((resolve) => {
-          // @ts-ignore
-          axe.run({ rules: ['heading-order'] }, (err, results) => {
-            if (err) throw err;
-            resolve(results);
-          });
-        });
-      });
-
-      const violations = (results as any).violations;
-      expect(violations.length).toBe(0);
     });
 
     test('buttons have accessible names', async ({ page }) => {
       await page.goto('/');
       await page.waitForSelector('[data-testid="dashboard"]');
 
-      await page.addScriptTag({
-        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      // Check button names using local axe-core
+      await checkAccessibility(page, {
+        includeOnly: ['button-name']
       });
-
-      const results = await page.evaluate(() => {
-        return new Promise((resolve) => {
-          // @ts-ignore
-          axe.run({ rules: ['button-name'] }, (err, results) => {
-            if (err) throw err;
-            resolve(results);
-          });
-        });
-      });
-
-      const violations = (results as any).violations;
-      expect(violations.length).toBe(0);
     });
 
     test('page has valid HTML lang attribute', async ({ page }) => {
@@ -279,44 +204,20 @@ test.describe('Quality: Usability', () => {
       await page.goto('/');
       await page.waitForSelector('[data-testid="dashboard"]');
 
-      await page.addScriptTag({
-        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      // Check link names using local axe-core
+      await checkAccessibility(page, {
+        includeOnly: ['link-name']
       });
-
-      const results = await page.evaluate(() => {
-        return new Promise((resolve) => {
-          // @ts-ignore
-          axe.run({ rules: ['link-name'] }, (err, results) => {
-            if (err) throw err;
-            resolve(results);
-          });
-        });
-      });
-
-      const violations = (results as any).violations;
-      expect(violations.length).toBe(0);
     });
 
     test('ARIA roles are used correctly', async ({ page }) => {
       await page.goto('/');
       await page.waitForSelector('[data-testid="dashboard"]');
 
-      await page.addScriptTag({
-        url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+      // Check ARIA usage using local axe-core
+      await checkAccessibility(page, {
+        includeOnly: ['aria-roles', 'aria-valid-attr']
       });
-
-      const results = await page.evaluate(() => {
-        return new Promise((resolve) => {
-          // @ts-ignore
-          axe.run({ rules: ['aria-roles', 'aria-valid-attr'] }, (err, results) => {
-            if (err) throw err;
-            resolve(results);
-          });
-        });
-      });
-
-      const violations = (results as any).violations;
-      expect(violations.length).toBe(0);
     });
   });
 
@@ -398,22 +299,10 @@ test.describe('Quality: Usability', () => {
       const tableCount = await tables.count();
 
       if (tableCount > 0) {
-        await page.addScriptTag({
-          url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
+        // Check table headers using local axe-core
+        await checkAccessibility(page, {
+          includeOnly: ['table-headers']
         });
-
-        const results = await page.evaluate(() => {
-          return new Promise((resolve) => {
-            // @ts-ignore
-            axe.run({ rules: ['table-headers'] }, (err, results) => {
-              if (err) throw err;
-              resolve(results);
-            });
-          });
-        });
-
-        const violations = (results as any).violations;
-        expect(violations.length).toBe(0);
       }
     });
 

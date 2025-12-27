@@ -90,6 +90,9 @@
 
 <button
 	onclick={onclick}
+	data-testid="event-card"
+	data-event-id={event.id}
+	data-event-type={event.eventType}
 	class="w-full rounded-lg border border-zinc-200 bg-white p-4 text-left transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-750 focus:outline-none focus:ring-2 focus:ring-blue-500"
 >
 	<div class="flex items-center gap-4">
@@ -120,6 +123,8 @@
 						<button
 							onclick={handleRetry}
 							disabled={retrying}
+							data-testid="retry-recording-button"
+							data-recording-id={event.recordingId}
 							class="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{retrying ? 'Retrying...' : 'Retry'}

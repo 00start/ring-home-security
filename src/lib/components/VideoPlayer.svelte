@@ -62,11 +62,12 @@
 	}
 </script>
 
-<div class="relative overflow-hidden rounded-lg bg-black">
+<div data-testid="video-player" data-recording-id={recording.id} class="relative overflow-hidden rounded-lg bg-black">
 	<video
 		bind:this={videoElement}
 		src={getVideoUrl(recording.id)}
 		poster={recording.thumbnailPath ? getThumbnailUrl(recording.id) : undefined}
+		data-testid="video-element"
 		class="w-full"
 		{autoplay}
 		preload="metadata"
@@ -82,6 +83,8 @@
 	<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4">
 		<div class="flex items-center gap-4">
 			<button
+				data-testid="video-play-pause-button"
+				data-playing={isPlaying}
 				onclick={togglePlay}
 				class="rounded-full bg-white/20 p-2 text-white transition-colors hover:bg-white/30"
 			>
@@ -110,6 +113,7 @@
 			</div>
 
 			<button
+				data-testid="video-fullscreen-button"
 				onclick={toggleFullscreen}
 				class="rounded-full bg-white/20 p-2 text-white transition-colors hover:bg-white/30"
 			>

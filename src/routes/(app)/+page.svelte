@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { StatCard, DeviceCard, EventCard, LiveViewModal } from '$lib/components';
+	import { StatCard, DeviceCard, EventCard, LiveViewModal, BatteryWarningBanner } from '$lib/components';
 	import {
 		stats,
 		fetchStats,
@@ -59,6 +59,9 @@
 			Monitor your home security devices and events
 		</p>
 	</div>
+
+	<!-- Battery Warning Banner -->
+	<BatteryWarningBanner devices={$devices} />
 
 	<!-- Stats -->
 	{#if $stats}

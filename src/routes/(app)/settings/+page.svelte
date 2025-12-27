@@ -241,7 +241,7 @@
 	</div>
 
 	<!-- Account Settings -->
-	<Card title="Account">
+	<Card title="Account" data-testid="settings-account-section">
 		{#snippet children()}
 			<div class="space-y-4">
 				<div>
@@ -253,7 +253,7 @@
 	</Card>
 
 	<!-- Notification Settings -->
-	<Card title="Notifications">
+	<Card title="Notifications" data-testid="settings-notifications-section">
 		{#snippet children()}
 			<div class="space-y-6">
 				<!-- Browser Permission -->
@@ -344,7 +344,7 @@
 	</Card>
 
 	<!-- Change Password -->
-	<Card title="Change Password">
+	<Card title="Change Password" data-testid="settings-password-section">
 		{#snippet children()}
 			<form onsubmit={(e) => { e.preventDefault(); handlePasswordChange(); }} class="space-y-4">
 				<Input
@@ -369,11 +369,11 @@
 				/>
 
 				{#if passwordError}
-					<p class="text-sm text-red-600">{passwordError}</p>
+					<p data-testid="error-message" data-error-type="password" class="text-sm text-red-600">{passwordError}</p>
 				{/if}
 
 				{#if passwordSuccess}
-					<p class="text-sm text-green-600">{passwordSuccess}</p>
+					<p data-testid="success-message" data-success-type="password" class="text-sm text-green-600">{passwordSuccess}</p>
 				{/if}
 
 				<Button type="submit" loading={isChangingPassword}>
@@ -384,7 +384,7 @@
 	</Card>
 
 	<!-- System Information -->
-	<Card title="System Information">
+	<Card title="System Information" data-testid="settings-system-section">
 		{#snippet children()}
 			<div class="space-y-4">
 				<div class="grid gap-4 sm:grid-cols-2">
@@ -420,7 +420,7 @@
 	</Card>
 
 	<!-- User Management -->
-	<Card title="User Management">
+	<Card title="User Management" data-testid="settings-users-section">
 		{#snippet children()}
 			<div class="space-y-6">
 				<!-- Existing Users -->
@@ -474,7 +474,7 @@
 						/>
 
 						{#if createUserError}
-							<p class="text-sm text-red-600">{createUserError}</p>
+							<p data-testid="error-message" data-error-type="create-user" class="text-sm text-red-600">{createUserError}</p>
 						{/if}
 
 						<Button type="submit" loading={isCreatingUser}>
@@ -490,7 +490,7 @@
 	<LogViewer />
 
 	<!-- Danger Zone -->
-	<Card title="Danger Zone">
+	<Card title="Danger Zone" data-testid="settings-danger-section">
 		{#snippet children()}
 			<div class="space-y-4">
 				<p class="text-sm text-zinc-500 dark:text-zinc-400">

@@ -5,9 +5,10 @@
 		label?: string;
 		error?: string;
 		value?: string;
+		'data-testid'?: string;
 	}
 
-	let { label, error, class: className = '', id, value = $bindable(''), ...rest }: Props = $props();
+	let { label, error, class: className = '', id, value = $bindable(''), 'data-testid': testId, ...rest }: Props = $props();
 
 	const inputId = id ?? `input-${Math.random().toString(36).substr(2, 9)}`;
 </script>
@@ -21,6 +22,7 @@
 	<input
 		id={inputId}
 		bind:value
+		data-testid={testId || `input-${inputId}`}
 		class="block w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors
 			{error
 				? 'border-red-300 focus:border-red-500 focus:ring-red-500'
@@ -32,6 +34,6 @@
 		{...rest}
 	/>
 	{#if error}
-		<p class="mt-1 text-sm text-red-600">{error}</p>
+		<p data-testid="input-error" class="mt-1 text-sm text-red-600">{error}</p>
 	{/if}
 </div>

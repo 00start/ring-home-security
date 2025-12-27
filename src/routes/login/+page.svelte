@@ -47,12 +47,13 @@
 
 		<Card>
 			{#snippet children()}
-				<form onsubmit={handleSubmit} class="space-y-6">
+				<form onsubmit={handleSubmit} class="space-y-6" data-testid="login-form">
 					<Input
 						type="text"
 						label="Username"
 						bind:value={username}
 						autocomplete="username"
+						data-testid="login-username-input"
 						required
 					/>
 
@@ -61,16 +62,17 @@
 						label="Password"
 						bind:value={password}
 						autocomplete="current-password"
+						data-testid="login-password-input"
 						required
 					/>
 
 					{#if error}
 						<div class="rounded-md bg-red-50 p-4 dark:bg-red-900/20">
-							<p class="text-sm text-red-600 dark:text-red-400">{error}</p>
+							<p data-testid="error-message" data-error-type="login" class="text-sm text-red-600 dark:text-red-400">{error}</p>
 						</div>
 					{/if}
 
-					<Button type="submit" {loading} class="w-full">
+					<Button type="submit" {loading} class="w-full" data-testid="login-submit-button">
 						Sign in
 					</Button>
 				</form>

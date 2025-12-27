@@ -286,7 +286,7 @@ async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<stri
 		logger.info({
 			cameraId: camera.id,
 			cameraName: camera.name,
-			hasSnapshotWithinSeconds: camera.hasSnapshotWithinSeconds,
+			hasSnapshotWithinSeconds: (camera as any).hasSnapshotWithinSeconds,
 			operatingOnBattery: camera.operatingOnBattery,
 			subscribed: cameraData.subscribed,
 			subscriptionStatus: cameraData.subscription_status,
@@ -327,14 +327,15 @@ async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<stri
 						if (attemptCount % 3 === 0) {
 							logger.info({ attemptCount }, 'Trying alternative approach: fetching recent events');
 							try {
-								const events = await camera.getEvents({ limit: 10 });
+								const eventsResponse = await camera.getEvents({ limit: 10 });
+								const events = Array.isArray(eventsResponse) ? eventsResponse : (eventsResponse as any).events || [];
 								logger.info({
 									eventCount: events.length,
-									eventIds: events.map(e => e.id),
+									eventIds: events.map((e: any) => e.id),
 									lookingFor: dingId
 								}, 'Recent events fetched');
 
-								const matchingEvent = events.find(e => e.id === dingId);
+								const matchingEvent = events.find((e: any) => e.id === dingId);
 								if (matchingEvent) {
 									logger.info({ event: matchingEvent }, 'Found matching event');
 
@@ -461,6 +462,7 @@ async function subscribeToCamera(camera: RingCamera): Promise<void> {
 				let eventType: 'motion' | 'ding' = 'motion';
 
 				// New notification format (notification.data.event.ding.subtype)
+				const notificationAny = notification as any;
 				if (notification.data?.event?.ding?.subtype === 'motion') {
 					eventType = 'motion';
 				} else if (notification.data?.event?.ding?.subtype === 'button_press') {
@@ -469,19 +471,17 @@ async function subscribeToCamera(camera: RingCamera): Promise<void> {
 					eventType = 'ding';
 				} else if (notification.data?.event?.ding?.detection_type === 'motion') {
 					eventType = 'motion';
-				} else if (notification.data?.event?.ding?.detection_type === 'ding') {
-					eventType = 'ding';
 				}
 				// Old notification format (notification.ding.kind)
-				else if (notification.ding?.kind === 'ding') {
+				else if (notificationAny.ding?.kind === 'ding') {
 					eventType = 'ding';
-				} else if (notification.ding?.kind === 'motion') {
+				} else if (notificationAny.ding?.kind === 'motion') {
 					eventType = 'motion';
 				}
 				// Fallback to action field
-				else if (notification.action === 'com.ring.push.HANDLE_NEW_DING') {
+				else if (notificationAny.action === 'com.ring.push.HANDLE_NEW_DING') {
 					eventType = 'ding';
-				} else if (notification.action === 'com.ring.push.HANDLE_NEW_motion') {
+				} else if (notificationAny.action === 'com.ring.push.HANDLE_NEW_motion') {
 					eventType = 'motion';
 				}
 
@@ -499,7 +499,7 @@ async function subscribeToCamera(camera: RingCamera): Promise<void> {
 	// Subscribe to battery updates
 	camera.onBatteryLevel?.subscribe({
 		next: (batteryLevel) => {
-			if (batteryLevel !== undefined) {
+			if (batteryLevel !== undefined && batteryLevel !== null) {
 				devicesRepo.updateDeviceBattery(camera.id.toString(), batteryLevel);
 			}
 		}

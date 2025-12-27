@@ -131,6 +131,8 @@
 		{#if supportsLiveView(device.type) && device.isOnline}
 			<div class="mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-700">
 				<button
+					data-testid="live-view-button"
+					data-device-id={device.id}
 					onclick={handleLiveView}
 					type="button"
 					class="w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors cursor-pointer"

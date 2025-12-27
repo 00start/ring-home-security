@@ -7,3 +7,4 @@ export { default as Navbar } from './Navbar.svelte';
 export { default as LogViewer } from './LogViewer.svelte';
 export { default as ToastContainer } from './ToastContainer.svelte';
 export { default as LiveViewModal } from './LiveViewModal.svelte';
+export { default as BatteryWarningBanner } from './BatteryWarningBanner.svelte';

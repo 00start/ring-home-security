@@ -32,7 +32,7 @@
 	}
 </script>
 
-<nav class="border-b border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
+<nav data-testid="navbar" class="border-b border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
 	<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 		<div class="flex h-16 justify-between">
 			<div class="flex">
@@ -46,6 +46,8 @@
 					{#each navItems as item}
 						<a
 							href={item.href}
+							data-testid="nav-link-{item.label.toLowerCase()}"
+							data-active={$page.url.pathname === item.href}
 							class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium transition-colors
 								{$page.url.pathname === item.href
 									? 'border-blue-500 text-zinc-900 dark:text-white'
@@ -66,6 +68,7 @@
 					</span>
 				{/if}
 				<button
+					data-testid="nav-logout-button"
 					onclick={handleLogout}
 					class="rounded-md px-3 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-300 cursor-pointer"
 				>
@@ -81,6 +84,8 @@
 			{#each navItems as item}
 				<a
 					href={item.href}
+					data-testid="nav-mobile-link-{item.label.toLowerCase()}"
+					data-active={$page.url.pathname === item.href}
 					class="flex items-center rounded-md px-3 py-2 text-sm font-medium
 						{$page.url.pathname === item.href
 							? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
