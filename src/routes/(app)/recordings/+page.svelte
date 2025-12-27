@@ -4,6 +4,7 @@
 	import { recordings, fetchRecordings, getThumbnailUrl } from '$lib/stores/recordings';
 	import { devices, fetchDevices } from '$lib/stores/devices';
 	import { formatBytes, formatDuration } from '$lib/utils';
+	import { lazyLoad } from '$lib/utils/performance';
 	import type { Recording, RecordingStatus } from '$lib/types';
 
 	let selectedRecording: Recording | null = $state(null);
@@ -158,7 +159,7 @@
 		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{#each $recordings as recording}
 				<div
-					class="overflow-hidden rounded-lg border border-zinc-200 bg-white text-left dark:border-zinc-700 dark:bg-zinc-800"
+					class="overflow-hidden rounded-lg border border-zinc-200 bg-white text-left transition-all duration-200 hover:shadow-lg dark:border-zinc-700 dark:bg-zinc-800"
 					class:opacity-60={recording.status !== 'completed' && recording.status !== 'failed'}
 				>
 					<!-- Thumbnail -->
@@ -167,24 +168,37 @@
 							<!-- Clickable area for completed recordings -->
 							<button
 								onclick={() => handleRecordingClick(recording)}
-								class="absolute inset-0 w-full h-full cursor-pointer"
+								class="group absolute inset-0 w-full h-full cursor-pointer overflow-hidden"
 								aria-label="Play recording from {getDeviceName(recording.deviceId)}"
 							>
 								{#if recording.thumbnailPath}
 									<img
-										data-src={getThumbnailUrl(recording.id)}
-										alt="Recording thumbnail for {getDeviceName(recording.deviceId)}"
-										class="h-full w-full object-cover bg-zinc-800"
-										loading="lazy"
+										use:lazyLoad={{ src: getThumbnailUrl(recording.id) }}
+										alt=""
+										class="h-full w-full object-cover bg-zinc-800 transition-opacity duration-200"
+										onerror={(e) => {
+											const target = e.currentTarget as HTMLImageElement;
+											target.style.display = 'none';
+											const fallback = target.nextElementSibling as HTMLElement;
+											if (fallback) fallback.style.display = 'flex';
+										}}
 									/>
-								{:else}
-									<div class="flex h-full items-center justify-center">
+									<!-- Fallback for failed image loads -->
+									<div class="hidden h-full items-center justify-center flex-col gap-2 bg-zinc-800" style="display: none;">
 										<svg class="h-12 w-12 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
 										</svg>
+										<span class="text-xs text-zinc-500">No Thumbnail</span>
+									</div>
+								{:else}
+									<div class="flex h-full items-center justify-center flex-col gap-2 bg-zinc-800">
+										<svg class="h-12 w-12 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+										</svg>
+										<span class="text-xs text-zinc-500">No Thumbnail</span>
 									</div>
 								{/if}
-								<div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity hover:opacity-100">
+								<div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
 									<svg class="h-16 w-16 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 										<path d="M8 5v14l11-7z" />
 									</svg>
@@ -192,10 +206,13 @@
 							</button>
 						{:else}
 							<!-- Non-clickable placeholder for non-completed recordings -->
-							<div class="flex h-full items-center justify-center">
+							<div class="flex h-full items-center justify-center flex-col gap-2 bg-zinc-800">
 								<svg class="h-12 w-12 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
 								</svg>
+								<span class="text-xs text-zinc-500">
+									{recording.status === 'processing' ? 'Processing...' : recording.status === 'pending' ? 'Pending' : 'Processing'}
+								</span>
 							</div>
 						{/if}
 
