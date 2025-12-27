@@ -791,7 +791,16 @@ async function main(): Promise<void> {
 		try {
 			await startListener();
 		} catch (error) {
-			logger.error({ error }, 'Ring listener error, restarting in 30 seconds');
+			logger.error(
+				{
+					error: error instanceof Error ? {
+						message: error.message,
+						stack: error.stack,
+						name: error.name
+					} : error
+				},
+				'Ring listener error, restarting in 30 seconds'
+			);
 			await sleep(30000);
 		}
 	}
