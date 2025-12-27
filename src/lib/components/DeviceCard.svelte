@@ -82,6 +82,10 @@
 	{#snippet children()}
 		<button
 			onclick={onclick}
+			data-testid="camera-card"
+			data-device-id={device.id}
+			data-status={device.isOnline ? 'online' : 'offline'}
+			data-battery-low={device.batteryLevel !== undefined && device.batteryLevel <= 20}
 			class="w-full text-left -m-6 p-6 transition-transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg"
 		>
 			<div class="flex items-start justify-between">
@@ -98,6 +102,7 @@
 				</div>
 				<div class="flex flex-col items-end gap-1">
 					<Badge variant={device.isOnline ? 'success' : 'danger'}>
+						<span data-testid="status-indicator" data-status={device.isOnline ? 'online' : 'offline'}>
 						{device.isOnline ? 'Online' : 'Offline'}
 					</Badge>
 					{#if device.type === 'sensor' && device.subtype === 'contact' && device.faulted !== undefined}
