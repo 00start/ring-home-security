@@ -18,7 +18,17 @@ import { createTranscodeWorker, closeRedisConnection } from '../lib/queue/index.
 import { config } from '../lib/config/index.js';
 import { createLogger } from '../lib/utils/logger.server.js';
 import { ensureDir, getThumbnailPath } from '../lib/utils/paths.js';
-import type { TranscodeJobData, TranscodeJobResult } from '../lib/types/index.js';
+import type { TranscodeJobData, TranscodeJobResult, VideoQuality } from '../lib/types/index.js';
+import {
+	getQualityPreset,
+	getQualityForEventType,
+	getFFmpegTranscodeArgs
+} from '../lib/services/video-quality.service.js';
+import {
+	getDefaultThumbnailOptions,
+	getFFmpegThumbnailArgs,
+	getThumbnailPath as getThumbnailPathWithFormat
+} from '../lib/services/thumbnail.service.js';
 
 const logger = createLogger('transcode-worker');
 
@@ -57,33 +67,23 @@ async function downloadVideo(url: string, outputPath: string): Promise<void> {
 
 async function transcodeVideo(
 	inputPath: string,
-	outputPath: string
+	outputPath: string,
+	quality: VideoQuality = config.defaultVideoQuality as VideoQuality
 ): Promise<{ duration: number; fileSize: number }> {
 	await ensureDir(outputPath);
 
 	const ffmpegPath = config.ffmpegPath || 'ffmpeg';
+	const preset = getQualityPreset(quality);
 
 	return new Promise((resolve, reject) => {
-		const args = [
-			'-i',
+		// Use quality-aware FFmpeg arguments
+		const args = getFFmpegTranscodeArgs({
+			quality,
 			inputPath,
-			'-c:v',
-			'libx264',
-			'-preset',
-			'fast',
-			'-crf',
-			'23',
-			'-c:a',
-			'aac',
-			'-b:a',
-			'128k',
-			'-movflags',
-			'+faststart',
-			'-y',
 			outputPath
-		];
+		});
 
-		logger.debug({ ffmpegPath, args }, 'Running ffmpeg');
+		logger.debug({ ffmpegPath, args, quality, preset: preset.preset, crf: preset.crf }, 'Running ffmpeg with quality preset');
 
 		const ffmpeg = spawn(ffmpegPath, args);
 
@@ -180,29 +180,45 @@ async function generateThumbnail(videoPath: string, thumbnailPath: string): Prom
 	await ensureDir(thumbnailPath);
 
 	const ffmpegPath = config.ffmpegPath || 'ffmpeg';
+	const thumbnailOptions = getDefaultThumbnailOptions();
 
 	return new Promise((resolve, reject) => {
-		const args = [
-			'-i',
-			videoPath,
-			'-ss',
-			'00:00:01',
-			'-vframes',
-			'1',
-			'-vf',
-			'scale=320:-1',
-			'-y',
-			thumbnailPath
-		];
+		// Use optimized thumbnail generation with WebP support
+		const args = getFFmpegThumbnailArgs({
+			inputPath: videoPath,
+			outputPath: thumbnailPath,
+			options: thumbnailOptions
+		});
+
+		logger.debug(
+			{
+				videoPath,
+				thumbnailPath,
+				format: thumbnailOptions.format,
+				width: thumbnailOptions.width,
+				quality: thumbnailOptions.quality
+			},
+			'Generating thumbnail with optimized settings'
+		);
 
 		const ffmpeg = spawn(ffmpegPath, args);
+
+		let stderr = '';
+
+		ffmpeg.stderr.on('data', (data) => {
+			stderr += data.toString();
+		});
 
 		ffmpeg.on('close', (code) => {
 			if (code !== 0) {
 				// Thumbnail generation is optional, don't fail the job
-				logger.warn({ code, videoPath }, 'Thumbnail generation failed');
+				logger.warn({ code, videoPath, stderr: stderr.slice(-500) }, 'Thumbnail generation failed');
 				resolve();
 			} else {
+				logger.debug(
+					{ thumbnailPath, format: thumbnailOptions.format },
+					'Thumbnail generated successfully'
+				);
 				resolve();
 			}
 		});
@@ -215,9 +231,16 @@ async function generateThumbnail(videoPath: string, thumbnailPath: string): Prom
 }
 
 async function processTranscodeJob(job: Job<TranscodeJobData>): Promise<TranscodeJobResult> {
-	const { recordingId, sourceUrl, deviceId, eventId, timestamp } = job.data;
+	const { recordingId, sourceUrl, deviceId, eventId, timestamp, eventType, quality: specifiedQuality } = job.data;
 
-	logger.info({ recordingId, deviceId }, 'Processing transcode job');
+	// Determine video quality: use specified quality, or derive from event type, or use default
+	const quality: VideoQuality = specifiedQuality
+		?? (eventType ? getQualityForEventType(eventType) : config.defaultVideoQuality as VideoQuality);
+
+	logger.info(
+		{ recordingId, deviceId, eventType, quality },
+		'Processing transcode job with quality preset'
+	);
 
 	// Get recording from database
 	const recording = recordingsRepo.getRecordingById(recordingId);
@@ -229,7 +252,10 @@ async function processTranscodeJob(job: Job<TranscodeJobData>): Promise<Transcod
 	const tempPath = `/tmp/ring-${recordingId}.mp4`;
 	const inputPath = isLocalFile ? sourceUrl : tempPath;
 	const outputPath = recording.filePath;
-	const thumbnailPath = getThumbnailPath(deviceId, new Date(timestamp));
+
+	// Generate thumbnail path with appropriate format (WebP by default)
+	const thumbnailOptions = getDefaultThumbnailOptions();
+	const thumbnailPath = getThumbnailPathWithFormat(deviceId, new Date(timestamp), thumbnailOptions.format);
 
 	try {
 		// Update status to processing
@@ -259,13 +285,13 @@ async function processTranscodeJob(job: Job<TranscodeJobData>): Promise<Transcod
 			// Get duration from ffprobe
 			duration = await getVideoDuration(outputPath);
 		} else {
-			// Transcode video
-			const result = await transcodeVideo(inputPath, outputPath);
+			// Transcode video with quality-based settings
+			const result = await transcodeVideo(inputPath, outputPath, quality);
 			duration = result.duration;
 			fileSize = result.fileSize;
 		}
 
-		// Generate thumbnail
+		// Generate thumbnail (WebP with optimized settings)
 		await job.updateProgress(80);
 		await generateThumbnail(outputPath, thumbnailPath);
 
@@ -274,16 +300,20 @@ async function processTranscodeJob(job: Job<TranscodeJobData>): Promise<Transcod
 			await fs.unlink(tempPath).catch(() => {});
 		}
 
-		// Update recording in database
+		// Update recording in database with quality information
 		recordingsRepo.updateRecordingStatus(recordingId, 'completed', {
 			thumbnailPath,
 			duration,
-			fileSize
+			fileSize,
+			quality
 		});
 
 		await job.updateProgress(100);
 
-		logger.info({ recordingId, duration, fileSize }, 'Transcode job completed');
+		logger.info(
+			{ recordingId, duration, fileSize, quality, thumbnailFormat: thumbnailOptions.format },
+			'Transcode job completed'
+		);
 
 		return {
 			success: true,

@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { getDatabase } from '../client';
-import type { Recording, RecordingRow, RecordingStatus } from '$lib/types';
+import type { Recording, RecordingRow, RecordingStatus, VideoQuality } from '$lib/types';
 import { config } from '$lib/config';
 import { promises as fs } from 'fs';
 import { join } from 'path';
@@ -15,7 +15,8 @@ function rowToRecording(row: RecordingRow): Recording {
 		duration: row.duration,
 		fileSize: row.file_size,
 		status: row.status,
-		createdAt: new Date(row.created_at)
+		createdAt: new Date(row.created_at),
+		quality: row.quality ?? undefined
 	};
 }
 
@@ -91,6 +92,7 @@ export function updateRecordingStatus(
 		thumbnailPath?: string;
 		duration?: number;
 		fileSize?: number;
+		quality?: VideoQuality;
 	}
 ): void {
 	const db = getDatabase();
@@ -99,10 +101,17 @@ export function updateRecordingStatus(
 		db.prepare(
 			`
             UPDATE recordings
-            SET status = ?, thumbnail_path = ?, duration = ?, file_size = ?, updated_at = datetime('now')
+            SET status = ?, thumbnail_path = ?, duration = ?, file_size = ?, quality = ?, updated_at = datetime('now')
             WHERE id = ?
         `
-		).run(status, details.thumbnailPath ?? null, details.duration ?? 0, details.fileSize ?? 0, id);
+		).run(
+			status,
+			details.thumbnailPath ?? null,
+			details.duration ?? 0,
+			details.fileSize ?? 0,
+			details.quality ?? null,
+			id
+		);
 	} else {
 		db.prepare(
 			`

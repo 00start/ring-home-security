@@ -69,6 +69,42 @@ export interface DeviceRow {
 	tamper_status: string | null;
 }
 
+// Video Quality Types (STOR-001)
+export type VideoQuality = 'high' | 'medium' | 'low';
+
+export interface VideoQualityPreset {
+	name: VideoQuality;
+	crf: number;
+	preset: string;
+	description: string;
+}
+
+// Thumbnail Format Types (STOR-002)
+export type ThumbnailFormat = 'jpeg' | 'webp';
+
+export interface ThumbnailOptions {
+	format: ThumbnailFormat;
+	width: number;
+	quality: number;
+	timestamp: number;
+}
+
+// Retention Priority Types (STOR-004)
+export type RetentionPriority = 'critical' | 'normal' | 'low';
+
+export interface DeviceRetentionConfig {
+	deviceId: string;
+	retentionDays: number;
+	priority: RetentionPriority;
+}
+
+export interface StorageThresholdConfig {
+	maxStorageBytes: number;
+	warningThresholdPercent: number;
+	criticalThresholdPercent: number;
+	cleanupTargetPercent: number;
+}
+
 // Recording Types
 export type RecordingStatus = 'pending' | 'processing' | 'completed' | 'failed';
 
@@ -82,6 +118,8 @@ export interface Recording {
 	fileSize: number;
 	status: RecordingStatus;
 	createdAt: Date;
+	quality?: VideoQuality;
+	eventType?: EventType;
 }
 
 export interface RecordingRow {
@@ -94,6 +132,7 @@ export interface RecordingRow {
 	file_size: number;
 	status: RecordingStatus;
 	created_at: string;
+	quality: VideoQuality | null;
 }
 
 // Queue Job Types
@@ -103,6 +142,8 @@ export interface TranscodeJobData {
 	deviceId: string;
 	eventId: string;
 	timestamp: string;
+	eventType?: EventType;
+	quality?: VideoQuality;
 }
 
 export interface TranscodeJobResult {
