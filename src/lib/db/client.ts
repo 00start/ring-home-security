@@ -60,12 +60,20 @@ async function runMigrations(database: Database.Database): Promise<void> {
 
 		logger.debug({ statementCount: statements.length }, 'Parsed statements');
 
-		for (const statement of statements) {
+		// Separate CREATE TABLE statements from other statements (like indexes)
+		const createTableStatements = statements.filter((s) =>
+			s.toUpperCase().startsWith('CREATE TABLE')
+		);
+		const otherStatements = statements.filter(
+			(s) => !s.toUpperCase().startsWith('CREATE TABLE') && !s.toUpperCase().startsWith('PRAGMA')
+		);
+
+		// 1. First, run CREATE TABLE statements
+		for (const statement of createTableStatements) {
 			try {
 				logger.debug({ statement: statement.substring(0, 80) + '...' }, 'Executing statement');
 				database.exec(statement);
 			} catch (error) {
-				// Ignore "table already exists" errors for CREATE TABLE IF NOT EXISTS
 				if (error instanceof Error && !error.message.includes('already exists')) {
 					logger.error({ error, statement }, 'Failed to execute statement');
 					throw error;
@@ -75,8 +83,23 @@ async function runMigrations(database: Database.Database): Promise<void> {
 			}
 		}
 
-		// Run incremental migrations for new columns
+		// 2. Run incremental migrations for new columns BEFORE indexes
 		runIncrementalMigrations(database);
+
+		// 3. Then run other statements (indexes, etc.)
+		for (const statement of otherStatements) {
+			try {
+				logger.debug({ statement: statement.substring(0, 80) + '...' }, 'Executing statement');
+				database.exec(statement);
+			} catch (error) {
+				if (error instanceof Error && !error.message.includes('already exists')) {
+					logger.error({ error, statement }, 'Failed to execute statement');
+					throw error;
+				} else {
+					logger.debug({ error }, 'Skipping statement (already exists)');
+				}
+			}
+		}
 
 		logger.info('Database migrations completed');
 	} catch (error) {
@@ -87,20 +110,29 @@ async function runMigrations(database: Database.Database): Promise<void> {
 
 function runIncrementalMigrations(database: Database.Database): void {
 	// Check if devices table has the new columns, add them if missing
-	const columns = database.prepare('PRAGMA table_info(devices)').all() as { name: string }[];
-	const columnNames = columns.map((c) => c.name);
+	const deviceColumns = database.prepare('PRAGMA table_info(devices)').all() as { name: string }[];
+	const deviceColumnNames = deviceColumns.map((c) => c.name);
 
-	const migrations: { column: string; sql: string }[] = [
+	const deviceMigrations: { column: string; sql: string }[] = [
 		{ column: 'subtype', sql: 'ALTER TABLE devices ADD COLUMN subtype TEXT' },
 		{ column: 'faulted', sql: 'ALTER TABLE devices ADD COLUMN faulted INTEGER' },
 		{ column: 'tamper_status', sql: 'ALTER TABLE devices ADD COLUMN tamper_status TEXT' }
 	];
 
-	for (const migration of migrations) {
-		if (!columnNames.includes(migration.column)) {
+	for (const migration of deviceMigrations) {
+		if (!deviceColumnNames.includes(migration.column)) {
 			logger.info({ column: migration.column }, 'Adding new column to devices table');
 			database.exec(migration.sql);
 		}
+	}
+
+	// Check if recordings table has the quality column (STOR-001)
+	const recordingsColumns = database.prepare('PRAGMA table_info(recordings)').all() as { name: string }[];
+	const recordingsColumnNames = recordingsColumns.map((c) => c.name);
+
+	if (!recordingsColumnNames.includes('quality')) {
+		logger.info('Adding quality column to recordings table (STOR-001)');
+		database.exec("ALTER TABLE recordings ADD COLUMN quality TEXT CHECK (quality IS NULL OR quality IN ('high', 'medium', 'low'))");
 	}
 
 	// Check if the CHECK constraint needs to be updated to include 'misc'

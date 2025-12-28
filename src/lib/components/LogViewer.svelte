@@ -179,7 +179,7 @@
 	}
 </script>
 
-<Card title="System Logs" data-testid="log-viewer" id="logs">
+<Card title="System Logs" data-testid="log-viewer">
 	{#snippet children()}
 		<div class="space-y-4">
 			<!-- Controls -->

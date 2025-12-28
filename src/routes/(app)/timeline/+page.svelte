@@ -86,11 +86,11 @@
 				View and filter all security events
 			</p>
 		</div>
-		<Button
-			variant="secondary"
+		<a
+			href="/settings#logs"
 			data-testid="system-logs-button"
 			aria-label="View system logs in settings"
-			onclick={() => goto('/settings#logs')}
+			class="inline-flex items-center justify-center font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 bg-zinc-200 text-zinc-900 hover:bg-zinc-300 hover:shadow focus:ring-zinc-500 dark:bg-zinc-700 dark:text-white dark:hover:bg-zinc-600 px-4 py-2 text-sm"
 		>
 			<svg
 				class="mr-2 h-4 w-4"
@@ -107,7 +107,7 @@
 				/>
 			</svg>
 			View System Logs
-		</Button>
+		</a>
 	</div>
 
 	<!-- Filters -->

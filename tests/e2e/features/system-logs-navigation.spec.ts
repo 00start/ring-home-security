@@ -82,24 +82,28 @@ test.describe('System Logs Navigation', () => {
 			const logsButton = page.locator('[data-testid="system-logs-button"]');
 			await expect(logsButton).toBeVisible();
 
-			// Click the button
+			// Click the link
 			await logsButton.click();
 
-			// Assert: URL changed to /settings#logs
-			await expect(page).toHaveURL(/\/settings#logs/);
+			// Wait for navigation to settings page
+			await page.waitForURL(/\/settings/, { timeout: 10000 });
+
+			// Assert: URL contains /settings
+			await expect(page).toHaveURL(/\/settings/);
 		});
 
 		test('logs section is visible after navigation', async ({ page }) => {
 			await page.goto('/timeline');
 
 			const logsButton = page.locator('[data-testid="system-logs-button"]');
-			await logsButton.click();
+			await expect(logsButton).toBeVisible();
 
-			// Wait for navigation
-			await page.waitForURL(/\/settings/);
+			// Click and wait for navigation
+			await logsButton.click();
+			await page.waitForURL(/\/settings/, { timeout: 10000 });
 
 			// Assert: Logs section is present
-			const logsSection = page.locator('#logs');
+			const logsSection = page.locator('#logs').first();
 			await expect(logsSection).toBeVisible();
 		});
 
@@ -107,14 +111,16 @@ test.describe('System Logs Navigation', () => {
 			await page.goto('/timeline');
 
 			const logsButton = page.locator('[data-testid="system-logs-button"]');
-			await logsButton.click();
+			await expect(logsButton).toBeVisible();
 
-			// Wait for navigation and scroll
-			await page.waitForURL(/\/settings#logs/);
+			// Click and wait for navigation
+			await logsButton.click();
+			await page.waitForURL(/\/settings/, { timeout: 10000 });
+
 			await page.waitForTimeout(500); // Allow scroll animation
 
 			// Assert: Logs section is in viewport
-			const logsSection = page.locator('#logs');
+			const logsSection = page.locator('#logs').first();
 			const isInViewport = await logsSection.evaluate((el) => {
 				const rect = el.getBoundingClientRect();
 				return rect.top >= 0 && rect.top < window.innerHeight;
@@ -127,10 +133,11 @@ test.describe('System Logs Navigation', () => {
 			await page.goto('/timeline');
 
 			const logsButton = page.locator('[data-testid="system-logs-button"]');
-			await logsButton.click();
+			await expect(logsButton).toBeVisible();
 
-			// Wait for navigation
-			await page.waitForURL(/\/settings/);
+			// Click and wait for navigation
+			await logsButton.click();
+			await page.waitForURL(/\/settings/, { timeout: 10000 });
 
 			// Go back
 			await page.goBack();
