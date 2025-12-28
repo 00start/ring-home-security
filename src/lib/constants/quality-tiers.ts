@@ -35,18 +35,18 @@ export const QUALITY_TIERS: Record<QualityTierName, QualityTier> = {
 	high: {
 		resolution: '1080p',
 		bitrate: 4000,
-		batteryThreshold: 50,
+		batteryThreshold: 50
 	},
 	medium: {
 		resolution: '720p',
 		bitrate: 2000,
-		batteryThreshold: 20,
+		batteryThreshold: 20
 	},
 	low: {
 		resolution: '480p',
 		bitrate: 1000,
-		batteryThreshold: 0,
-	},
+		batteryThreshold: 0
+	}
 };
 
 /**
@@ -61,7 +61,7 @@ export const BATTERY_THRESHOLDS = {
 	/** Battery level above which high quality is used */
 	HIGH_QUALITY: 50,
 	/** Battery level above which medium quality is used (below this, use low) */
-	MEDIUM_QUALITY: 20,
+	MEDIUM_QUALITY: 20
 } as const;
 
 /**
@@ -84,5 +84,5 @@ export interface QualityPreference {
  */
 export const DEFAULT_QUALITY_PREFERENCE: QualityPreference = {
 	mode: 'auto',
-	tier: null,
+	tier: null
 };

@@ -26,14 +26,14 @@ const localStorageMock = (() => {
 		},
 		clear: () => {
 			store = {};
-		},
+		}
 	};
 })();
 
 // Assign to global object
 Object.defineProperty(global, 'localStorage', {
 	value: localStorageMock,
-	writable: true,
+	writable: true
 });
 
 /**
@@ -47,7 +47,7 @@ function mockDevice(overrides?: Partial<Device>): Device {
 		type: 'camera',
 		batteryLevel: 85,
 		isOnline: true,
-		lastSeen: new Date(),
+		lastSeen: new Date()
 	};
 
 	return { ...defaults, ...overrides };
@@ -56,14 +56,12 @@ function mockDevice(overrides?: Partial<Device>): Device {
 /**
  * Helper to create multiple devices with varying battery levels
  */
-function mockDevicesWithBatteryLevels(
-	levels: number[]
-): Device[] {
+function mockDevicesWithBatteryLevels(levels: number[]): Device[] {
 	return levels.map((level, index) =>
 		mockDevice({
 			id: `device-${index + 1}`,
 			name: `Camera ${index + 1}`,
-			batteryLevel: level,
+			batteryLevel: level
 		})
 	);
 }
@@ -113,7 +111,7 @@ describe('Battery Warning Banner - Component Logic', () => {
 			const devices = [
 				mockDevice({ id: 'cam-1', batteryLevel: 15 }),
 				mockDevice({ id: 'cam-2', batteryLevel: undefined }),
-				mockDevice({ id: 'cam-3', batteryLevel: 10 }),
+				mockDevice({ id: 'cam-3', batteryLevel: 10 })
 			];
 
 			// Act
@@ -161,9 +159,7 @@ describe('Battery Warning Banner - Component Logic', () => {
 			const devices = mockDevicesWithBatteryLevels([19, 15, 10, 9, 5]);
 
 			// Act
-			const lowBattery = devices.filter(
-				(d) => d.batteryLevel !== undefined && d.batteryLevel < 20
-			);
+			const lowBattery = devices.filter((d) => d.batteryLevel !== undefined && d.batteryLevel < 20);
 			const criticalBattery = devices.filter(
 				(d) => d.batteryLevel !== undefined && d.batteryLevel < 10
 			);
@@ -338,7 +334,7 @@ describe('Battery Warning Banner - Component Logic', () => {
 			const device = mockDevice({
 				id: 'cam-1',
 				name: 'Front Door Camera',
-				batteryLevel: 15,
+				batteryLevel: 15
 			});
 
 			// Act & Assert
@@ -351,7 +347,7 @@ describe('Battery Warning Banner - Component Logic', () => {
 			const devices = [
 				mockDevice({ id: 'cam-1', name: 'Front Door', batteryLevel: 19 }),
 				mockDevice({ id: 'cam-2', name: 'Backyard', batteryLevel: 15 }),
-				mockDevice({ id: 'cam-3', name: 'Garage', batteryLevel: 8 }),
+				mockDevice({ id: 'cam-3', name: 'Garage', batteryLevel: 8 })
 			];
 
 			// Act
@@ -361,11 +357,7 @@ describe('Battery Warning Banner - Component Logic', () => {
 
 			// Assert
 			expect(lowBatteryDevices).toHaveLength(3);
-			expect(lowBatteryDevices.map((d) => d.name)).toEqual([
-				'Front Door',
-				'Backyard',
-				'Garage',
-			]);
+			expect(lowBatteryDevices.map((d) => d.name)).toEqual(['Front Door', 'Backyard', 'Garage']);
 			expect(lowBatteryDevices.map((d) => d.batteryLevel)).toEqual([19, 15, 8]);
 		});
 
@@ -374,9 +366,7 @@ describe('Battery Warning Banner - Component Logic', () => {
 			const devices = mockDevicesWithBatteryLevels([19, 15, 9, 5]);
 
 			// Act
-			const lowBattery = devices.filter(
-				(d) => d.batteryLevel !== undefined && d.batteryLevel < 20
-			);
+			const lowBattery = devices.filter((d) => d.batteryLevel !== undefined && d.batteryLevel < 20);
 			const criticalDevices = lowBattery.filter((d) => d.batteryLevel! < 10);
 
 			// Assert
@@ -436,7 +426,7 @@ describe('Battery Warning Banner - Component Logic', () => {
 				mockDevice({ id: 'cam-1', type: 'camera', batteryLevel: 15 }),
 				mockDevice({ id: 'sensor-1', type: 'sensor', batteryLevel: 8 }),
 				mockDevice({ id: 'doorbell-1', type: 'doorbell', batteryLevel: undefined }),
-				mockDevice({ id: 'cam-2', type: 'camera', batteryLevel: 85 }),
+				mockDevice({ id: 'cam-2', type: 'camera', batteryLevel: 85 })
 			];
 
 			// Act

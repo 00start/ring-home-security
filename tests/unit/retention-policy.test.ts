@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
 	mockRecording,
-	mockRecordingsWithAge,
+	mockRecordingsWithAge
 } from '../../src/lib/test-utils/business-fixtures.js';
 import type { Recording } from '../../src/lib/types/index.js';
 
@@ -18,19 +18,13 @@ import type { Recording } from '../../src/lib/types/index.js';
  * This represents the business logic that should be implemented
  */
 interface RetentionPolicyService {
-	markRecordingsForDeletion(
-		recordings: Recording[],
-		retentionDays: number
-	): Promise<Recording[]>;
+	markRecordingsForDeletion(recordings: Recording[], retentionDays: number): Promise<Recording[]>;
 	verifyRetentionCompliance(
 		recordings: Recording[],
 		retentionDays: number
 	): Promise<RetentionComplianceReport>;
 	getRetentionConfiguration(): Promise<RetentionConfiguration>;
-	preserveRecentRecordings(
-		recordings: Recording[],
-		retentionDays: number
-	): Promise<Recording[]>;
+	preserveRecentRecordings(recordings: Recording[], retentionDays: number): Promise<Recording[]>;
 }
 
 interface RetentionComplianceReport {
@@ -59,13 +53,11 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 				markRecordingsForDeletion: vi.fn().mockImplementation((recs, days) => {
 					const now = new Date();
 					const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-					return Promise.resolve(
-						recs.filter((rec: Recording) => rec.createdAt < cutoffDate)
-					);
+					return Promise.resolve(recs.filter((rec: Recording) => rec.createdAt < cutoffDate));
 				}),
 				verifyRetentionCompliance: vi.fn(),
 				getRetentionConfiguration: vi.fn(),
-				preserveRecentRecordings: vi.fn(),
+				preserveRecentRecordings: vi.fn()
 			};
 
 			// Act: Mark recordings older than 30 days
@@ -77,8 +69,7 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 			// Assert: Should identify recordings older than 30 days
 			expect(markedForDeletion.length).toBeGreaterThan(0);
 			markedForDeletion.forEach((recording) => {
-				const ageInDays =
-					(Date.now() - recording.createdAt.getTime()) / (1000 * 60 * 60 * 24);
+				const ageInDays = (Date.now() - recording.createdAt.getTime()) / (1000 * 60 * 60 * 24);
 				expect(ageInDays).toBeGreaterThan(30);
 			});
 		});
@@ -89,16 +80,16 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 			const recordings = [
 				mockRecording({
 					id: 'rec-1',
-					createdAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000), // 1 day old
+					createdAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000) // 1 day old
 				}),
 				mockRecording({
 					id: 'rec-2',
-					createdAt: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000), // 10 days old
+					createdAt: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000) // 10 days old
 				}),
 				mockRecording({
 					id: 'rec-3',
-					createdAt: new Date(now.getTime() - 25 * 24 * 60 * 60 * 1000), // 25 days old
-				}),
+					createdAt: new Date(now.getTime() - 25 * 24 * 60 * 60 * 1000) // 25 days old
+				})
 			];
 			const retentionDays = 30;
 
@@ -106,14 +97,11 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 				markRecordingsForDeletion: vi.fn().mockResolvedValue([]),
 				verifyRetentionCompliance: vi.fn(),
 				getRetentionConfiguration: vi.fn(),
-				preserveRecentRecordings: vi.fn().mockResolvedValue(recordings),
+				preserveRecentRecordings: vi.fn().mockResolvedValue(recordings)
 			};
 
 			// Act: Check which recordings are preserved
-			const preserved = await mockService.preserveRecentRecordings(
-				recordings,
-				retentionDays
-			);
+			const preserved = await mockService.preserveRecentRecordings(recordings, retentionDays);
 
 			// Assert: All recordings should be preserved (all within 30 days)
 			expect(preserved).toHaveLength(3);
@@ -127,8 +115,8 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 			const recordings = [
 				mockRecording({
 					id: 'rec-boundary',
-					createdAt: exactlyThirtyDaysOld,
-				}),
+					createdAt: exactlyThirtyDaysOld
+				})
 			];
 			const retentionDays = 30;
 
@@ -136,13 +124,11 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 				markRecordingsForDeletion: vi.fn().mockImplementation((recs, days) => {
 					const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 					// Recordings exactly at boundary should be preserved (>= vs >)
-					return Promise.resolve(
-						recs.filter((rec: Recording) => rec.createdAt < cutoffDate)
-					);
+					return Promise.resolve(recs.filter((rec: Recording) => rec.createdAt < cutoffDate));
 				}),
 				verifyRetentionCompliance: vi.fn(),
 				getRetentionConfiguration: vi.fn(),
-				preserveRecentRecordings: vi.fn(),
+				preserveRecentRecordings: vi.fn()
 			};
 
 			// Act
@@ -166,9 +152,9 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 					retentionDays: 30,
 					minimumRetentionDays: 30,
 					autoDeleteEnabled: true,
-					graceperiodDays: 7,
+					graceperiodDays: 7
 				}),
-				preserveRecentRecordings: vi.fn(),
+				preserveRecentRecordings: vi.fn()
 			};
 
 			// Act
@@ -188,9 +174,9 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 					retentionDays: 60,
 					minimumRetentionDays: 30,
 					autoDeleteEnabled: true,
-					graceperiodDays: 7,
+					graceperiodDays: 7
 				}),
-				preserveRecentRecordings: vi.fn(),
+				preserveRecentRecordings: vi.fn()
 			};
 
 			// Act
@@ -210,9 +196,9 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 					retentionDays: 30,
 					minimumRetentionDays: 30,
 					autoDeleteEnabled: true,
-					graceperiodDays: 7,
+					graceperiodDays: 7
 				}),
-				preserveRecentRecordings: vi.fn(),
+				preserveRecentRecordings: vi.fn()
 			};
 
 			// Act
@@ -231,7 +217,7 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 			const recordings = Array.from({ length: 10 }, (_, i) =>
 				mockRecording({
 					id: `rec-${i}`,
-					createdAt: new Date(now.getTime() - i * 2 * 24 * 60 * 60 * 1000), // 0, 2, 4...18 days old
+					createdAt: new Date(now.getTime() - i * 2 * 24 * 60 * 60 * 1000) // 0, 2, 4...18 days old
 				})
 			);
 			const retentionDays = 30;
@@ -243,17 +229,14 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 					recordingsWithinRetention: 10,
 					recordingsBeyondRetention: 0,
 					oldestRecordingAge: 18, // days
-					isCompliant: true,
+					isCompliant: true
 				}),
 				getRetentionConfiguration: vi.fn(),
-				preserveRecentRecordings: vi.fn(),
+				preserveRecentRecordings: vi.fn()
 			};
 
 			// Act
-			const compliance = await mockService.verifyRetentionCompliance(
-				recordings,
-				retentionDays
-			);
+			const compliance = await mockService.verifyRetentionCompliance(recordings, retentionDays);
 
 			// Assert: System should be compliant
 			expect(compliance.isCompliant).toBe(true);
@@ -271,13 +254,10 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 				verifyRetentionCompliance: vi.fn().mockImplementation((recs, days) => {
 					const now = new Date();
 					const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-					const beyondRetention = recs.filter(
-						(rec: Recording) => rec.createdAt < cutoffDate
-					);
+					const beyondRetention = recs.filter((rec: Recording) => rec.createdAt < cutoffDate);
 					const oldestAge = Math.max(
 						...recs.map(
-							(rec: Recording) =>
-								(now.getTime() - rec.createdAt.getTime()) / (1000 * 60 * 60 * 24)
+							(rec: Recording) => (now.getTime() - rec.createdAt.getTime()) / (1000 * 60 * 60 * 24)
 						)
 					);
 
@@ -286,18 +266,15 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 						recordingsWithinRetention: recs.length - beyondRetention.length,
 						recordingsBeyondRetention: beyondRetention.length,
 						oldestRecordingAge: Math.round(oldestAge),
-						isCompliant: beyondRetention.length === 0,
+						isCompliant: beyondRetention.length === 0
 					});
 				}),
 				getRetentionConfiguration: vi.fn(),
-				preserveRecentRecordings: vi.fn(),
+				preserveRecentRecordings: vi.fn()
 			};
 
 			// Act
-			const compliance = await mockService.verifyRetentionCompliance(
-				recordings,
-				retentionDays
-			);
+			const compliance = await mockService.verifyRetentionCompliance(recordings, retentionDays);
 
 			// Assert: Should detect non-compliance
 			expect(compliance.isCompliant).toBe(false);
@@ -309,14 +286,14 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 			const now = new Date();
 			const recordings = [
 				mockRecording({
-					createdAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days
+					createdAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000) // 5 days
 				}),
 				mockRecording({
-					createdAt: new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000), // 15 days
+					createdAt: new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000) // 15 days
 				}),
 				mockRecording({
-					createdAt: new Date(now.getTime() - 45 * 24 * 60 * 60 * 1000), // 45 days (oldest)
-				}),
+					createdAt: new Date(now.getTime() - 45 * 24 * 60 * 60 * 1000) // 45 days (oldest)
+				})
 			];
 			const retentionDays = 30;
 
@@ -327,17 +304,14 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 					recordingsWithinRetention: 2,
 					recordingsBeyondRetention: 1,
 					oldestRecordingAge: 45,
-					isCompliant: false,
+					isCompliant: false
 				}),
 				getRetentionConfiguration: vi.fn(),
-				preserveRecentRecordings: vi.fn(),
+				preserveRecentRecordings: vi.fn()
 			};
 
 			// Act
-			const compliance = await mockService.verifyRetentionCompliance(
-				recordings,
-				retentionDays
-			);
+			const compliance = await mockService.verifyRetentionCompliance(recordings, retentionDays);
 
 			// Assert: Should accurately report oldest recording age
 			expect(compliance.oldestRecordingAge).toBe(45);
@@ -358,10 +332,10 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 					recordingsWithinRetention: 0,
 					recordingsBeyondRetention: 0,
 					oldestRecordingAge: 0,
-					isCompliant: true,
+					isCompliant: true
 				}),
 				getRetentionConfiguration: vi.fn(),
-				preserveRecentRecordings: vi.fn().mockResolvedValue([]),
+				preserveRecentRecordings: vi.fn().mockResolvedValue([])
 			};
 
 			// Act
@@ -369,10 +343,7 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 				recordings,
 				retentionDays
 			);
-			const compliance = await mockService.verifyRetentionCompliance(
-				recordings,
-				retentionDays
-			);
+			const compliance = await mockService.verifyRetentionCompliance(recordings, retentionDays);
 
 			// Assert: Should handle empty list gracefully
 			expect(markedForDeletion).toHaveLength(0);
@@ -386,7 +357,7 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 			const recordings = Array.from({ length: 5 }, (_, i) =>
 				mockRecording({
 					id: `rec-${i}`,
-					createdAt: new Date(now.getTime() - (35 + i) * 24 * 60 * 60 * 1000), // 35-39 days old
+					createdAt: new Date(now.getTime() - (35 + i) * 24 * 60 * 60 * 1000) // 35-39 days old
 				})
 			);
 			const retentionDays = 30;
@@ -395,7 +366,7 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 				markRecordingsForDeletion: vi.fn().mockResolvedValue(recordings),
 				verifyRetentionCompliance: vi.fn(),
 				getRetentionConfiguration: vi.fn(),
-				preserveRecentRecordings: vi.fn(),
+				preserveRecentRecordings: vi.fn()
 			};
 
 			// Act
@@ -415,7 +386,7 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 			const recordings = Array.from({ length: 5 }, (_, i) =>
 				mockRecording({
 					id: `rec-${i}`,
-					createdAt: new Date(now.getTime() - (i + 1) * 24 * 60 * 60 * 1000), // 1-5 days old
+					createdAt: new Date(now.getTime() - (i + 1) * 24 * 60 * 60 * 1000) // 1-5 days old
 				})
 			);
 			const retentionDays = 30;
@@ -423,13 +394,11 @@ describe('BR-3: 30-Day Local Retention Policy', () => {
 			const mockService: RetentionPolicyService = {
 				markRecordingsForDeletion: vi.fn().mockImplementation((recs, days) => {
 					const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-					return Promise.resolve(
-						recs.filter((rec: Recording) => rec.createdAt < cutoffDate)
-					);
+					return Promise.resolve(recs.filter((rec: Recording) => rec.createdAt < cutoffDate));
 				}),
 				verifyRetentionCompliance: vi.fn(),
 				getRetentionConfiguration: vi.fn(),
-				preserveRecentRecordings: vi.fn(),
+				preserveRecentRecordings: vi.fn()
 			};
 
 			// Act

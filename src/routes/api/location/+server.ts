@@ -1,6 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getRingApi } from '$lib/ring';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-location');
 
 export const GET: RequestHandler = async () => {
 	try {
@@ -22,7 +25,7 @@ export const GET: RequestHandler = async () => {
 			}
 		});
 	} catch (error) {
-		console.error('Failed to get location:', error);
+		logger.error({ error }, 'Failed to get location');
 		return json({ success: false, error: 'Failed to get location' }, { status: 500 });
 	}
 };

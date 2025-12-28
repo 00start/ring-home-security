@@ -21,7 +21,7 @@ describe('Accessibility - Performance Utilities Tests', () => {
 			expect(cache.get('key1')).toBe('value1');
 
 			// Wait for TTL to expire
-			await new Promise(resolve => setTimeout(resolve, 60));
+			await new Promise((resolve) => setTimeout(resolve, 60));
 
 			// Should return null after expiry
 			expect(cache.get('key1')).toBeNull();
@@ -82,7 +82,7 @@ describe('Accessibility - Performance Utilities Tests', () => {
 			expect(fn).not.toHaveBeenCalled();
 
 			// Wait for debounce delay
-			await new Promise(resolve => setTimeout(resolve, 120));
+			await new Promise((resolve) => setTimeout(resolve, 120));
 
 			// Function should be called only once
 			expect(fn).toHaveBeenCalledTimes(1);
@@ -96,7 +96,7 @@ describe('Accessibility - Performance Utilities Tests', () => {
 			debounced('second');
 			debounced('third');
 
-			await new Promise(resolve => setTimeout(resolve, 70));
+			await new Promise((resolve) => setTimeout(resolve, 70));
 
 			expect(fn).toHaveBeenCalledTimes(1);
 			expect(fn).toHaveBeenCalledWith('third');
@@ -119,7 +119,7 @@ describe('Accessibility - Performance Utilities Tests', () => {
 			expect(fn).toHaveBeenCalledTimes(1);
 
 			// Wait for throttle period
-			await new Promise(resolve => setTimeout(resolve, 120));
+			await new Promise((resolve) => setTimeout(resolve, 120));
 
 			// Last call should execute after throttle period
 			expect(fn).toHaveBeenCalledTimes(2);
@@ -170,12 +170,12 @@ describe('Accessibility - Performance Utilities Tests', () => {
 			const colorPairs = [
 				{ bg: 'bg-blue-600', text: 'text-white', purpose: 'Primary button' },
 				{ bg: 'bg-red-600', text: 'text-white', purpose: 'Danger button' },
-				{ bg: 'bg-zinc-200', text: 'text-zinc-900', purpose: 'Secondary button' },
+				{ bg: 'bg-zinc-200', text: 'text-zinc-900', purpose: 'Secondary button' }
 			];
 
 			// Verify we have defined color pairs for accessibility
 			expect(colorPairs.length).toBeGreaterThan(0);
-			colorPairs.forEach(pair => {
+			colorPairs.forEach((pair) => {
 				expect(pair.bg).toBeTruthy();
 				expect(pair.text).toBeTruthy();
 				expect(pair.purpose).toBeTruthy();

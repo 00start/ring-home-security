@@ -90,7 +90,11 @@ describe('FTR-002: Zone Latency Metrics', () => {
 			mockService.recordTrigger('zone-1', 'camera-trigger', triggerTime);
 
 			// Assert
-			expect(mockService.recordTrigger).toHaveBeenCalledWith('zone-1', 'camera-trigger', triggerTime);
+			expect(mockService.recordTrigger).toHaveBeenCalledWith(
+				'zone-1',
+				'camera-trigger',
+				triggerTime
+			);
 			expect(measurements.has('zone-1-camera-trigger')).toBe(true);
 			expect(measurements.get('zone-1-camera-trigger')?.triggerTimestamp).toBe(triggerTime);
 		});
@@ -132,7 +136,11 @@ describe('FTR-002: Zone Latency Metrics', () => {
 			const latency = mockService.recordFollowerStart('zone-1', 'follower-1', followerTime);
 
 			// Assert
-			expect(mockService.recordFollowerStart).toHaveBeenCalledWith('zone-1', 'follower-1', followerTime);
+			expect(mockService.recordFollowerStart).toHaveBeenCalledWith(
+				'zone-1',
+				'follower-1',
+				followerTime
+			);
 			expect(latency).toBe(150);
 			expect(measurements.get('zone-1-follower-1')?.followerStartTimestamp).toBe(followerTime);
 		});
@@ -205,7 +213,7 @@ describe('FTR-002: Zone Latency Metrics', () => {
 
 			// Assert
 			expect(latencies).toHaveLength(3);
-			expect(latencies.every(l => l > 0)).toBe(true);
+			expect(latencies.every((l) => l > 0)).toBe(true);
 		});
 
 		it('stores metrics per zone', () => {

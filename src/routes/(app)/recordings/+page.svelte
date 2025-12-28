@@ -15,7 +15,7 @@
 
 	onMount(async () => {
 		await fetchDevices();
-		await fetchRecordings({status: filterStatus || undefined});
+		await fetchRecordings({ status: filterStatus || undefined });
 	});
 
 	function handleFilterChange() {
@@ -34,10 +34,14 @@
 
 	function getStatusVariant(status: RecordingStatus): 'success' | 'warning' | 'danger' | 'info' {
 		switch (status) {
-			case 'completed': return 'success';
-			case 'processing': return 'info';
-			case 'pending': return 'warning';
-			case 'failed': return 'danger';
+			case 'completed':
+				return 'success';
+			case 'processing':
+				return 'info';
+			case 'pending':
+				return 'warning';
+			case 'failed':
+				return 'danger';
 		}
 	}
 
@@ -52,17 +56,15 @@
 		// Ring keeps recordings for 60 days (or less depending on plan)
 		// After that, they're permanently deleted
 		// We'll be conservative and only allow retry within 7 days
-		const ageInDays = (Date.now() - new Date(recording.createdAt).getTime()) / (1000 * 60 * 60 * 24);
+		const ageInDays =
+			(Date.now() - new Date(recording.createdAt).getTime()) / (1000 * 60 * 60 * 24);
 		return ageInDays < 7;
 	}
 
 	function getDownloadFilename(recording: Recording): string {
 		const deviceName = getDeviceName(recording.deviceId);
 		const date = new Date(recording.createdAt);
-		const timestamp = date.toISOString()
-			.replace(/:/g, '-')
-			.replace(/\..+/, '')
-			.replace('T', '_');
+		const timestamp = date.toISOString().replace(/:/g, '-').replace(/\..+/, '').replace('T', '_');
 		return `${deviceName}_${timestamp}.mp4`;
 	}
 
@@ -101,9 +103,7 @@
 	<!-- Page header -->
 	<div>
 		<h1 class="text-2xl font-bold text-zinc-900 dark:text-white">Recordings</h1>
-		<p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-			View and download video recordings
-		</p>
+		<p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">View and download video recordings</p>
 	</div>
 
 	<!-- Filters -->
@@ -146,9 +146,21 @@
 
 	<!-- Recordings grid -->
 	{#if $recordings.length === 0}
-		<div class="rounded-lg border border-zinc-200 bg-white p-12 text-center dark:border-zinc-700 dark:bg-zinc-800">
-			<svg class="mx-auto h-12 w-12 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+		<div
+			class="rounded-lg border border-zinc-200 bg-white p-12 text-center dark:border-zinc-700 dark:bg-zinc-800"
+		>
+			<svg
+				class="mx-auto h-12 w-12 text-zinc-400"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+				/>
 			</svg>
 			<p class="mt-4 text-lg font-medium text-zinc-900 dark:text-white">No recordings found</p>
 			<p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
@@ -168,14 +180,14 @@
 							<!-- Clickable area for completed recordings -->
 							<button
 								onclick={() => handleRecordingClick(recording)}
-								class="group absolute inset-0 w-full h-full cursor-pointer overflow-hidden"
+								class="group absolute inset-0 h-full w-full cursor-pointer overflow-hidden"
 								aria-label="Play recording from {getDeviceName(recording.deviceId)}"
 							>
 								{#if recording.thumbnailPath}
 									<img
 										use:lazyLoad={{ src: getThumbnailUrl(recording.id) }}
 										alt=""
-										class="h-full w-full object-cover bg-zinc-800 transition-opacity duration-200"
+										class="h-full w-full bg-zinc-800 object-cover transition-opacity duration-200"
 										onerror={(e) => {
 											const target = e.currentTarget as HTMLImageElement;
 											target.style.display = 'none';
@@ -184,34 +196,80 @@
 										}}
 									/>
 									<!-- Fallback for failed image loads -->
-									<div class="hidden h-full items-center justify-center flex-col gap-2 bg-zinc-800" style="display: none;">
-										<svg class="h-12 w-12 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+									<div
+										class="hidden h-full flex-col items-center justify-center gap-2 bg-zinc-800"
+										style="display: none;"
+									>
+										<svg
+											class="h-12 w-12 text-zinc-600"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											aria-hidden="true"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+											/>
 										</svg>
 										<span class="text-xs text-zinc-500">No Thumbnail</span>
 									</div>
 								{:else}
-									<div class="flex h-full items-center justify-center flex-col gap-2 bg-zinc-800">
-										<svg class="h-12 w-12 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+									<div class="flex h-full flex-col items-center justify-center gap-2 bg-zinc-800">
+										<svg
+											class="h-12 w-12 text-zinc-600"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											aria-hidden="true"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+											/>
 										</svg>
 										<span class="text-xs text-zinc-500">No Thumbnail</span>
 									</div>
 								{/if}
-								<div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
-									<svg class="h-16 w-16 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+								<div
+									class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100"
+								>
+									<svg
+										class="h-16 w-16 text-white"
+										fill="currentColor"
+										viewBox="0 0 24 24"
+										aria-hidden="true"
+									>
 										<path d="M8 5v14l11-7z" />
 									</svg>
 								</div>
 							</button>
 						{:else}
 							<!-- Non-clickable placeholder for non-completed recordings -->
-							<div class="flex h-full items-center justify-center flex-col gap-2 bg-zinc-800">
-								<svg class="h-12 w-12 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+							<div class="flex h-full flex-col items-center justify-center gap-2 bg-zinc-800">
+								<svg
+									class="h-12 w-12 text-zinc-600"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+									/>
 								</svg>
 								<span class="text-xs text-zinc-500">
-									{recording.status === 'processing' ? 'Processing...' : recording.status === 'pending' ? 'Pending' : 'Processing'}
+									{recording.status === 'processing'
+										? 'Processing...'
+										: recording.status === 'pending'
+											? 'Pending'
+											: 'Processing'}
 								</span>
 							</div>
 						{/if}
@@ -222,14 +280,24 @@
 									<button
 										onclick={(e) => handleRetry(e, recording.id)}
 										disabled={retryingId === recording.id}
-										class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+										class="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
 									>
 										{retryingId === recording.id ? 'Retrying...' : 'Retry Download'}
 									</button>
 								{:else}
 									<div class="text-center">
-										<svg class="mx-auto h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+										<svg
+											class="mx-auto h-12 w-12 text-red-500"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+											/>
 										</svg>
 										<p class="mt-2 text-sm text-white">Recording Expired</p>
 									</div>
@@ -237,14 +305,16 @@
 							</div>
 						{/if}
 
-						<div class="absolute bottom-2 right-2 pointer-events-none">
+						<div class="pointer-events-none absolute right-2 bottom-2">
 							<Badge variant={getStatusVariant(recording.status)}>
 								{recording.status}
 							</Badge>
 						</div>
 
 						{#if recording.duration > 0}
-							<div class="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-0.5 text-xs text-white pointer-events-none">
+							<div
+								class="pointer-events-none absolute bottom-2 left-2 rounded bg-black/70 px-2 py-0.5 text-xs text-white"
+							>
 								{formatDuration(recording.duration)}
 							</div>
 						{/if}
@@ -286,7 +356,12 @@
 					class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+						/>
 					</svg>
 					Download
 				</a>

@@ -36,13 +36,16 @@
 	}
 </script>
 
-<div data-testid="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+<div
+	data-testid="toast-container"
+	class="pointer-events-none fixed right-4 bottom-4 z-50 flex w-full max-w-sm flex-col gap-2"
+>
 	{#each $toasts as toast (toast.id)}
 		<div
 			data-testid="toast"
 			data-toast-type={toast.type}
 			data-toast-id={toast.id}
-			class="pointer-events-auto rounded-lg border shadow-lg p-4 {typeStyles[toast.type].bg}"
+			class="pointer-events-auto rounded-lg border p-4 shadow-lg {typeStyles[toast.type].bg}"
 			transition:fly={{ x: 100, duration: 200 }}
 		>
 			<div class="flex items-start gap-3">
@@ -52,18 +55,27 @@
 					stroke="currentColor"
 					viewBox="0 0 24 24"
 				>
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={typeStyles[toast.type].icon} />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d={typeStyles[toast.type].icon}
+					/>
 				</svg>
 
-				<div class="flex-1 min-w-0">
-					<p data-testid="toast-title" class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{toast.title}</p>
+				<div class="min-w-0 flex-1">
+					<p data-testid="toast-title" class="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+						{toast.title}
+					</p>
 					{#if toast.message}
-						<p data-testid="toast-message" class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{toast.message}</p>
+						<p data-testid="toast-message" class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+							{toast.message}
+						</p>
 					{/if}
 					{#if toast.action}
 						<button
 							data-testid="toast-action"
-							class="mt-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+							class="mt-2 text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
 							onclick={() => handleAction(toast)}
 						>
 							{toast.action.label}
@@ -78,7 +90,12 @@
 					aria-label="Dismiss notification"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			</div>

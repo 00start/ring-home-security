@@ -2,6 +2,9 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { eventsRepo } from '$lib/db';
 import type { EventType, EventFilters } from '$lib/types';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-events');
 
 export const GET: RequestHandler = async ({ url }) => {
 	try {
@@ -35,7 +38,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			limit
 		});
 	} catch (error) {
-		console.error('Failed to get events:', error);
+		logger.error({ error }, 'Failed to get events');
 		return json({ success: false, error: 'Failed to get events' }, { status: 500 });
 	}
 };

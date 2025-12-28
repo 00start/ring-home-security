@@ -23,7 +23,11 @@ export const GET: RequestHandler = async ({ params }) => {
 		if (camera.batteryLevel !== null && camera.batteryLevel !== undefined) {
 			if (camera.batteryLevel < config.batteryLowThreshold) {
 				logger.warn(
-					{ deviceId: id, batteryLevel: camera.batteryLevel, threshold: config.batteryLowThreshold },
+					{
+						deviceId: id,
+						batteryLevel: camera.batteryLevel,
+						threshold: config.batteryLowThreshold
+					},
 					'Live view started on low battery camera'
 				);
 			}
@@ -46,17 +50,28 @@ export const GET: RequestHandler = async ({ params }) => {
 					// Transcode to H.264 baseline profile for maximum browser compatibility
 					sipCall = await camera.streamVideo({
 						output: [
-							'-f', 'mpegts',
-							'-codec:v', 'libx264',
-							'-preset', 'ultrafast',
-							'-tune', 'zerolatency',
-							'-profile:v', 'baseline',
-							'-level', '3.0',
-							'-pix_fmt', 'yuv420p',
-							'-g', '30',
-							'-codec:a', 'aac',
-							'-ar', '44100',
-							'-ac', '2',
+							'-f',
+							'mpegts',
+							'-codec:v',
+							'libx264',
+							'-preset',
+							'ultrafast',
+							'-tune',
+							'zerolatency',
+							'-profile:v',
+							'baseline',
+							'-level',
+							'3.0',
+							'-pix_fmt',
+							'yuv420p',
+							'-g',
+							'30',
+							'-codec:a',
+							'aac',
+							'-ar',
+							'44100',
+							'-ac',
+							'2',
 							'pipe:1'
 						],
 						stdoutCallback: (data: Buffer) => {
@@ -157,19 +172,22 @@ export const GET: RequestHandler = async ({ params }) => {
 			headers: {
 				'Content-Type': 'video/mp2t',
 				'Cache-Control': 'no-cache',
-				'Connection': 'keep-alive'
+				Connection: 'keep-alive'
 			}
 		});
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : String(error);
 		const errorStack = error instanceof Error ? error.stack : undefined;
-		logger.error({
-			deviceId: id,
-			error,
-			errorMessage,
-			errorStack,
-			errorType: error?.constructor?.name
-		}, 'Failed to start live stream');
+		logger.error(
+			{
+				deviceId: id,
+				error,
+				errorMessage,
+				errorStack,
+				errorType: error?.constructor?.name
+			},
+			'Failed to start live stream'
+		);
 		return new Response(
 			JSON.stringify({ error: 'Failed to start live stream', message: errorMessage }),
 			{ status: 500, headers: { 'Content-Type': 'application/json' } }

@@ -45,12 +45,14 @@ export function getRecordingById(id: string): Recording | null {
 	return row ? rowToRecording(row) : null;
 }
 
-export function getRecordings(options: {
-	deviceId?: string;
-	status?: RecordingStatus;
-	limit?: number;
-	offset?: number;
-} = {}): Recording[] {
+export function getRecordings(
+	options: {
+		deviceId?: string;
+		status?: RecordingStatus;
+		limit?: number;
+		offset?: number;
+	} = {}
+): Recording[] {
 	const db = getDatabase();
 
 	let query = 'SELECT * FROM recordings WHERE 1=1';
@@ -100,13 +102,7 @@ export function updateRecordingStatus(
             SET status = ?, thumbnail_path = ?, duration = ?, file_size = ?, updated_at = datetime('now')
             WHERE id = ?
         `
-		).run(
-			status,
-			details.thumbnailPath ?? null,
-			details.duration ?? 0,
-			details.fileSize ?? 0,
-			id
-		);
+		).run(status, details.thumbnailPath ?? null, details.duration ?? 0, details.fileSize ?? 0, id);
 	} else {
 		db.prepare(
 			`
@@ -126,7 +122,9 @@ export function getTotalRecordingsCount(): number {
 
 export function getTotalStorageUsed(): number {
 	const db = getDatabase();
-	const result = db.prepare('SELECT COALESCE(SUM(file_size), 0) as total FROM recordings').get() as { total: number };
+	const result = db
+		.prepare('SELECT COALESCE(SUM(file_size), 0) as total FROM recordings')
+		.get() as { total: number };
 	return result.total;
 }
 
@@ -179,11 +177,15 @@ export async function getTotalStorageUsedWithSystemFiles(): Promise<number> {
 
 export function getStorageByDevice(): { deviceId: string; total: number }[] {
 	const db = getDatabase();
-	const rows = db.prepare(`
+	const rows = db
+		.prepare(
+			`
         SELECT device_id, SUM(file_size) as total
         FROM recordings
         GROUP BY device_id
-    `).all() as { device_id: string; total: number }[];
+    `
+		)
+		.all() as { device_id: string; total: number }[];
 
 	return rows.map((row) => ({
 		deviceId: row.device_id,
@@ -196,11 +198,15 @@ export function getRecordingsOlderThan(days: number): Recording[] {
 	const cutoffDate = new Date();
 	cutoffDate.setDate(cutoffDate.getDate() - days);
 
-	const rows = db.prepare(`
+	const rows = db
+		.prepare(
+			`
         SELECT * FROM recordings
         WHERE created_at < ? AND status = 'completed'
         ORDER BY created_at ASC
-    `).all(cutoffDate.toISOString()) as RecordingRow[];
+    `
+		)
+		.all(cutoffDate.toISOString()) as RecordingRow[];
 
 	return rows.map(rowToRecording);
 }

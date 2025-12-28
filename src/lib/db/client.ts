@@ -87,13 +87,13 @@ async function runMigrations(database: Database.Database): Promise<void> {
 
 function runIncrementalMigrations(database: Database.Database): void {
 	// Check if devices table has the new columns, add them if missing
-	const columns = database.prepare("PRAGMA table_info(devices)").all() as { name: string }[];
-	const columnNames = columns.map(c => c.name);
+	const columns = database.prepare('PRAGMA table_info(devices)').all() as { name: string }[];
+	const columnNames = columns.map((c) => c.name);
 
 	const migrations: { column: string; sql: string }[] = [
 		{ column: 'subtype', sql: 'ALTER TABLE devices ADD COLUMN subtype TEXT' },
 		{ column: 'faulted', sql: 'ALTER TABLE devices ADD COLUMN faulted INTEGER' },
-		{ column: 'tamper_status', sql: 'ALTER TABLE devices ADD COLUMN tamper_status TEXT' },
+		{ column: 'tamper_status', sql: 'ALTER TABLE devices ADD COLUMN tamper_status TEXT' }
 	];
 
 	for (const migration of migrations) {
@@ -105,7 +105,9 @@ function runIncrementalMigrations(database: Database.Database): void {
 
 	// Check if the CHECK constraint needs to be updated to include 'misc'
 	// SQLite doesn't support ALTER TABLE to modify constraints, so we need to recreate the table
-	const tableSchema = database.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='devices'").get() as { sql: string } | undefined;
+	const tableSchema = database
+		.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='devices'")
+		.get() as { sql: string } | undefined;
 	if (tableSchema && !tableSchema.sql.includes("'misc'")) {
 		logger.info('Migrating devices table to add misc type support');
 

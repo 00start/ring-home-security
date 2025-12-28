@@ -42,9 +42,4 @@ export {
 } from './recordings';
 
 // Re-export stats store with namespaced exports to avoid conflicts
-export {
-	stats,
-	loading as statsLoading,
-	error as statsError,
-	fetchStats
-} from './stats';
+export { stats, loading as statsLoading, error as statsError, fetchStats } from './stats';

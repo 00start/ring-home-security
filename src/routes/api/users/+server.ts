@@ -1,6 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { authRepo } from '$lib/db';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-users');
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user) {
@@ -18,7 +21,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			}))
 		});
 	} catch (error) {
-		console.error('Failed to get users:', error);
+		logger.error({ error }, 'Failed to get users');
 		return json({ success: false, error: 'Failed to get users' }, { status: 500 });
 	}
 };
@@ -36,7 +39,10 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		}
 
 		if (!password || typeof password !== 'string' || password.length < 8) {
-			return json({ success: false, error: 'Password must be at least 8 characters' }, { status: 400 });
+			return json(
+				{ success: false, error: 'Password must be at least 8 characters' },
+				{ status: 400 }
+			);
 		}
 
 		// Check if username already exists
@@ -56,7 +62,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			}
 		});
 	} catch (error) {
-		console.error('Failed to create user:', error);
+		logger.error({ error }, 'Failed to create user');
 		return json({ success: false, error: 'Failed to create user' }, { status: 500 });
 	}
 };

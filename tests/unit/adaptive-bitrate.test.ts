@@ -34,14 +34,14 @@ const localStorageMock = (() => {
 		},
 		clear: () => {
 			store = {};
-		},
+		}
 	};
 })();
 
 // Assign to global object
 Object.defineProperty(global, 'localStorage', {
 	value: localStorageMock,
-	writable: true,
+	writable: true
 });
 
 describe('Adaptive Bitrate', () => {
@@ -60,7 +60,7 @@ describe('Adaptive Bitrate', () => {
 			const highQuality: QualityTier = {
 				resolution: '1080p',
 				bitrate: 4000,
-				batteryThreshold: 50,
+				batteryThreshold: 50
 			};
 
 			// Act
@@ -78,7 +78,7 @@ describe('Adaptive Bitrate', () => {
 			const mediumQuality: QualityTier = {
 				resolution: '720p',
 				bitrate: 2000,
-				batteryThreshold: 20,
+				batteryThreshold: 20
 			};
 
 			// Act
@@ -96,7 +96,7 @@ describe('Adaptive Bitrate', () => {
 			const lowQuality: QualityTier = {
 				resolution: '480p',
 				bitrate: 1000,
-				batteryThreshold: 0,
+				batteryThreshold: 0
 			};
 
 			// Act
@@ -150,7 +150,7 @@ describe('Adaptive Bitrate', () => {
 			const highQuality: QualityTier = {
 				resolution: '1080p',
 				bitrate: 4000,
-				batteryThreshold: 50,
+				batteryThreshold: 50
 			};
 
 			expect(highQuality.resolution).toBe('1080p');
@@ -162,7 +162,7 @@ describe('Adaptive Bitrate', () => {
 			const mediumQuality: QualityTier = {
 				resolution: '720p',
 				bitrate: 2000,
-				batteryThreshold: 20,
+				batteryThreshold: 20
 			};
 
 			expect(mediumQuality.resolution).toBe('720p');
@@ -174,7 +174,7 @@ describe('Adaptive Bitrate', () => {
 			const lowQuality: QualityTier = {
 				resolution: '480p',
 				bitrate: 1000,
-				batteryThreshold: 0,
+				batteryThreshold: 0
 			};
 
 			expect(lowQuality.resolution).toBe('480p');
@@ -186,7 +186,7 @@ describe('Adaptive Bitrate', () => {
 			const tiers = [
 				{ resolution: '1080p', bitrate: 4000, batteryThreshold: 50 },
 				{ resolution: '720p', bitrate: 2000, batteryThreshold: 20 },
-				{ resolution: '480p', bitrate: 1000, batteryThreshold: 0 },
+				{ resolution: '480p', bitrate: 1000, batteryThreshold: 0 }
 			];
 
 			expect(tiers[0].bitrate).toBeGreaterThan(tiers[1].bitrate);
@@ -201,7 +201,7 @@ describe('Adaptive Bitrate', () => {
 			const userOverride: QualityTier = {
 				resolution: '1080p',
 				bitrate: 4000,
-				batteryThreshold: 50,
+				batteryThreshold: 50
 			};
 
 			// Act
@@ -231,7 +231,7 @@ describe('Adaptive Bitrate', () => {
 			let userOverride: QualityTier | null = {
 				resolution: '1080p',
 				bitrate: 4000,
-				batteryThreshold: 50,
+				batteryThreshold: 50
 			};
 
 			// Act
@@ -248,7 +248,7 @@ describe('Adaptive Bitrate', () => {
 			const userId = 'user123';
 			const preference = {
 				mode: 'manual',
-				tier: 'high',
+				tier: 'high'
 			};
 
 			// Act
@@ -265,7 +265,7 @@ describe('Adaptive Bitrate', () => {
 			const userId = 'user123';
 			const preference = {
 				mode: 'auto',
-				tier: null,
+				tier: null
 			};
 			localStorage.setItem(`quality-preference-${userId}`, JSON.stringify(preference));
 

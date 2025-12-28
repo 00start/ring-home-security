@@ -48,7 +48,7 @@ export const GET: RequestHandler = async () => {
 				hasVAAPI: false,
 				hasVideoToolbox: false,
 				preferredEncoder: 'libx264',
-				error: 'GPU detection failed',
+				error: 'GPU detection failed'
 			},
 			{ status: 500 }
 		);

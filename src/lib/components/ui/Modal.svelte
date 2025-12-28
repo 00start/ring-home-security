@@ -91,7 +91,9 @@
 		data-testid="modal-backdrop"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
 		onclick={handleBackdropClick}
-		onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleBackdropClick(e as unknown as MouseEvent); }}
+		onkeydown={(e) => {
+			if (e.key === 'Enter' || e.key === ' ') handleBackdropClick(e as unknown as MouseEvent);
+		}}
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby={title ? 'modal-title' : undefined}
@@ -104,7 +106,9 @@
 			role="document"
 		>
 			{#if title}
-				<div class="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
+				<div
+					class="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-700"
+				>
 					<h2
 						id="modal-title"
 						data-testid="modal-title"
@@ -115,11 +119,22 @@
 					<button
 						data-testid="modal-close-button"
 						onclick={handleClose}
-						class="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:hover:bg-zinc-700"
+						class="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:hover:bg-zinc-700"
 						aria-label="Close modal"
 					>
-						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						<svg
+							class="h-5 w-5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+							aria-hidden="true"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
 						</svg>
 					</button>
 				</div>
@@ -130,7 +145,9 @@
 			</div>
 
 			{#if footer}
-				<div class="border-t border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900">
+				<div
+					class="border-t border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900"
+				>
 					{@render footer()}
 				</div>
 			{/if}

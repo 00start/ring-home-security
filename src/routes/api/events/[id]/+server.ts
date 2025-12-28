@@ -1,6 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { eventsRepo } from '$lib/db';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-event');
 
 export const GET: RequestHandler = async ({ params }) => {
 	try {
@@ -15,7 +18,7 @@ export const GET: RequestHandler = async ({ params }) => {
 			data: event
 		});
 	} catch (error) {
-		console.error('Failed to get event:', error);
+		logger.error({ error, eventId: params.id }, 'Failed to get event');
 		return json({ success: false, error: 'Failed to get event' }, { status: 500 });
 	}
 };

@@ -65,13 +65,20 @@ async function transcodeVideo(
 
 	return new Promise((resolve, reject) => {
 		const args = [
-			'-i', inputPath,
-			'-c:v', 'libx264',
-			'-preset', 'fast',
-			'-crf', '23',
-			'-c:a', 'aac',
-			'-b:a', '128k',
-			'-movflags', '+faststart',
+			'-i',
+			inputPath,
+			'-c:v',
+			'libx264',
+			'-preset',
+			'fast',
+			'-crf',
+			'23',
+			'-c:a',
+			'aac',
+			'-b:a',
+			'128k',
+			'-movflags',
+			'+faststart',
 			'-y',
 			outputPath
 		];
@@ -129,9 +136,12 @@ async function getVideoDuration(videoPath: string): Promise<number> {
 
 	return new Promise((resolve, reject) => {
 		const args = [
-			'-v', 'error',
-			'-show_entries', 'format=duration',
-			'-of', 'default=noprint_wrappers=1:nokey=1',
+			'-v',
+			'error',
+			'-show_entries',
+			'format=duration',
+			'-of',
+			'default=noprint_wrappers=1:nokey=1',
 			videoPath
 		];
 
@@ -173,10 +183,14 @@ async function generateThumbnail(videoPath: string, thumbnailPath: string): Prom
 
 	return new Promise((resolve, reject) => {
 		const args = [
-			'-i', videoPath,
-			'-ss', '00:00:01',
-			'-vframes', '1',
-			'-vf', 'scale=320:-1',
+			'-i',
+			videoPath,
+			'-ss',
+			'00:00:01',
+			'-vframes',
+			'1',
+			'-vf',
+			'scale=320:-1',
 			'-y',
 			thumbnailPath
 		];

@@ -14,7 +14,10 @@
 	let { title, class: className = '', children, header, footer, ...rest }: Props = $props();
 </script>
 
-<div class="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800 {className}" {...rest}>
+<div
+	class="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800 {className}"
+	{...rest}
+>
 	{#if header}
 		<div class="border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
 			{@render header()}
@@ -30,7 +33,9 @@
 	</div>
 
 	{#if footer}
-		<div class="border-t border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900">
+		<div
+			class="border-t border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900"
+		>
 			{@render footer()}
 		</div>
 	{/if}

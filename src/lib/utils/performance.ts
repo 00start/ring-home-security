@@ -101,10 +101,7 @@ export class ApiCache<T = unknown> {
 /**
  * Create a cached fetch function
  */
-export function createCachedFetch<T>(
-	cache: ApiCache<T>,
-	options: { ttl?: number } = {}
-) {
+export function createCachedFetch<T>(cache: ApiCache<T>, options: { ttl?: number } = {}) {
 	return async (url: string, init?: RequestInit): Promise<T> => {
 		// Create cache key from URL and relevant request options
 		const cacheKey = `${url}:${init?.method || 'GET'}`;
@@ -289,10 +286,7 @@ export async function preloadImages(srcs: string[]): Promise<void> {
 /**
  * Measure performance of an async function
  */
-export async function measurePerformance<T>(
-	name: string,
-	fn: () => Promise<T>
-): Promise<T> {
+export async function measurePerformance<T>(name: string, fn: () => Promise<T>): Promise<T> {
 	const start = performance.now();
 	try {
 		const result = await fn();

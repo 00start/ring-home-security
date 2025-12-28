@@ -70,7 +70,7 @@ describe('Pre-Buffer Toggle - Zone Settings Store', () => {
 			const deviceIds = ['camera-1', 'camera-2', 'doorbell-1'];
 
 			// Act & Assert
-			deviceIds.forEach(deviceId => {
+			deviceIds.forEach((deviceId) => {
 				const settings = zoneSettings.getDeviceSettings(deviceId);
 				expect(settings.preBufferEnabled).toBe(false);
 			});

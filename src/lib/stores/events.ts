@@ -66,7 +66,8 @@ export async function fetchEvents(append = false): Promise<void> {
 		const params = new URLSearchParams();
 		if (currentFilters.deviceId) params.set('deviceId', currentFilters.deviceId);
 		if (currentFilters.eventType) params.set('eventType', currentFilters.eventType);
-		if (currentFilters.hasRecording !== undefined) params.set('hasRecording', currentFilters.hasRecording.toString());
+		if (currentFilters.hasRecording !== undefined)
+			params.set('hasRecording', currentFilters.hasRecording.toString());
 		if (currentFilters.startDate) params.set('startDate', currentFilters.startDate.toISOString());
 		if (currentFilters.endDate) params.set('endDate', currentFilters.endDate.toISOString());
 		if (currentFilters.limit) params.set('limit', currentFilters.limit.toString());

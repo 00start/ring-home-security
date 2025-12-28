@@ -149,7 +149,9 @@ export function getUserCount(): number {
 
 export function getAllUsers(): User[] {
 	const db = getDatabase();
-	const rows = db.prepare('SELECT id, username, created_at FROM users ORDER BY created_at DESC').all() as UserRow[];
+	const rows = db
+		.prepare('SELECT id, username, created_at FROM users ORDER BY created_at DESC')
+		.all() as UserRow[];
 	return rows.map((row) => ({
 		id: row.id,
 		username: row.username,

@@ -22,6 +22,12 @@
 	};
 </script>
 
-<span data-testid={rest['data-testid'] || 'badge'} data-status={rest['data-status']} class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {variantClasses[variant]} {className}">
+<span
+	data-testid={rest['data-testid'] || 'badge'}
+	data-status={rest['data-status']}
+	class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {variantClasses[
+		variant
+	]} {className}"
+>
 	{@render children()}
 </span>

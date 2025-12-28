@@ -69,7 +69,9 @@ export class CameraZoneManager {
 	private cameraNameToId: Map<string, string> = new Map();
 	private cameraIdToName: Map<string, string> = new Map();
 	private zoneStates: Map<string, ZoneRecordingState> = new Map();
-	private recordingCallback: ((camera: RingCamera, triggeredBy: string, zoneName: string) => Promise<void>) | null = null;
+	private recordingCallback:
+		| ((camera: RingCamera, triggeredBy: string, zoneName: string) => Promise<void>)
+		| null = null;
 
 	constructor() {
 		this.loadZoneConfiguration();
@@ -91,12 +93,15 @@ export class CameraZoneManager {
 
 			// Log zone configuration
 			for (const zone of this.zones) {
-				logger.info({
-					zoneName: zone.name,
-					triggerCameras: zone.triggerCameras,
-					recordCameras: zone.recordCameras,
-					cooldownSeconds: zone.motionCooldownSeconds
-				}, 'Zone configured');
+				logger.info(
+					{
+						zoneName: zone.name,
+						triggerCameras: zone.triggerCameras,
+						recordCameras: zone.recordCameras,
+						cooldownSeconds: zone.motionCooldownSeconds
+					},
+					'Zone configured'
+				);
 			}
 		} catch (error) {
 			logger.error({ error }, 'Failed to parse CAMERA_ZONES, using defaults');
@@ -134,16 +139,21 @@ export class CameraZoneManager {
 			});
 		}
 
-		logger.info({
-			cameraCount: cameras.length,
-			zoneCount: this.zones.length
-		}, 'Camera zone manager initialized');
+		logger.info(
+			{
+				cameraCount: cameras.length,
+				zoneCount: this.zones.length
+			},
+			'Camera zone manager initialized'
+		);
 	}
 
 	/**
 	 * Set callback for when zone recording should start
 	 */
-	setRecordingCallback(callback: (camera: RingCamera, triggeredBy: string, zoneName: string) => Promise<void>): void {
+	setRecordingCallback(
+		callback: (camera: RingCamera, triggeredBy: string, zoneName: string) => Promise<void>
+	): void {
 		this.recordingCallback = callback;
 	}
 
@@ -152,10 +162,11 @@ export class CameraZoneManager {
 	 */
 	private findTriggerZones(cameraName: string): CameraZone[] {
 		const normalizedName = cameraName.toLowerCase();
-		return this.zones.filter(zone =>
-			zone.triggerCameras.some(trigger =>
-				normalizedName.includes(trigger.toLowerCase()) ||
-				trigger.toLowerCase().includes(normalizedName)
+		return this.zones.filter((zone) =>
+			zone.triggerCameras.some(
+				(trigger) =>
+					normalizedName.includes(trigger.toLowerCase()) ||
+					trigger.toLowerCase().includes(normalizedName)
 			)
 		);
 	}
@@ -216,11 +227,14 @@ export class CameraZoneManager {
 				state.cooldownTimer = null;
 			}
 
-			logger.info({
-				zoneName: zone.name,
-				triggeredBy: cameraName,
-				isAlreadyRecording: state.isRecording
-			}, 'Zone motion detected');
+			logger.info(
+				{
+					zoneName: zone.name,
+					triggeredBy: cameraName,
+					isAlreadyRecording: state.isRecording
+				},
+				'Zone motion detected'
+			);
 
 			if (!state.isRecording) {
 				// Start zone recording
@@ -244,12 +258,19 @@ export class CameraZoneManager {
 	/**
 	 * Start recording on all cameras in a zone
 	 */
-	private async startZoneRecording(zone: CameraZone, triggeredBy: string, state: ZoneRecordingState): Promise<void> {
-		logger.info({
-			zoneName: zone.name,
-			triggeredBy,
-			cameras: zone.recordCameras
-		}, 'Starting zone recording');
+	private async startZoneRecording(
+		zone: CameraZone,
+		triggeredBy: string,
+		state: ZoneRecordingState
+	): Promise<void> {
+		logger.info(
+			{
+				zoneName: zone.name,
+				triggeredBy,
+				cameras: zone.recordCameras
+			},
+			'Starting zone recording'
+		);
 
 		const recordingPromises: Promise<void>[] = [];
 
@@ -274,32 +295,45 @@ export class CameraZoneManager {
 			if (this.recordingCallback) {
 				// Record follower start timestamp for latency tracking
 				const followerStartTimestamp = Date.now();
-				const latency = latencyTracker.recordFollowerStart(zone.name, cameraId, followerStartTimestamp);
+				const latency = latencyTracker.recordFollowerStart(
+					zone.name,
+					cameraId,
+					followerStartTimestamp
+				);
 
 				// Log latency and check SLA
 				if (latency !== null) {
 					const slaStatus = latencyTracker.checkSLA(latency);
-					logger.info({
-						zoneName: zone.name,
-						cameraName,
-						latency,
-						slaBreached: slaStatus.breached
-					}, 'Zone follower recording started');
-
-					if (slaStatus.breached) {
-						logger.warn({
+					logger.info(
+						{
 							zoneName: zone.name,
 							cameraName,
 							latency,
-							threshold: slaStatus.threshold,
-							message: slaStatus.message
-						}, 'Zone recording latency SLA breached');
+							slaBreached: slaStatus.breached
+						},
+						'Zone follower recording started'
+					);
+
+					if (slaStatus.breached) {
+						logger.warn(
+							{
+								zoneName: zone.name,
+								cameraName,
+								latency,
+								threshold: slaStatus.threshold,
+								message: slaStatus.message
+							},
+							'Zone recording latency SLA breached'
+						);
 					}
 				}
 
 				recordingPromises.push(
-					this.recordingCallback(camera, triggeredBy, zone.name).catch(error => {
-						logger.error({ error, cameraName, zoneName: zone.name }, 'Failed to start zone recording for camera');
+					this.recordingCallback(camera, triggeredBy, zone.name).catch((error) => {
+						logger.error(
+							{ error, cameraName, zoneName: zone.name },
+							'Failed to start zone recording for camera'
+						);
 					})
 				);
 			}
@@ -320,10 +354,13 @@ export class CameraZoneManager {
 
 			if (timeSinceLastMotion >= cooldownMs) {
 				// Cooldown period passed with no new motion, stop zone recording
-				logger.info({
-					zoneName: zone.name,
-					timeSinceLastMotion: (timeSinceLastMotion / 1000).toFixed(1)
-				}, 'Zone cooldown expired, stopping zone recording');
+				logger.info(
+					{
+						zoneName: zone.name,
+						timeSinceLastMotion: (timeSinceLastMotion / 1000).toFixed(1)
+					},
+					'Zone cooldown expired, stopping zone recording'
+				);
 
 				state.isRecording = false;
 				state.activeCameraIds.clear();
@@ -331,10 +368,13 @@ export class CameraZoneManager {
 			} else {
 				// Motion detected during cooldown, reschedule
 				const remainingCooldown = cooldownMs - timeSinceLastMotion;
-				logger.debug({
-					zoneName: zone.name,
-					remainingSeconds: (remainingCooldown / 1000).toFixed(1)
-				}, 'Motion during cooldown, rescheduling');
+				logger.debug(
+					{
+						zoneName: zone.name,
+						remainingSeconds: (remainingCooldown / 1000).toFixed(1)
+					},
+					'Motion during cooldown, rescheduling'
+				);
 
 				this.scheduleCooldownCheck(zone, state);
 			}
@@ -344,8 +384,14 @@ export class CameraZoneManager {
 	/**
 	 * Get zone status for all zones
 	 */
-	getStatus(): Record<string, { isRecording: boolean; activeCameras: string[]; lastMotion: number }> {
-		const status: Record<string, { isRecording: boolean; activeCameras: string[]; lastMotion: number }> = {};
+	getStatus(): Record<
+		string,
+		{ isRecording: boolean; activeCameras: string[]; lastMotion: number }
+	> {
+		const status: Record<
+			string,
+			{ isRecording: boolean; activeCameras: string[]; lastMotion: number }
+		> = {};
 
 		for (const [zoneName, state] of this.zoneStates) {
 			const activeCameras: string[] = [];
@@ -369,9 +415,10 @@ export class CameraZoneManager {
 	 */
 	isZoneCamera(cameraName: string): boolean {
 		const normalizedName = cameraName.toLowerCase();
-		return this.zones.some(zone =>
-			zone.triggerCameras.some(t => normalizedName.includes(t.toLowerCase())) ||
-			zone.recordCameras.some(r => normalizedName.includes(r.toLowerCase()))
+		return this.zones.some(
+			(zone) =>
+				zone.triggerCameras.some((t) => normalizedName.includes(t.toLowerCase())) ||
+				zone.recordCameras.some((r) => normalizedName.includes(r.toLowerCase()))
 		);
 	}
 

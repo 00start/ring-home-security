@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
 	mockRecording,
 	mockRecordingsWithAge,
-	mockCamera,
+	mockCamera
 } from '../../src/lib/test-utils/business-fixtures.js';
 import type { Recording, Device } from '../../src/lib/types/index.js';
 
@@ -66,23 +66,23 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 			// Arrange
 			const recording = mockRecording({
 				id: 'rec-1',
-				filePath: '/recordings/rec-1.mp4',
+				filePath: '/recordings/rec-1.mp4'
 			});
 
 			const mockLocalService: LocalStorageService = {
 				saveRecording: vi.fn().mockResolvedValue({
 					success: true,
 					location: 'local',
-					filePath: '/data/recordings/rec-1.mp4',
+					filePath: '/data/recordings/rec-1.mp4'
 				}),
 				retrieveRecording: vi.fn(),
 				verifyLocalStorageAvailable: vi.fn().mockResolvedValue(true),
 				getStorageStrategy: vi.fn().mockResolvedValue({
 					name: 'local',
 					priority: 1,
-					isAvailable: true,
+					isAvailable: true
 				}),
-				calculateLocalStorageStats: vi.fn(),
+				calculateLocalStorageStats: vi.fn()
 			};
 
 			// Act
@@ -102,7 +102,7 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 				retrieveRecording: vi.fn(),
 				verifyLocalStorageAvailable: vi.fn().mockResolvedValue(true),
 				getStorageStrategy: vi.fn(),
-				calculateLocalStorageStats: vi.fn(),
+				calculateLocalStorageStats: vi.fn()
 			};
 
 			// Act
@@ -122,9 +122,9 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 				getStorageStrategy: vi.fn().mockResolvedValue({
 					name: 'local',
 					priority: 1, // Highest priority
-					isAvailable: true,
+					isAvailable: true
 				}),
-				calculateLocalStorageStats: vi.fn(),
+				calculateLocalStorageStats: vi.fn()
 			};
 
 			// Act
@@ -140,7 +140,7 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 			// Arrange
 			const recording = mockRecording({
 				id: 'rec-2',
-				filePath: '/data/recordings/rec-2.mp4',
+				filePath: '/data/recordings/rec-2.mp4'
 			});
 
 			const mockLocalService: LocalStorageService = {
@@ -148,7 +148,7 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 				retrieveRecording: vi.fn().mockResolvedValue(recording),
 				verifyLocalStorageAvailable: vi.fn(),
 				getStorageStrategy: vi.fn(),
-				calculateLocalStorageStats: vi.fn(),
+				calculateLocalStorageStats: vi.fn()
 			};
 
 			// Act
@@ -171,7 +171,7 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 				retrieveRecording: vi.fn(),
 				verifyLocalStorageAvailable: vi.fn().mockResolvedValue(false),
 				getStorageStrategy: vi.fn(),
-				calculateLocalStorageStats: vi.fn(),
+				calculateLocalStorageStats: vi.fn()
 			};
 
 			const mockCloudService: CloudFallbackService = {
@@ -179,9 +179,9 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 				saveToCloud: vi.fn().mockResolvedValue({
 					success: true,
 					location: 'cloud',
-					filePath: 'https://cloud.ring.com/recordings/rec-3.mp4',
+					filePath: 'https://cloud.ring.com/recordings/rec-3.mp4'
 				}),
-				shouldFallbackToCloud: vi.fn().mockResolvedValue(true),
+				shouldFallbackToCloud: vi.fn().mockResolvedValue(true)
 			};
 
 			// Act
@@ -207,7 +207,7 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 			const mockCloudService: CloudFallbackService = {
 				isCloudAvailable: vi.fn().mockResolvedValue(true),
 				saveToCloud: vi.fn(),
-				shouldFallbackToCloud: vi.fn(),
+				shouldFallbackToCloud: vi.fn()
 			};
 
 			// Act
@@ -226,18 +226,18 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 				saveRecording: vi.fn().mockResolvedValue({
 					success: true,
 					location: 'local',
-					filePath: '/data/recordings/rec-4.mp4',
+					filePath: '/data/recordings/rec-4.mp4'
 				}),
 				retrieveRecording: vi.fn(),
 				verifyLocalStorageAvailable: vi.fn().mockResolvedValue(true),
 				getStorageStrategy: vi.fn(),
-				calculateLocalStorageStats: vi.fn(),
+				calculateLocalStorageStats: vi.fn()
 			};
 
 			const mockCloudService: CloudFallbackService = {
 				isCloudAvailable: vi.fn(),
 				saveToCloud: vi.fn(),
-				shouldFallbackToCloud: vi.fn().mockResolvedValue(false),
+				shouldFallbackToCloud: vi.fn().mockResolvedValue(false)
 			};
 
 			// Act
@@ -259,13 +259,13 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 				retrieveRecording: vi.fn(),
 				verifyLocalStorageAvailable: vi.fn().mockResolvedValue(false),
 				getStorageStrategy: vi.fn(),
-				calculateLocalStorageStats: vi.fn(),
+				calculateLocalStorageStats: vi.fn()
 			};
 
 			const mockCloudService: CloudFallbackService = {
 				isCloudAvailable: vi.fn().mockResolvedValue(false),
 				saveToCloud: vi.fn().mockRejectedValue(new Error('Cloud unavailable')),
-				shouldFallbackToCloud: vi.fn().mockResolvedValue(true),
+				shouldFallbackToCloud: vi.fn().mockResolvedValue(true)
 			};
 
 			// Act
@@ -303,8 +303,8 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 					cloudRecordings: 0,
 					localStoragePercentage: 100,
 					totalSizeBytes: 250_000_000_000, // 250 GB
-					cloudCostSavings: 30.0, // $30/month saved
-				}),
+					cloudCostSavings: 30.0 // $30/month saved
+				})
 			};
 
 			// Act
@@ -329,8 +329,8 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 					cloudRecordings: 0,
 					localStoragePercentage: 100,
 					totalSizeBytes: 500_000_000_000, // 500 GB
-					cloudCostSavings: 60.0, // $60/month saved (Ring Protect Plus ~$10-20/camera)
-				}),
+					cloudCostSavings: 60.0 // $60/month saved (Ring Protect Plus ~$10-20/camera)
+				})
 			};
 
 			// Act
@@ -355,8 +355,8 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 					cloudRecordings: 0,
 					localStoragePercentage: 100,
 					totalSizeBytes: 300_000_000_000, // 300 GB
-					cloudCostSavings: 40.0,
-				}),
+					cloudCostSavings: 40.0
+				})
 			};
 
 			// Act
@@ -380,8 +380,8 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 					cloudRecordings: 20,
 					localStoragePercentage: 80,
 					totalSizeBytes: 200_000_000_000,
-					cloudCostSavings: 24.0, // Reduced savings due to cloud usage
-				}),
+					cloudCostSavings: 24.0 // Reduced savings due to cloud usage
+				})
 			};
 
 			// Act
@@ -410,8 +410,8 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 					cloudRecordings: 0,
 					localStoragePercentage: 100,
 					totalSizeBytes: recordings.reduce((sum, r) => sum + r.fileSize, 0),
-					cloudCostSavings: 50.0, // Full savings
-				}),
+					cloudCostSavings: 50.0 // Full savings
+				})
 			};
 
 			// Act
@@ -428,7 +428,7 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 			const recordings = [
 				mockRecording({ id: 'rec-1', filePath: '/data/recordings/rec-1.mp4' }),
 				mockRecording({ id: 'rec-2', filePath: '/data/recordings/rec-2.mp4' }),
-				mockRecording({ id: 'rec-3', filePath: '/data/recordings/rec-3.mp4' }),
+				mockRecording({ id: 'rec-3', filePath: '/data/recordings/rec-3.mp4' })
 			];
 
 			const mockLocalService: LocalStorageService = {
@@ -442,8 +442,8 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 					cloudRecordings: 0,
 					localStoragePercentage: 100,
 					totalSizeBytes: recordings.reduce((sum, r) => sum + r.fileSize, 0),
-					cloudCostSavings: 15.0,
-				}),
+					cloudCostSavings: 15.0
+				})
 			};
 
 			// Act
@@ -478,8 +478,8 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 					cloudRecordings: 0,
 					localStoragePercentage: 100,
 					totalSizeBytes: 400_000_000_000,
-					cloudCostSavings: potentialSavings,
-				}),
+					cloudCostSavings: potentialSavings
+				})
 			};
 
 			// Act
@@ -501,18 +501,18 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 				saveRecording: vi.fn().mockResolvedValue({
 					success: true,
 					location: 'local',
-					filePath: '/data/recordings/rec-offline.mp4',
+					filePath: '/data/recordings/rec-offline.mp4'
 				}),
 				retrieveRecording: vi.fn(),
 				verifyLocalStorageAvailable: vi.fn().mockResolvedValue(true),
 				getStorageStrategy: vi.fn(),
-				calculateLocalStorageStats: vi.fn(),
+				calculateLocalStorageStats: vi.fn()
 			};
 
 			const mockCloudService: CloudFallbackService = {
 				isCloudAvailable: vi.fn().mockResolvedValue(false), // Network down
 				saveToCloud: vi.fn(),
-				shouldFallbackToCloud: vi.fn(),
+				shouldFallbackToCloud: vi.fn()
 			};
 
 			// Act: Save recording despite network outage
@@ -529,7 +529,7 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 			// Arrange: Existing local recording
 			const recording = mockRecording({
 				id: 'rec-local',
-				filePath: '/data/recordings/rec-local.mp4',
+				filePath: '/data/recordings/rec-local.mp4'
 			});
 
 			const mockLocalService: LocalStorageService = {
@@ -537,7 +537,7 @@ describe('BO-3: Cloud Dependency Reduction - Local Storage Priority', () => {
 				retrieveRecording: vi.fn().mockResolvedValue(recording),
 				verifyLocalStorageAvailable: vi.fn().mockResolvedValue(true),
 				getStorageStrategy: vi.fn(),
-				calculateLocalStorageStats: vi.fn(),
+				calculateLocalStorageStats: vi.fn()
 			};
 
 			// Act: Retrieve recording without internet connection

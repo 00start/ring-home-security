@@ -9,7 +9,15 @@
 		'data-testid'?: string;
 	}
 
-	let { label, error, class: className = '', id, children, 'data-testid': testId, ...rest }: Props = $props();
+	let {
+		label,
+		error,
+		class: className = '',
+		id,
+		children,
+		'data-testid': testId,
+		...rest
+	}: Props = $props();
 
 	const fallbackId = `select-${Math.random().toString(36).substr(2, 9)}`;
 	const selectId = $derived(id ?? fallbackId);
@@ -26,11 +34,11 @@
 		data-testid={testId || `select-${selectId}`}
 		class="block w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors
 			{error
-				? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-				: 'border-zinc-300 focus:border-blue-500 focus:ring-blue-500 dark:border-zinc-600'}
-			bg-white dark:bg-zinc-700 dark:text-white
-			focus:outline-none focus:ring-1
-			disabled:cursor-not-allowed disabled:bg-zinc-100 dark:disabled:bg-zinc-800
+			? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+			: 'border-zinc-300 focus:border-blue-500 focus:ring-blue-500 dark:border-zinc-600'}
+			bg-white focus:ring-1 focus:outline-none
+			disabled:cursor-not-allowed disabled:bg-zinc-100
+			dark:bg-zinc-700 dark:text-white dark:disabled:bg-zinc-800
 			{className}"
 		{...rest}
 	>
