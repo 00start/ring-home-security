@@ -120,16 +120,19 @@ npm install
 ### Step 2: Start Redis
 
 **Option A: Using Docker (Recommended for Windows)**
+
 ```bash
 docker compose -f docker/docker-compose.yml up -d redis
 ```
 
 **Option B: Using Redis Server (Linux/macOS)**
+
 ```bash
 redis-server
 ```
 
 Verify Redis is running:
+
 ```bash
 docker exec ring-security-redis redis-cli ping
 # Should return: PONG
@@ -150,6 +153,7 @@ npx -p ring-client-api ring-auth-cli
 ```
 
 Follow the prompts to:
+
 1. Enter your Ring email and password
 2. Complete 2FA if enabled
 3. Copy the refresh token that's displayed
@@ -167,16 +171,19 @@ All other settings have sensible defaults and are optional.
 ### Step 6: Start the Application
 
 **Terminal 1 - Web Server:**
+
 ```bash
 npm run dev
 ```
 
 **Terminal 2 - Ring Listener (optional, only if you want to connect Ring devices):**
+
 ```bash
 npm run worker:ring
 ```
 
 **Terminal 3 - Transcode Worker (optional, only needed for video processing):**
+
 ```bash
 npm run worker:transcode
 ```
@@ -268,6 +275,7 @@ npm run worker:transcode
 ```
 
 Visit http://localhost:3000 and log in with:
+
 - Username: `admin`
 - Password: `admin`
 
@@ -321,44 +329,44 @@ docker-compose up -d
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/auth/login` | POST | Authenticate user |
-| `/api/auth/logout` | POST | End session |
-| `/api/auth/me` | GET | Get current user |
-| `/api/devices` | GET | List all devices |
-| `/api/devices/:id` | GET | Get device details |
-| `/api/events` | GET | List events (with filters) |
-| `/api/events/:id` | GET | Get event details |
-| `/api/events/stream` | GET | SSE stream for real-time events |
-| `/api/recordings` | GET | List recordings |
-| `/api/recordings/:id` | GET | Get recording details |
-| `/api/recordings/:id/video` | GET | Stream video file |
-| `/api/recordings/:id/thumbnail` | GET | Get thumbnail image |
-| `/api/devices/:id/live` | GET | Stream live video from camera/doorbell |
-| `/api/stats` | GET | Dashboard statistics |
+| Endpoint                        | Method | Description                            |
+| ------------------------------- | ------ | -------------------------------------- |
+| `/api/auth/login`               | POST   | Authenticate user                      |
+| `/api/auth/logout`              | POST   | End session                            |
+| `/api/auth/me`                  | GET    | Get current user                       |
+| `/api/devices`                  | GET    | List all devices                       |
+| `/api/devices/:id`              | GET    | Get device details                     |
+| `/api/events`                   | GET    | List events (with filters)             |
+| `/api/events/:id`               | GET    | Get event details                      |
+| `/api/events/stream`            | GET    | SSE stream for real-time events        |
+| `/api/recordings`               | GET    | List recordings                        |
+| `/api/recordings/:id`           | GET    | Get recording details                  |
+| `/api/recordings/:id/video`     | GET    | Stream video file                      |
+| `/api/recordings/:id/thumbnail` | GET    | Get thumbnail image                    |
+| `/api/devices/:id/live`         | GET    | Stream live video from camera/doorbell |
+| `/api/stats`                    | GET    | Dashboard statistics                   |
 
 ## Configuration Options
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `RING_REFRESH_TOKEN` | Ring API refresh token | Required |
-| `DATABASE_PATH` | SQLite database path | `./data/ring-security.db` |
-| `REDIS_URL` | Redis connection URL | `redis://localhost:6379` |
-| `RECORDINGS_PATH` | Video storage path | `./data/recordings` |
-| `THUMBNAILS_PATH` | Thumbnail storage path | `./data/thumbnails` |
-| `LOGS_PATH` | Log files directory | `./data/logs` |
-| `RETENTION_DAYS` | Days to keep recordings | `30` |
-| `PORT` | Web server port | `3000` |
-| `HOST` | Web server host | `0.0.0.0` |
-| `AUTH_SECRET` | Session encryption key | Required |
-| `LOG_LEVEL` | Logging level (trace, debug, info, warn, error, fatal) | `info` |
-| `FFMPEG_PATH` | Custom ffmpeg path | System ffmpeg |
-| `FFPROBE_PATH` | Custom ffprobe path | System ffprobe |
-| `BUFFER_PRE_EVENT_SECONDS` | Seconds of video to capture before an event | `15` |
-| `BUFFER_LATENCY_COMPENSATION_SECONDS` | Extra buffer for Ring notification delay | `10` |
-| `BUFFER_SAFETY_MARGIN_SECONDS` | Additional safety buffer | `5` |
-| `BUFFER_POST_EVENT_SECONDS` | Seconds to record after an event | `60` |
+| Variable                              | Description                                            | Default                   |
+| ------------------------------------- | ------------------------------------------------------ | ------------------------- |
+| `RING_REFRESH_TOKEN`                  | Ring API refresh token                                 | Required                  |
+| `DATABASE_PATH`                       | SQLite database path                                   | `./data/ring-security.db` |
+| `REDIS_URL`                           | Redis connection URL                                   | `redis://localhost:6379`  |
+| `RECORDINGS_PATH`                     | Video storage path                                     | `./data/recordings`       |
+| `THUMBNAILS_PATH`                     | Thumbnail storage path                                 | `./data/thumbnails`       |
+| `LOGS_PATH`                           | Log files directory                                    | `./data/logs`             |
+| `RETENTION_DAYS`                      | Days to keep recordings                                | `30`                      |
+| `PORT`                                | Web server port                                        | `3000`                    |
+| `HOST`                                | Web server host                                        | `0.0.0.0`                 |
+| `AUTH_SECRET`                         | Session encryption key                                 | Required                  |
+| `LOG_LEVEL`                           | Logging level (trace, debug, info, warn, error, fatal) | `info`                    |
+| `FFMPEG_PATH`                         | Custom ffmpeg path                                     | System ffmpeg             |
+| `FFPROBE_PATH`                        | Custom ffprobe path                                    | System ffprobe            |
+| `BUFFER_PRE_EVENT_SECONDS`            | Seconds of video to capture before an event            | `15`                      |
+| `BUFFER_LATENCY_COMPENSATION_SECONDS` | Extra buffer for Ring notification delay               | `10`                      |
+| `BUFFER_SAFETY_MARGIN_SECONDS`        | Additional safety buffer                               | `5`                       |
+| `BUFFER_POST_EVENT_SECONDS`           | Seconds to record after an event                       | `60`                      |
 
 ## Pre-Event Video Buffering
 
@@ -373,13 +381,14 @@ The Ring Listener maintains a continuous video buffer for each camera, allowing 
 
 ### Resource Usage
 
-| Cameras | Memory Usage | CPU Impact |
-|---------|--------------|------------|
-| 1       | ~15-30 MB    | Low        |
-| 4       | ~60-120 MB   | Medium     |
-| 8       | ~120-240 MB  | Medium-High|
+| Cameras | Memory Usage | CPU Impact  |
+| ------- | ------------ | ----------- |
+| 1       | ~15-30 MB    | Low         |
+| 4       | ~60-120 MB   | Medium      |
+| 8       | ~120-240 MB  | Medium-High |
 
 The system uses:
+
 - **H.264 baseline profile** with ultrafast encoding preset
 - **Memory-based buffering** (no disk I/O during buffering)
 - **Staggered startup** (2-second delay between cameras to reduce initial load)
@@ -422,6 +431,7 @@ The dashboard supports real-time video streaming from Ring cameras and doorbells
 ### Browser Compatibility
 
 Live view requires a browser that supports Media Source Extensions (MSE):
+
 - Chrome/Edge (recommended)
 - Firefox
 - Safari 11+
@@ -442,6 +452,7 @@ By default, logs are stored in `./data/logs/`:
 ### Log Format
 
 Each log entry includes:
+
 - **Timestamp**: ISO 8601 format with timezone
 - **Level**: trace, debug, info, warn, error, or fatal
 - **Component**: The specific module or function generating the log
@@ -454,6 +465,7 @@ Each log entry includes:
 All processes output colored logs to the console for easy monitoring during development.
 
 **Log Files (Persistent)**:
+
 ```bash
 # View latest logs from a specific process
 tail -f ./data/logs/ring-listener.log
@@ -501,12 +513,12 @@ npm run lint
 
 The application consists of multiple independent processes. Here's when you need to restart each one:
 
-| Process | Restart Needed When... | How to Restart |
-|---------|------------------------|----------------|
-| **Web Server** | - Code changes to routes, components, or API<br>- Environment variable changes<br>- Logging configuration changes | Stop with `Ctrl+C`, then `npm run dev` |
-| **Ring Listener** | - Ring refresh token updated<br>- Logging configuration changes<br>- Ring API connection issues | Stop with `Ctrl+C`, then `npm run worker:ring` |
-| **Transcode Worker** | - FFmpeg path changes<br>- Logging configuration changes<br>- Video processing issues | Stop with `Ctrl+C`, then `npm run worker:transcode` |
-| **Retention Worker** | - Retention days configuration changes<br>- Logging configuration changes | Stop with `Ctrl+C`, then `npm run worker:retention` |
+| Process              | Restart Needed When...                                                                                            | How to Restart                                      |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| **Web Server**       | - Code changes to routes, components, or API<br>- Environment variable changes<br>- Logging configuration changes | Stop with `Ctrl+C`, then `npm run dev`              |
+| **Ring Listener**    | - Ring refresh token updated<br>- Logging configuration changes<br>- Ring API connection issues                   | Stop with `Ctrl+C`, then `npm run worker:ring`      |
+| **Transcode Worker** | - FFmpeg path changes<br>- Logging configuration changes<br>- Video processing issues                             | Stop with `Ctrl+C`, then `npm run worker:transcode` |
+| **Retention Worker** | - Retention days configuration changes<br>- Logging configuration changes                                         | Stop with `Ctrl+C`, then `npm run worker:retention` |
 
 **Note**: After updating the logging configuration in this release, you must restart ALL processes for log file separation to take effect.
 

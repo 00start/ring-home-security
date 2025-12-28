@@ -49,24 +49,24 @@ Execute a complete backlog clearance sprint using 9 orchestrators, each managing
 ```yaml
 execution_model: priority_gated_parallel
 phases:
-  - name: "Gate 0: P0 Blockers (Parallel)"
+  - name: 'Gate 0: P0 Blockers (Parallel)'
     orchestrators: [ORCH-1, ORCH-2, ORCH-3]
     blocking: true
-    gate_condition: "All P0 items complete with passing tests"
+    gate_condition: 'All P0 items complete with passing tests'
 
-  - name: "Gate 1: P1 Gaps (Parallel)"
+  - name: 'Gate 1: P1 Gaps (Parallel)'
     orchestrators: [ORCH-4, ORCH-5, ORCH-6, ORCH-7]
     depends_on: [Gate 0]
     blocking: true
-    gate_condition: "All P1 items complete with passing tests"
+    gate_condition: 'All P1 items complete with passing tests'
 
-  - name: "Gate 2: P2 Improvements + Regression"
+  - name: 'Gate 2: P2 Improvements + Regression'
     orchestrators: [ORCH-8, ORCH-9]
     depends_on: [Gate 1]
     blocking: false
     output: Sprint completion report
 
-backlog_source: "reports/prioritized-backlog.json"
+backlog_source: 'reports/prioritized-backlog.json'
 ```
 
 ---
@@ -74,21 +74,22 @@ backlog_source: "reports/prioritized-backlog.json"
 ## ORCHESTRATOR 1: P0 Blocker - Data TestIDs (BLK-001)
 
 ### Mission
+
 Add remaining data-testid attributes to all components for E2E test stability.
 
 ### Worker Allocation (9 Workers)
 
-| Worker | Component | TestIDs to Add |
-|--------|-----------|----------------|
-| W1.1 | EventCard.svelte | `event-card`, `event-type`, `event-timestamp`, `event-thumbnail` |
-| W1.2 | StatCard.svelte | `stat-card`, `stat-value`, `stat-label` |
-| W1.3 | Settings Page | `settings-section`, `setting-toggle`, `save-button` |
-| W1.4 | Error Components | `error-message`, `error-retry`, `error-details` |
-| W1.5 | Timeline Page | `event-list`, `event-filter`, `date-picker` |
-| W1.6 | Devices Page | `device-list`, `device-detail`, `device-actions` |
-| W1.7 | Navigation | `nav-item`, `nav-link`, `breadcrumb` |
-| W1.8 | Modals | `modal-overlay`, `modal-content`, `modal-close` |
-| W1.9 | Forms | `form-input`, `form-label`, `form-error`, `form-submit` |
+| Worker | Component        | TestIDs to Add                                                   |
+| ------ | ---------------- | ---------------------------------------------------------------- |
+| W1.1   | EventCard.svelte | `event-card`, `event-type`, `event-timestamp`, `event-thumbnail` |
+| W1.2   | StatCard.svelte  | `stat-card`, `stat-value`, `stat-label`                          |
+| W1.3   | Settings Page    | `settings-section`, `setting-toggle`, `save-button`              |
+| W1.4   | Error Components | `error-message`, `error-retry`, `error-details`                  |
+| W1.5   | Timeline Page    | `event-list`, `event-filter`, `date-picker`                      |
+| W1.6   | Devices Page     | `device-list`, `device-detail`, `device-actions`                 |
+| W1.7   | Navigation       | `nav-item`, `nav-link`, `breadcrumb`                             |
+| W1.8   | Modals           | `modal-overlay`, `modal-content`, `modal-close`                  |
+| W1.9   | Forms            | `form-input`, `form-label`, `form-error`, `form-submit`          |
 
 ### TDD Protocol
 
@@ -120,34 +121,34 @@ worker_protocol:
 ```typescript
 // Test to write first
 test('EventCard has proper test identifiers', async ({ page }) => {
-  await page.goto('/timeline');
+	await page.goto('/timeline');
 
-  const eventCard = page.locator('[data-testid="event-card"]').first();
-  await expect(eventCard).toBeVisible();
+	const eventCard = page.locator('[data-testid="event-card"]').first();
+	await expect(eventCard).toBeVisible();
 
-  // Verify child elements
-  await expect(eventCard.locator('[data-testid="event-type"]')).toBeVisible();
-  await expect(eventCard.locator('[data-testid="event-timestamp"]')).toBeVisible();
+	// Verify child elements
+	await expect(eventCard.locator('[data-testid="event-type"]')).toBeVisible();
+	await expect(eventCard.locator('[data-testid="event-timestamp"]')).toBeVisible();
 
-  // Verify data attributes
-  const eventType = await eventCard.getAttribute('data-event-type');
-  expect(['motion', 'ding', 'on_demand']).toContain(eventType);
+	// Verify data attributes
+	const eventType = await eventCard.getAttribute('data-event-type');
+	expect(['motion', 'ding', 'on_demand']).toContain(eventType);
 });
 ```
 
 ```svelte
 <!-- Implementation in EventCard.svelte -->
 <div
-  data-testid="event-card"
-  data-event-id={event.id}
-  data-event-type={event.eventType}
-  class="..."
+	data-testid="event-card"
+	data-event-id={event.id}
+	data-event-type={event.eventType}
+	class="..."
 >
-  <span data-testid="event-type">{eventType}</span>
-  <span data-testid="event-timestamp">{formatTime(event.createdAt)}</span>
-  {#if event.thumbnailPath}
-    <img data-testid="event-thumbnail" src={event.thumbnailPath} alt="" />
-  {/if}
+	<span data-testid="event-type">{eventType}</span>
+	<span data-testid="event-timestamp">{formatTime(event.createdAt)}</span>
+	{#if event.thumbnailPath}
+		<img data-testid="event-thumbnail" src={event.thumbnailPath} alt="" />
+	{/if}
 </div>
 ```
 
@@ -155,17 +156,17 @@ test('EventCard has proper test identifiers', async ({ page }) => {
 
 ```json
 {
-  "blocker_id": "BLK-001",
-  "status": "complete",
-  "components_updated": 9,
-  "testids_added": 36,
-  "tests_created": 9,
-  "tests_passing": true,
-  "files_modified": [
-    "src/lib/components/EventCard.svelte",
-    "src/lib/components/StatCard.svelte",
-    "..."
-  ]
+	"blocker_id": "BLK-001",
+	"status": "complete",
+	"components_updated": 9,
+	"testids_added": 36,
+	"tests_created": 9,
+	"tests_passing": true,
+	"files_modified": [
+		"src/lib/components/EventCard.svelte",
+		"src/lib/components/StatCard.svelte",
+		"..."
+	]
 }
 ```
 
@@ -174,21 +175,22 @@ test('EventCard has proper test identifiers', async ({ page }) => {
 ## ORCHESTRATOR 2: P0 Blocker - Axe-Core Fix (BLK-002)
 
 ### Mission
+
 Replace CDN-based axe-core with local @axe-core/playwright package in all accessibility tests.
 
 ### Worker Allocation (9 Workers)
 
-| Worker | File/Section | Responsibility |
-|--------|--------------|----------------|
-| W2.1 | responsiveness.spec.ts - Setup | Create injectAxe helper, update imports |
-| W2.2 | responsiveness.spec.ts - Color | Fix color contrast tests |
-| W2.3 | responsiveness.spec.ts - Focus | Fix focus indicator tests |
-| W2.4 | responsiveness.spec.ts - Images | Fix alt text tests |
-| W2.5 | responsiveness.spec.ts - Forms | Fix label association tests |
-| W2.6 | responsiveness.spec.ts - Headings | Fix heading hierarchy tests |
-| W2.7 | responsiveness.spec.ts - ARIA | Fix ARIA role tests |
-| W2.8 | responsiveness.spec.ts - Landmarks | Fix navigation landmark tests |
-| W2.9 | comprehension.spec.ts | Fix any a11y tests in comprehension |
+| Worker | File/Section                       | Responsibility                          |
+| ------ | ---------------------------------- | --------------------------------------- |
+| W2.1   | responsiveness.spec.ts - Setup     | Create injectAxe helper, update imports |
+| W2.2   | responsiveness.spec.ts - Color     | Fix color contrast tests                |
+| W2.3   | responsiveness.spec.ts - Focus     | Fix focus indicator tests               |
+| W2.4   | responsiveness.spec.ts - Images    | Fix alt text tests                      |
+| W2.5   | responsiveness.spec.ts - Forms     | Fix label association tests             |
+| W2.6   | responsiveness.spec.ts - Headings  | Fix heading hierarchy tests             |
+| W2.7   | responsiveness.spec.ts - ARIA      | Fix ARIA role tests                     |
+| W2.8   | responsiveness.spec.ts - Landmarks | Fix navigation landmark tests           |
+| W2.9   | comprehension.spec.ts              | Fix any a11y tests in comprehension     |
 
 ### TDD Protocol
 
@@ -266,12 +268,12 @@ worker_W2.2_color_contrast:
 
 ```json
 {
-  "blocker_id": "BLK-002",
-  "status": "complete",
-  "cdn_references_removed": 12,
-  "tests_updated": 15,
-  "helper_file_created": "tests/e2e/fixtures/axe-helper.ts",
-  "tests_passing": true
+	"blocker_id": "BLK-002",
+	"status": "complete",
+	"cdn_references_removed": 12,
+	"tests_updated": 15,
+	"helper_file_created": "tests/e2e/fixtures/axe-helper.ts",
+	"tests_passing": true
 }
 ```
 
@@ -280,21 +282,22 @@ worker_W2.2_color_contrast:
 ## ORCHESTRATOR 3: P0 Blocker - Test Database Seeding (BLK-003)
 
 ### Mission
+
 Create comprehensive test database seeding for realistic E2E test execution.
 
 ### Worker Allocation (9 Workers)
 
-| Worker | Responsibility | Data Type |
-|--------|---------------|-----------|
-| W3.1 | Global Setup | Create setup file, database init |
-| W3.2 | Device Seeding | Seed 6 devices (cameras, doorbells, sensors) |
-| W3.3 | Event Seeding | Seed 20 events with various types |
-| W3.4 | Recording Seeding | Seed 10 recordings with mock video files |
-| W3.5 | User Seeding | Ensure admin user, create test user |
-| W3.6 | Zone Seeding | Seed 2 zones (front, garden) |
-| W3.7 | Alert Seeding | Seed battery alerts, offline alerts |
-| W3.8 | Cleanup | Create teardown for test isolation |
-| W3.9 | Integration | Wire seeding into playwright global setup |
+| Worker | Responsibility    | Data Type                                    |
+| ------ | ----------------- | -------------------------------------------- |
+| W3.1   | Global Setup      | Create setup file, database init             |
+| W3.2   | Device Seeding    | Seed 6 devices (cameras, doorbells, sensors) |
+| W3.3   | Event Seeding     | Seed 20 events with various types            |
+| W3.4   | Recording Seeding | Seed 10 recordings with mock video files     |
+| W3.5   | User Seeding      | Ensure admin user, create test user          |
+| W3.6   | Zone Seeding      | Seed 2 zones (front, garden)                 |
+| W3.7   | Alert Seeding     | Seed battery alerts, offline alerts          |
+| W3.8   | Cleanup           | Create teardown for test isolation           |
+| W3.9   | Integration       | Wire seeding into playwright global setup    |
 
 ### TDD Protocol
 
@@ -433,20 +436,20 @@ worker_W3.6_zone_seeding:
 
 ```json
 {
-  "blocker_id": "BLK-003",
-  "status": "complete",
-  "files_created": [
-    "tests/setup/global-setup.ts",
-    "tests/setup/seed-db.ts",
-    "tests/setup/teardown.ts"
-  ],
-  "test_data": {
-    "devices": 6,
-    "events": 20,
-    "recordings": 10,
-    "zones": 2
-  },
-  "playwright_config_updated": true
+	"blocker_id": "BLK-003",
+	"status": "complete",
+	"files_created": [
+		"tests/setup/global-setup.ts",
+		"tests/setup/seed-db.ts",
+		"tests/setup/teardown.ts"
+	],
+	"test_data": {
+		"devices": 6,
+		"events": 20,
+		"recordings": 10,
+		"zones": 2
+	},
+	"playwright_config_updated": true
 }
 ```
 
@@ -455,21 +458,22 @@ worker_W3.6_zone_seeding:
 ## ORCHESTRATOR 4: P1 Gap - Battery Warning Banner (GAP-001)
 
 ### Mission
+
 Implement dashboard-level battery warning banner component with dismiss and snooze functionality.
 
 ### Worker Allocation (9 Workers)
 
-| Worker | Responsibility |
-|--------|---------------|
-| W4.1 | Write E2E tests for battery banner |
-| W4.2 | Create BatteryWarningBanner.svelte component |
-| W4.3 | Implement banner logic (20% warning) |
-| W4.4 | Implement critical banner (10% warning) |
-| W4.5 | Add dismiss functionality |
-| W4.6 | Add snooze functionality (1 hour) |
-| W4.7 | Integrate with dashboard |
-| W4.8 | Add persistence (localStorage) |
-| W4.9 | Verify all tests pass |
+| Worker | Responsibility                               |
+| ------ | -------------------------------------------- |
+| W4.1   | Write E2E tests for battery banner           |
+| W4.2   | Create BatteryWarningBanner.svelte component |
+| W4.3   | Implement banner logic (20% warning)         |
+| W4.4   | Implement critical banner (10% warning)      |
+| W4.5   | Add dismiss functionality                    |
+| W4.6   | Add snooze functionality (1 hour)            |
+| W4.7   | Integrate with dashboard                     |
+| W4.8   | Add persistence (localStorage)               |
+| W4.9   | Verify all tests pass                        |
 
 ### TDD Protocol
 
@@ -610,42 +614,44 @@ worker_W4.2_component:
 ## ORCHESTRATOR 5: P1 Gap - Pre-Buffer Toggle (GAP-002)
 
 ### Mission
+
 Implement pre-event buffer toggle in zone settings with battery impact warning.
 
 ### Worker Allocation (9 Workers)
 
-| Worker | Responsibility |
-|--------|---------------|
-| W5.1 | Write E2E tests for pre-buffer toggle |
-| W5.2 | Create toggle component |
-| W5.3 | Add to zone settings form |
-| W5.4 | Implement battery warning display |
-| W5.5 | Add buffer duration selector |
-| W5.6 | Persist settings to database |
-| W5.7 | Integrate with camera-buffer.ts |
-| W5.8 | Update zone management API |
-| W5.9 | Verify all tests pass |
+| Worker | Responsibility                        |
+| ------ | ------------------------------------- |
+| W5.1   | Write E2E tests for pre-buffer toggle |
+| W5.2   | Create toggle component               |
+| W5.3   | Add to zone settings form             |
+| W5.4   | Implement battery warning display     |
+| W5.5   | Add buffer duration selector          |
+| W5.6   | Persist settings to database          |
+| W5.7   | Integrate with camera-buffer.ts       |
+| W5.8   | Update zone management API            |
+| W5.9   | Verify all tests pass                 |
 
 ---
 
 ## ORCHESTRATOR 6: P1 Gap - Type Error Fixes (GAP-003)
 
 ### Mission
+
 Fix all 35 pre-existing TypeScript errors in application components.
 
 ### Worker Allocation (9 Workers)
 
-| Worker | File | Error Count |
-|--------|------|-------------|
-| W6.1 | devices/[id]/+page.svelte | 12 errors (null checks) |
-| W6.2 | Modal.svelte | 3 errors (a11y) |
-| W6.3 | Input.svelte | 1 error (state reference) |
-| W6.4 | Select.svelte | 1 error (state reference) |
-| W6.5 | EventCard.svelte | 1 error (state reference) |
-| W6.6 | timeline/+page.svelte | 4 errors (label association) |
-| W6.7 | settings/+page.svelte | 8 errors (label association) |
-| W6.8 | Other components | Remaining errors |
-| W6.9 | Final verification | Run npm run check |
+| Worker | File                      | Error Count                  |
+| ------ | ------------------------- | ---------------------------- |
+| W6.1   | devices/[id]/+page.svelte | 12 errors (null checks)      |
+| W6.2   | Modal.svelte              | 3 errors (a11y)              |
+| W6.3   | Input.svelte              | 1 error (state reference)    |
+| W6.4   | Select.svelte             | 1 error (state reference)    |
+| W6.5   | EventCard.svelte          | 1 error (state reference)    |
+| W6.6   | timeline/+page.svelte     | 4 errors (label association) |
+| W6.7   | settings/+page.svelte     | 8 errors (label association) |
+| W6.8   | Other components          | Remaining errors             |
+| W6.9   | Final verification        | Run npm run check            |
 
 ### TDD Protocol
 
@@ -694,21 +700,22 @@ worker_W6.2_modal:
 ## ORCHESTRATOR 7: P1 Gap - Missing Requirement Tests (GAP-004)
 
 ### Mission
+
 Add comprehensive tests for BR-3 (30-day retention), BR-4 (auto-terminate), BO-3 (cloud reduction).
 
 ### Worker Allocation (9 Workers)
 
-| Worker | Requirement | Tests to Create |
-|--------|-------------|-----------------|
-| W7.1 | BR-3 Setup | Create retention test file |
-| W7.2 | BR-3 Tests | 30-day retention verification |
-| W7.3 | BR-3 Tests | Auto-cleanup of old recordings |
-| W7.4 | BR-4 Setup | Create live view timeout tests |
-| W7.5 | BR-4 Tests | 5-minute auto-terminate with clock mock |
-| W7.6 | BR-4 Tests | 4:30 warning display |
-| W7.7 | BO-3 Setup | Create cloud independence tests |
-| W7.8 | BO-3 Tests | Verify local storage only |
-| W7.9 | Integration | Verify all new tests pass |
+| Worker | Requirement | Tests to Create                         |
+| ------ | ----------- | --------------------------------------- |
+| W7.1   | BR-3 Setup  | Create retention test file              |
+| W7.2   | BR-3 Tests  | 30-day retention verification           |
+| W7.3   | BR-3 Tests  | Auto-cleanup of old recordings          |
+| W7.4   | BR-4 Setup  | Create live view timeout tests          |
+| W7.5   | BR-4 Tests  | 5-minute auto-terminate with clock mock |
+| W7.6   | BR-4 Tests  | 4:30 warning display                    |
+| W7.7   | BO-3 Setup  | Create cloud independence tests         |
+| W7.8   | BO-3 Tests  | Verify local storage only               |
+| W7.9   | Integration | Verify all new tests pass               |
 
 ### TDD Protocol
 
@@ -784,72 +791,74 @@ worker_W7.5_live_view_timeout:
 ## ORCHESTRATOR 8: P2 Improvements
 
 ### Mission
+
 Implement performance and accessibility improvements.
 
 ### Worker Allocation (9 Workers)
 
-| Worker | Focus Area | Improvements |
-|--------|-----------|--------------|
-| W8.1 | Dashboard Performance | Lazy loading, code splitting |
-| W8.2 | API Caching | Add response caching |
-| W8.3 | Image Optimization | Lazy load thumbnails |
-| W8.4 | A11y - Color Contrast | Fix contrast issues |
-| W8.5 | A11y - Focus States | Visible focus indicators |
-| W8.6 | A11y - Screen Reader | ARIA labels, live regions |
-| W8.7 | A11y - Keyboard Nav | Tab order, shortcuts |
-| W8.8 | A11y - Labels | Form label associations |
-| W8.9 | Performance Testing | Verify improvements |
+| Worker | Focus Area            | Improvements                 |
+| ------ | --------------------- | ---------------------------- |
+| W8.1   | Dashboard Performance | Lazy loading, code splitting |
+| W8.2   | API Caching           | Add response caching         |
+| W8.3   | Image Optimization    | Lazy load thumbnails         |
+| W8.4   | A11y - Color Contrast | Fix contrast issues          |
+| W8.5   | A11y - Focus States   | Visible focus indicators     |
+| W8.6   | A11y - Screen Reader  | ARIA labels, live regions    |
+| W8.7   | A11y - Keyboard Nav   | Tab order, shortcuts         |
+| W8.8   | A11y - Labels         | Form label associations      |
+| W8.9   | Performance Testing   | Verify improvements          |
 
 ---
 
 ## ORCHESTRATOR 9: Regression, Retrospective & Planning
 
 ### Mission
+
 Execute full regression suite, document sprint results, and prepare next sprint backlog.
 
 ### Worker Allocation (9 Workers)
 
-| Worker | Phase | Responsibility |
-|--------|-------|----------------|
-| W9.1 | Regression | Run unit tests |
-| W9.2 | Regression | Run E2E business tests |
-| W9.3 | Regression | Run E2E UX tests |
-| W9.4 | Regression | Run E2E quality tests |
-| W9.5 | Regression | Run E2E dependency tests |
-| W9.6 | Analysis | Compare before/after metrics |
-| W9.7 | Retrospective | Document lessons learned |
-| W9.8 | Backlog | Identify remaining gaps |
-| W9.9 | Planning | Prioritize next sprint |
+| Worker | Phase         | Responsibility               |
+| ------ | ------------- | ---------------------------- |
+| W9.1   | Regression    | Run unit tests               |
+| W9.2   | Regression    | Run E2E business tests       |
+| W9.3   | Regression    | Run E2E UX tests             |
+| W9.4   | Regression    | Run E2E quality tests        |
+| W9.5   | Regression    | Run E2E dependency tests     |
+| W9.6   | Analysis      | Compare before/after metrics |
+| W9.7   | Retrospective | Document lessons learned     |
+| W9.8   | Backlog       | Identify remaining gaps      |
+| W9.9   | Planning      | Prioritize next sprint       |
 
 ### Execution Protocol
 
 ```yaml
 phase_regression:
   worker_W9.1:
-    command: "npm run test:unit"
-    success_criteria: "100% pass rate"
+    command: 'npm run test:unit'
+    success_criteria: '100% pass rate'
 
   worker_W9.2:
-    command: "npm run test:e2e -- tests/e2e/business/"
+    command: 'npm run test:e2e -- tests/e2e/business/'
     capture: pass_rate, failures
 
   worker_W9.3:
-    command: "npm run test:e2e -- tests/e2e/ux/"
+    command: 'npm run test:e2e -- tests/e2e/ux/'
     capture: pass_rate, failures
 
   worker_W9.4:
-    command: "npm run test:e2e -- tests/e2e/quality/"
+    command: 'npm run test:e2e -- tests/e2e/quality/'
     capture: pass_rate, a11y_violations
 
   worker_W9.5:
-    command: "npm run test:e2e -- tests/e2e/dependencies/"
+    command: 'npm run test:e2e -- tests/e2e/dependencies/'
     capture: pass_rate, dependency_status
 
 phase_analysis:
   worker_W9.6:
     compare:
-      before: "reports/test-results.json"
-      after: "reports/test-results-post-sprint.json"
+      before: 'reports/test-results.json'
+      after: 'reports/test-results-post-sprint.json'
     metrics:
       - tests_passing_delta
       - failures_resolved
@@ -892,7 +901,7 @@ phase_planning:
         - User impact
         - Effort vs value
         - Dependencies
-    output: "reports/next-sprint-backlog.json"
+    output: 'reports/next-sprint-backlog.json'
 ```
 
 ---
@@ -901,7 +910,7 @@ phase_planning:
 
 ```yaml
 gate_0_p0_complete:
-  condition: "All P0 blockers resolved"
+  condition: 'All P0 blockers resolved'
   verification:
     - BLK-001: All data-testids added, E2E selectors working
     - BLK-002: Axe-core local, no CDN requests
@@ -912,7 +921,7 @@ gate_0_p0_complete:
     - E2E selector failures: -90%
 
 gate_1_p1_complete:
-  condition: "All P1 gaps resolved"
+  condition: 'All P1 gaps resolved'
   verification:
     - GAP-001: Battery banner visible and functional
     - GAP-002: Pre-buffer toggle in settings
@@ -924,14 +933,14 @@ gate_1_p1_complete:
     - Requirements coverage: 100%
 
 gate_2_sprint_complete:
-  condition: "Sprint deliverables complete"
+  condition: 'Sprint deliverables complete'
   verification:
     - P2 improvements applied
     - Regression tests passing
     - Retrospective documented
     - Next sprint planned
   pass_criteria:
-    - E2E pass rate: >90%
+    - E2E pass rate: >90
     - Unit test pass rate: 100%
     - A11y violations: -50%
 ```
@@ -958,13 +967,13 @@ npm run check && npm run test:all
 
 ## Output Artifacts
 
-| Artifact | Path | Description |
-|----------|------|-------------|
-| Unit Results | `reports/unit-results.json` | Unit test results |
-| E2E Results | `reports/test-results-post-sprint.json` | Post-sprint E2E |
-| Comparison | `reports/sprint-comparison.json` | Before/after delta |
-| Retrospective | `reports/sprint-2-retrospective.md` | Sprint retrospective |
-| Next Backlog | `reports/next-sprint-backlog.json` | Prioritized backlog |
+| Artifact      | Path                                    | Description          |
+| ------------- | --------------------------------------- | -------------------- |
+| Unit Results  | `reports/unit-results.json`             | Unit test results    |
+| E2E Results   | `reports/test-results-post-sprint.json` | Post-sprint E2E      |
+| Comparison    | `reports/sprint-comparison.json`        | Before/after delta   |
+| Retrospective | `reports/sprint-2-retrospective.md`     | Sprint retrospective |
+| Next Backlog  | `reports/next-sprint-backlog.json`      | Prioritized backlog  |
 
 ---
 
@@ -996,5 +1005,5 @@ sprint_success:
 
 ---
 
-*Product Owner Backlog Clearance Agent v1.0*
-*81 Parallel Workers | 9 Orchestrators | Priority-Gated Execution*
+_Product Owner Backlog Clearance Agent v1.0_
+_81 Parallel Workers | 9 Orchestrators | Priority-Gated Execution_

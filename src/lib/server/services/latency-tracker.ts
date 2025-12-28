@@ -119,7 +119,7 @@ class LatencyTracker {
 	calculateLatency(zoneId: string, cameraId: string): number | null {
 		// Look in completed measurements first
 		const completed = this.completedMeasurements
-			.filter(m => m.zoneId === zoneId && m.cameraId === cameraId)
+			.filter((m) => m.zoneId === zoneId && m.cameraId === cameraId)
 			.sort((a, b) => b.triggerTimestamp - a.triggerTimestamp);
 
 		if (completed.length > 0 && completed[0].latency !== undefined) {
@@ -140,7 +140,7 @@ class LatencyTracker {
 		const sorted = [...latencies].sort((a, b) => a - b);
 		const count = sorted.length;
 
-		const p50Index = Math.floor(count * 0.50);
+		const p50Index = Math.floor(count * 0.5);
 		const p95Index = Math.floor(count * 0.95);
 		const p99Index = Math.floor(count * 0.99);
 
@@ -157,12 +157,12 @@ class LatencyTracker {
 	 */
 	getPercentiles(zoneId: string, timeRange: TimeRange): LatencyPercentiles {
 		const latencies = this.completedMeasurements
-			.filter(m => {
+			.filter((m) => {
 				if (m.zoneId !== zoneId || m.latency === undefined) return false;
 				const recordedAt = m.recordedAt.getTime();
 				return recordedAt >= timeRange.start.getTime() && recordedAt <= timeRange.end.getTime();
 			})
-			.map(m => m.latency!);
+			.map((m) => m.latency!);
 
 		return this.calculatePercentilesFromArray(latencies);
 	}
@@ -186,13 +186,13 @@ class LatencyTracker {
 	 * Get comprehensive latency statistics for a zone
 	 */
 	getLatencyStats(zoneId: string, timeRange: TimeRange): LatencyStats {
-		const measurements = this.completedMeasurements.filter(m => {
+		const measurements = this.completedMeasurements.filter((m) => {
 			if (m.zoneId !== zoneId || m.latency === undefined) return false;
 			const recordedAt = m.recordedAt.getTime();
 			return recordedAt >= timeRange.start.getTime() && recordedAt <= timeRange.end.getTime();
 		});
 
-		const latencies = measurements.map(m => m.latency!);
+		const latencies = measurements.map((m) => m.latency!);
 
 		if (latencies.length === 0) {
 			return {
@@ -235,9 +235,7 @@ class LatencyTracker {
 					this.measurements.delete(key);
 				}
 			}
-			this.completedMeasurements = this.completedMeasurements.filter(
-				m => m.zoneId !== zoneId
-			);
+			this.completedMeasurements = this.completedMeasurements.filter((m) => m.zoneId !== zoneId);
 			this.slaBreachCount.delete(zoneId);
 		} else {
 			// Clear all metrics
@@ -268,7 +266,7 @@ class LatencyTracker {
 
 		const beforeCount = this.completedMeasurements.length;
 		this.completedMeasurements = this.completedMeasurements.filter(
-			m => m.recordedAt.getTime() >= cutoffTime
+			(m) => m.recordedAt.getTime() >= cutoffTime
 		);
 		const afterCount = this.completedMeasurements.length;
 
@@ -280,10 +278,4 @@ class LatencyTracker {
 export const latencyTracker = new LatencyTracker();
 
 // Export types
-export type {
-	LatencyMeasurement,
-	TimeRange,
-	LatencyPercentiles,
-	SLAStatus,
-	LatencyStats
-};
+export type { LatencyMeasurement, TimeRange, LatencyPercentiles, SLAStatus, LatencyStats };

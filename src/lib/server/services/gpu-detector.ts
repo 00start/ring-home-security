@@ -149,25 +149,28 @@ export async function detectGPU(): Promise<GPUCapabilities> {
 		const [hasNVENC, hasVAAPI, hasVideoToolbox] = await Promise.all([
 			detectNVENC(),
 			detectVAAPI(),
-			detectVideoToolbox(),
+			detectVideoToolbox()
 		]);
 
 		const capabilities: GPUCapabilities = {
 			hasNVENC,
 			hasVAAPI,
 			hasVideoToolbox,
-			preferredEncoder: selectPreferredEncoder(hasNVENC, hasVAAPI, hasVideoToolbox),
+			preferredEncoder: selectPreferredEncoder(hasNVENC, hasVAAPI, hasVideoToolbox)
 		};
 
 		// Cache the results
 		capabilitiesCache = capabilities;
 
-		logger.info({
-			hasNVENC,
-			hasVAAPI,
-			hasVideoToolbox,
-			preferredEncoder: capabilities.preferredEncoder,
-		}, 'GPU detection complete');
+		logger.info(
+			{
+				hasNVENC,
+				hasVAAPI,
+				hasVideoToolbox,
+				preferredEncoder: capabilities.preferredEncoder
+			},
+			'GPU detection complete'
+		);
 
 		return capabilities;
 	} catch (error) {
@@ -178,7 +181,7 @@ export async function detectGPU(): Promise<GPUCapabilities> {
 			hasNVENC: false,
 			hasVAAPI: false,
 			hasVideoToolbox: false,
-			preferredEncoder: 'libx264',
+			preferredEncoder: 'libx264'
 		};
 
 		capabilitiesCache = fallbackCapabilities;

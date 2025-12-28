@@ -35,7 +35,9 @@ async function checkSubscription() {
 			console.log(`ID: ${camera.id}`);
 			console.log(`Type: ${camera.deviceType}`);
 			console.log(`Model: ${camera.model || 'N/A'}`);
-			console.log(`Battery: ${camera.batteryLevel !== undefined ? camera.batteryLevel + '%' : 'Wired'}`);
+			console.log(
+				`Battery: ${camera.batteryLevel !== undefined ? camera.batteryLevel + '%' : 'Wired'}`
+			);
 
 			console.log('\n🔐 SUBSCRIPTION STATUS:');
 			console.log(`  Subscribed: ${data.subscribed !== undefined ? data.subscribed : 'Unknown'}`);
@@ -44,20 +46,24 @@ async function checkSubscription() {
 
 			console.log('\n✨ FEATURES:');
 			if (data.features && Array.isArray(data.features)) {
-				data.features.forEach(feature => console.log(`  - ${feature}`));
+				data.features.forEach((feature) => console.log(`  - ${feature}`));
 			} else {
 				console.log('  No features data available');
 			}
 
 			console.log('\n⚙️  SETTINGS:');
 			const settings = data.settings || {};
-			console.log(`  Motion Detection: ${settings.motion_detection_enabled !== undefined ? (settings.motion_detection_enabled ? 'Enabled' : 'Disabled') : 'N/A'}`);
+			console.log(
+				`  Motion Detection: ${settings.motion_detection_enabled !== undefined ? (settings.motion_detection_enabled ? 'Enabled' : 'Disabled') : 'N/A'}`
+			);
 			console.log(`  Recording Quality: ${settings.video_settings?.quality || 'N/A'}`);
 			console.log(`  Night Vision: ${settings.night_vision_mode || 'N/A'}`);
 
 			console.log('\n📊 RECORDING CAPABILITY:');
-			const hasRecordingFeature = data.features?.includes('recordings') || data.features?.includes('video_recording');
-			const hasActiveSubscription = data.subscribed === true || data.subscription_status === 'active';
+			const hasRecordingFeature =
+				data.features?.includes('recordings') || data.features?.includes('video_recording');
+			const hasActiveSubscription =
+				data.subscribed === true || data.subscription_status === 'active';
 
 			if (!hasActiveSubscription) {
 				console.log('  ❌ NO ACTIVE RING PROTECT SUBSCRIPTION');
@@ -95,7 +101,6 @@ async function checkSubscription() {
 		console.log('4. Check if the camera has internet connectivity');
 		console.log('5. Some events may not trigger recording (e.g., low battery mode)');
 		console.log('\n');
-
 	} catch (error) {
 		console.error('\n❌ ERROR:', error.message);
 		if (error.stack) {

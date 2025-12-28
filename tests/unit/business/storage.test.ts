@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
 	mockRecording,
 	mockRecordingsWithAge,
-	mockCamera,
+	mockCamera
 } from '../../../src/lib/test-utils/business-fixtures.js';
 import type { Recording } from '../../../src/lib/types/index.js';
 
@@ -41,10 +41,7 @@ interface StorageHealthStatus {
 }
 
 interface RetentionService {
-	identifyExpiredRecordings(
-		recordings: Recording[],
-		retentionDays: number
-	): Promise<Recording[]>;
+	identifyExpiredRecordings(recordings: Recording[], retentionDays: number): Promise<Recording[]>;
 	deleteExpiredRecordings(recordingIds: string[]): Promise<DeleteResult>;
 	enforceRetentionPolicy(retentionDays: number): Promise<RetentionReport>;
 }
@@ -70,7 +67,7 @@ describe('BO-3: Local Storage Verification', () => {
 			const recordings = [
 				mockRecording({ id: 'rec-1', filePath: '/recordings/rec-1.mp4', fileSize: 5_000_000 }),
 				mockRecording({ id: 'rec-2', filePath: '/recordings/rec-2.mp4', fileSize: 3_500_000 }),
-				mockRecording({ id: 'rec-3', filePath: '/recordings/rec-3.mp4', fileSize: 2_000_000 }),
+				mockRecording({ id: 'rec-3', filePath: '/recordings/rec-3.mp4', fileSize: 2_000_000 })
 			];
 
 			// Mock storage service
@@ -80,10 +77,10 @@ describe('BO-3: Local Storage Verification', () => {
 					verifiedRecordings: 3,
 					missingFiles: [],
 					corruptedFiles: [],
-					totalSize: 10_500_000,
+					totalSize: 10_500_000
 				}),
 				calculateStorageUsage: vi.fn(),
-				checkStorageHealth: vi.fn(),
+				checkStorageHealth: vi.fn()
 			};
 
 			// Act
@@ -102,7 +99,7 @@ describe('BO-3: Local Storage Verification', () => {
 			const recordings = [
 				mockRecording({ id: 'rec-1', filePath: '/recordings/rec-1.mp4' }),
 				mockRecording({ id: 'rec-2', filePath: '/recordings/rec-2.mp4' }),
-				mockRecording({ id: 'rec-3', filePath: '/recordings/rec-3.mp4' }),
+				mockRecording({ id: 'rec-3', filePath: '/recordings/rec-3.mp4' })
 			];
 
 			const mockStorageService: StorageService = {
@@ -111,10 +108,10 @@ describe('BO-3: Local Storage Verification', () => {
 					verifiedRecordings: 2,
 					missingFiles: ['/recordings/rec-2.mp4'],
 					corruptedFiles: [],
-					totalSize: 7_500_000,
+					totalSize: 7_500_000
 				}),
 				calculateStorageUsage: vi.fn(),
-				checkStorageHealth: vi.fn(),
+				checkStorageHealth: vi.fn()
 			};
 
 			// Act
@@ -130,7 +127,7 @@ describe('BO-3: Local Storage Verification', () => {
 			// Arrange
 			const recordings = [
 				mockRecording({ id: 'rec-1', filePath: '/recordings/rec-1.mp4' }),
-				mockRecording({ id: 'rec-2', filePath: '/recordings/rec-2.mp4' }),
+				mockRecording({ id: 'rec-2', filePath: '/recordings/rec-2.mp4' })
 			];
 
 			const mockStorageService: StorageService = {
@@ -139,10 +136,10 @@ describe('BO-3: Local Storage Verification', () => {
 					verifiedRecordings: 1,
 					missingFiles: [],
 					corruptedFiles: ['/recordings/rec-2.mp4'],
-					totalSize: 2_500_000,
+					totalSize: 2_500_000
 				}),
 				calculateStorageUsage: vi.fn(),
-				checkStorageHealth: vi.fn(),
+				checkStorageHealth: vi.fn()
 			};
 
 			// Act
@@ -160,13 +157,13 @@ describe('BO-3: Local Storage Verification', () => {
 			const recordings = [
 				mockRecording({ fileSize: 5_000_000 }),
 				mockRecording({ fileSize: 3_500_000 }),
-				mockRecording({ fileSize: 2_000_000 }),
+				mockRecording({ fileSize: 2_000_000 })
 			];
 
 			const mockStorageService: StorageService = {
 				verifyLocalStorage: vi.fn(),
 				calculateStorageUsage: vi.fn().mockResolvedValue(10_500_000),
-				checkStorageHealth: vi.fn(),
+				checkStorageHealth: vi.fn()
 			};
 
 			// Act
@@ -183,7 +180,7 @@ describe('BO-3: Local Storage Verification', () => {
 			const mockStorageService: StorageService = {
 				verifyLocalStorage: vi.fn(),
 				calculateStorageUsage: vi.fn().mockResolvedValue(0),
-				checkStorageHealth: vi.fn(),
+				checkStorageHealth: vi.fn()
 			};
 
 			// Act
@@ -205,8 +202,8 @@ describe('BO-3: Local Storage Verification', () => {
 					usedSpace: 50_000_000_000, // 50GB
 					freeSpace: 50_000_000_000, // 50GB
 					utilizationPercent: 50,
-					isHealthy: true,
-				}),
+					isHealthy: true
+				})
 			};
 
 			// Act
@@ -228,8 +225,8 @@ describe('BO-3: Local Storage Verification', () => {
 					usedSpace: 85_000_000_000, // 85GB
 					freeSpace: 15_000_000_000, // 15GB
 					utilizationPercent: 85,
-					isHealthy: false,
-				}),
+					isHealthy: false
+				})
 			};
 
 			// Act
@@ -254,12 +251,10 @@ describe('BR-3: 30-Day Retention Policy', () => {
 				identifyExpiredRecordings: vi.fn().mockImplementation((recs, days) => {
 					const now = new Date();
 					const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-					return Promise.resolve(
-						recs.filter((rec: Recording) => rec.createdAt < cutoffDate)
-					);
+					return Promise.resolve(recs.filter((rec: Recording) => rec.createdAt < cutoffDate));
 				}),
 				deleteExpiredRecordings: vi.fn(),
-				enforceRetentionPolicy: vi.fn(),
+				enforceRetentionPolicy: vi.fn()
 			};
 
 			// Act
@@ -271,8 +266,7 @@ describe('BR-3: 30-Day Retention Policy', () => {
 			// Assert: Should find recordings older than 30 days
 			expect(expired.length).toBeGreaterThan(0);
 			expired.forEach((recording) => {
-				const ageInDays =
-					(Date.now() - recording.createdAt.getTime()) / (1000 * 60 * 60 * 24);
+				const ageInDays = (Date.now() - recording.createdAt.getTime()) / (1000 * 60 * 60 * 24);
 				expect(ageInDays).toBeGreaterThan(30);
 			});
 		});
@@ -283,7 +277,7 @@ describe('BR-3: 30-Day Retention Policy', () => {
 			const recordings = Array.from({ length: 5 }, (_, i) =>
 				mockRecording({
 					id: `rec-${i}`,
-					createdAt: new Date(now.getTime() - i * 5 * 24 * 60 * 60 * 1000), // 0, 5, 10, 15, 20 days old
+					createdAt: new Date(now.getTime() - i * 5 * 24 * 60 * 60 * 1000) // 0, 5, 10, 15, 20 days old
 				})
 			);
 			const retentionDays = 30;
@@ -291,12 +285,10 @@ describe('BR-3: 30-Day Retention Policy', () => {
 			const mockRetentionService: RetentionService = {
 				identifyExpiredRecordings: vi.fn().mockImplementation((recs, days) => {
 					const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-					return Promise.resolve(
-						recs.filter((rec: Recording) => rec.createdAt < cutoffDate)
-					);
+					return Promise.resolve(recs.filter((rec: Recording) => rec.createdAt < cutoffDate));
 				}),
 				deleteExpiredRecordings: vi.fn(),
-				enforceRetentionPolicy: vi.fn(),
+				enforceRetentionPolicy: vi.fn()
 			};
 
 			// Act
@@ -318,12 +310,10 @@ describe('BR-3: 30-Day Retention Policy', () => {
 				identifyExpiredRecordings: vi.fn().mockImplementation((recs, days) => {
 					const now = new Date();
 					const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-					return Promise.resolve(
-						recs.filter((rec: Recording) => rec.createdAt < cutoffDate)
-					);
+					return Promise.resolve(recs.filter((rec: Recording) => rec.createdAt < cutoffDate));
 				}),
 				deleteExpiredRecordings: vi.fn(),
-				enforceRetentionPolicy: vi.fn(),
+				enforceRetentionPolicy: vi.fn()
 			};
 
 			// Act
@@ -335,8 +325,7 @@ describe('BR-3: 30-Day Retention Policy', () => {
 			// Assert: Should find more expired recordings with shorter retention
 			expect(expired.length).toBeGreaterThan(0);
 			expired.forEach((recording) => {
-				const ageInDays =
-					(Date.now() - recording.createdAt.getTime()) / (1000 * 60 * 60 * 24);
+				const ageInDays = (Date.now() - recording.createdAt.getTime()) / (1000 * 60 * 60 * 24);
 				expect(ageInDays).toBeGreaterThan(14);
 			});
 		});
@@ -352,9 +341,9 @@ describe('BR-3: 30-Day Retention Policy', () => {
 				deleteExpiredRecordings: vi.fn().mockResolvedValue({
 					deletedCount: 3,
 					failedIds: [],
-					freedSpace: 7_500_000, // ~7.5MB freed
+					freedSpace: 7_500_000 // ~7.5MB freed
 				}),
-				enforceRetentionPolicy: vi.fn(),
+				enforceRetentionPolicy: vi.fn()
 			};
 
 			// Act
@@ -375,9 +364,9 @@ describe('BR-3: 30-Day Retention Policy', () => {
 				deleteExpiredRecordings: vi.fn().mockResolvedValue({
 					deletedCount: 3,
 					failedIds: ['rec-2'], // One deletion failed
-					freedSpace: 5_000_000,
+					freedSpace: 5_000_000
 				}),
-				enforceRetentionPolicy: vi.fn(),
+				enforceRetentionPolicy: vi.fn()
 			};
 
 			// Act
@@ -398,9 +387,9 @@ describe('BR-3: 30-Day Retention Policy', () => {
 				deleteExpiredRecordings: vi.fn().mockResolvedValue({
 					deletedCount: 2,
 					failedIds: [],
-					freedSpace: 10_000_000, // 10MB freed
+					freedSpace: 10_000_000 // 10MB freed
 				}),
-				enforceRetentionPolicy: vi.fn(),
+				enforceRetentionPolicy: vi.fn()
 			};
 
 			// Act
@@ -423,8 +412,8 @@ describe('BR-3: 30-Day Retention Policy', () => {
 					expiredRecordings: 15,
 					deletedRecordings: 15,
 					freedSpace: 37_500_000, // ~37.5MB freed
-					errors: [],
-				}),
+					errors: []
+				})
 			};
 
 			// Act
@@ -447,8 +436,8 @@ describe('BR-3: 30-Day Retention Policy', () => {
 					expiredRecordings: 8,
 					deletedRecordings: 8,
 					freedSpace: 20_000_000,
-					errors: [],
-				}),
+					errors: []
+				})
 			};
 
 			// Act
@@ -473,8 +462,8 @@ describe('BR-3: 30-Day Retention Policy', () => {
 					expiredRecordings: 5,
 					deletedRecordings: 3,
 					freedSpace: 7_500_000,
-					errors: ['Failed to delete rec-2', 'Failed to delete rec-4'],
-				}),
+					errors: ['Failed to delete rec-2', 'Failed to delete rec-4']
+				})
 			};
 
 			// Act

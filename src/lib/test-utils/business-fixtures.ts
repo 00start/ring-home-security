@@ -73,7 +73,7 @@ export function mockCamera(options: MockCameraOptions = {}): Device {
 		location: options.location ?? 'Front Door',
 		batteryLevel: options.batteryLevel ?? 85,
 		isOnline: options.isOnline ?? true,
-		lastSeen: new Date(),
+		lastSeen: new Date()
 	};
 }
 
@@ -97,7 +97,7 @@ export function mockZone(options: MockZoneOptions = {}): Zone {
 		triggerLatencyMs: options.triggerLatencyMs ?? 350,
 		isActive: options.isActive ?? true,
 		createdAt: new Date(),
-		updatedAt: new Date(),
+		updatedAt: new Date()
 	};
 }
 
@@ -120,9 +120,9 @@ export function mockMotionEvent(options: MockMotionEventOptions = {}): EventLog 
 		timestamp: options.timestamp ?? new Date(),
 		metadata: options.metadata ?? {
 			confidence: 0.95,
-			duration: 5000,
+			duration: 5000
 		},
-		recordingId: options.recordingId,
+		recordingId: options.recordingId
 	};
 }
 
@@ -150,7 +150,7 @@ export function mockRecording(options: MockRecordingOptions = {}): Recording {
 		duration: options.duration ?? 30,
 		fileSize: options.fileSize ?? 2_500_000, // ~2.5MB
 		status: options.status ?? 'completed',
-		createdAt: options.createdAt ?? new Date(),
+		createdAt: options.createdAt ?? new Date()
 	};
 }
 
@@ -165,7 +165,7 @@ export function mockCameraFleet(count: number = 5): Device[] {
 			id: `camera-${i + 1}`,
 			name: `Camera ${i + 1}`,
 			batteryLevel: batteryLevels[i % batteryLevels.length],
-			location: ['Front Door', 'Back Yard', 'Driveway', 'Side Gate', 'Garage'][i % 5],
+			location: ['Front Door', 'Back Yard', 'Driveway', 'Side Gate', 'Garage'][i % 5]
 		})
 	);
 }
@@ -184,7 +184,7 @@ export function mockMotionEventSeries(
 		mockMotionEvent({
 			id: `event-${i + 1}`,
 			deviceId,
-			timestamp: new Date(baseTime.getTime() + (i * intervalMs)),
+			timestamp: new Date(baseTime.getTime() + i * intervalMs)
 		})
 	);
 }
@@ -199,12 +199,12 @@ export function mockRecordingsWithAge(count: number = 10): Recording[] {
 
 	return Array.from({ length: count }, (_, i) => {
 		const ageInDays = daysOld[i % daysOld.length];
-		const createdAt = new Date(now.getTime() - (ageInDays * 24 * 60 * 60 * 1000));
+		const createdAt = new Date(now.getTime() - ageInDays * 24 * 60 * 60 * 1000);
 
 		return mockRecording({
 			id: `recording-${i + 1}`,
 			createdAt,
-			fileSize: 2_000_000 + (i * 500_000), // Varying sizes
+			fileSize: 2_000_000 + i * 500_000 // Varying sizes
 		});
 	});
 }

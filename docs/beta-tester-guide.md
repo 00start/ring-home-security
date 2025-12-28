@@ -10,6 +10,7 @@
 Thank you for participating in the Ring Home Security Beta program. Your feedback is invaluable in helping us build the best possible experience for all users.
 
 This guide will help you:
+
 - Get started with the application
 - Understand new features
 - Report issues effectively
@@ -35,6 +36,7 @@ This guide will help you:
 ### Step 3: Explore the Dashboard
 
 Once connected, you'll see:
+
 - All your Ring cameras displayed as cards
 - Battery levels for each camera
 - Online/offline status
@@ -49,12 +51,14 @@ Once connected, you'll see:
 **What it does:** Extends camera battery life by up to 40% through intelligent polling and recording management.
 
 **How to test:**
+
 - [ ] Check battery levels on Dashboard (should show accurate %)
 - [ ] Look for battery warning banner when any camera is below 20%
 - [ ] Verify low battery alert appears when camera drops below 10%
 - [ ] Test dismissing/snoozing the battery warning
 
 **Settings to explore:**
+
 - Navigate to **Settings** → **Battery**
 - Adjust polling interval (default: 30 seconds)
 - Enable/disable continuous buffering
@@ -65,6 +69,7 @@ Once connected, you'll see:
 **What it does:** When a camera on the edge of your property detects motion, it automatically triggers recording on nearby cameras.
 
 **How to test:**
+
 - [ ] Go to **Settings** → **Zones**
 - [ ] Create a zone (e.g., "Front Yard")
 - [ ] Add trigger cameras (cameras that detect motion first)
@@ -73,6 +78,7 @@ Once connected, you'll see:
 - [ ] Verify follower cameras recorded the event
 
 **Zone Configuration:**
+
 - Cooldown period: Time before zone can trigger again (default: 7 seconds)
 - Pre-buffer: Capture video before motion detected
 
@@ -81,6 +87,7 @@ Once connected, you'll see:
 **What it does:** Captures 3 seconds of video before motion is detected, so you never miss the start of an event.
 
 **How to test:**
+
 - [ ] Go to device details for any camera
 - [ ] Find "Camera Settings" section
 - [ ] Toggle "Pre-event buffer" on
@@ -94,6 +101,7 @@ Once connected, you'll see:
 **What it does:** Live view automatically ends after 10 minutes to conserve battery.
 
 **How to test:**
+
 - [ ] Start live view on any camera
 - [ ] Note the session timer
 - [ ] Verify warning appears at 8 minutes
@@ -105,6 +113,7 @@ Once connected, you'll see:
 **What it does:** Select and download multiple event recordings as a single merged video file.
 
 **How to test:**
+
 - [ ] Go to **Timeline** or **Recordings**
 - [ ] Enable selection mode
 - [ ] Select 2-5 events from the same zone
@@ -117,6 +126,7 @@ Once connected, you'll see:
 **What it does:** Automatically adjusts video quality based on camera battery level.
 
 **How to test:**
+
 - [ ] Find the quality selector in live view or recordings
 - [ ] Toggle between Auto and Manual modes
 - [ ] In Auto mode, verify quality changes with battery level:
@@ -222,16 +232,17 @@ Once connected, you'll see:
 
 The following issues are known and being worked on:
 
-| Issue | Workaround | Fix ETA |
-|-------|------------|---------|
-| Logout may not redirect immediately | Manually navigate to /login | Week 1 |
-| First dashboard load may be slow | Refresh page, subsequent loads are fast | Week 2 |
+| Issue                               | Workaround                              | Fix ETA |
+| ----------------------------------- | --------------------------------------- | ------- |
+| Logout may not redirect immediately | Manually navigate to /login             | Week 1  |
+| First dashboard load may be slow    | Refresh page, subsequent loads are fast | Week 2  |
 
 ---
 
 ## Tips for Effective Testing
 
 ### Do's
+
 - Test features in different scenarios
 - Try edge cases (low battery, offline cameras, many events)
 - Test on different browsers
@@ -240,6 +251,7 @@ The following issues are known and being worked on:
 - Be specific in your reports
 
 ### Don'ts
+
 - Don't share beta access with others
 - Don't post screenshots on social media
 - Don't expect all features to be polished
@@ -267,6 +279,7 @@ A: Chrome (v100+), Firefox (v100+), Safari (v15+). Chrome is recommended for bes
 
 **Q: My cameras aren't showing up. What do I do?**
 A:
+
 1. Check your Ring API credentials in Settings
 2. Ensure cameras are online in the Ring app
 3. Try refreshing the page
@@ -274,6 +287,7 @@ A:
 
 **Q: Live view isn't working. Why?**
 A:
+
 1. Check camera is online
 2. Ensure browser allows camera/audio access
 3. Try a different browser
@@ -298,16 +312,21 @@ A: Pre-buffer requires the camera to continuously record in a loop, which uses m
 ## Contact & Support
 
 ### Beta Support
+
 - **Email:** beta-support@[COMPANY].com
 - **Response Time:** Within 24 hours
 
 ### Emergency Issues
+
 If you experience data loss or security concerns:
+
 - **Email:** security@[COMPANY].com
 - **Response Time:** Within 2 hours
 
 ### Office Hours
+
 Join our weekly beta feedback call:
+
 - **When:** Thursdays at 3:00 PM EST
 - **Where:** [VIDEO_CALL_LINK]
 - **What:** Live Q&A, feature demos, feedback discussion
@@ -319,16 +338,19 @@ Join our weekly beta feedback call:
 Based on beta feedback, we're planning:
 
 ### Week 2
+
 - Fix known issues
 - Performance improvements
 - Additional documentation
 
 ### Week 3-4
+
 - Advanced battery analytics
 - Enhanced zone configuration
 - Cross-browser improvements
 
 ### Post-Beta
+
 - Smart recording schedules
 - Multi-camera coordination
 - Smart home integration
@@ -340,6 +362,7 @@ Based on beta feedback, we're planning:
 Your participation in the beta program is helping us build a better product for everyone. We truly appreciate your time and feedback.
 
 **Remember:**
+
 - Test early, test often
 - Report everything (good and bad)
 - Your feedback directly shapes the product
@@ -348,6 +371,6 @@ Happy testing!
 
 ---
 
-*Ring Home Security Beta Program*
-*Version 1.0 | December 2025*
-*Questions? Email beta-support@[COMPANY].com*
+_Ring Home Security Beta Program_
+_Version 1.0 | December 2025_
+_Questions? Email beta-support@[COMPANY].com_

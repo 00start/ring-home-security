@@ -36,7 +36,9 @@ async function checkSubscription() {
 			console.log(`ID: ${camera.id}`);
 			console.log(`Type: ${camera.deviceType}`);
 			console.log(`Model: ${camera.model || 'N/A'}`);
-			console.log(`Battery: ${camera.batteryLevel !== undefined ? camera.batteryLevel + '%' : 'Wired'}`);
+			console.log(
+				`Battery: ${camera.batteryLevel !== undefined ? camera.batteryLevel + '%' : 'Wired'}`
+			);
 
 			console.log('\n🔐 SUBSCRIPTION STATUS:');
 			console.log(`  Subscribed: ${data.subscribed !== undefined ? data.subscribed : 'Unknown'}`);
@@ -44,18 +46,22 @@ async function checkSubscription() {
 
 			console.log('\n✨ FEATURES:');
 			if (data.features && Array.isArray(data.features)) {
-				data.features.forEach(feature => console.log(`  - ${feature}`));
+				data.features.forEach((feature) => console.log(`  - ${feature}`));
 			} else {
 				console.log('  No features data available');
 			}
 
 			console.log('\n⚙️  SETTINGS:');
 			const settings = data.settings || {};
-			console.log(`  Motion Detection: ${settings.motion_detection_enabled !== undefined ? (settings.motion_detection_enabled ? 'Enabled' : 'Disabled') : 'N/A'}`);
+			console.log(
+				`  Motion Detection: ${settings.motion_detection_enabled !== undefined ? (settings.motion_detection_enabled ? 'Enabled' : 'Disabled') : 'N/A'}`
+			);
 
 			console.log('\n📊 RECORDING CAPABILITY:');
-			const hasRecordingFeature = data.features?.includes('recordings') || data.features?.includes('video_recording');
-			const hasActiveSubscription = data.subscribed === true || data.subscription_status === 'active';
+			const hasRecordingFeature =
+				data.features?.includes('recordings') || data.features?.includes('video_recording');
+			const hasActiveSubscription =
+				data.subscribed === true || data.subscription_status === 'active';
 
 			if (!hasActiveSubscription) {
 				console.log('  ❌ NO ACTIVE RING PROTECT SUBSCRIPTION');
@@ -87,8 +93,8 @@ async function checkSubscription() {
 		console.log('\n' + '='.repeat(60));
 		console.log('\n💡 DIAGNOSIS:\n');
 
-		const allCamerasHaveSubscription = cameras.every(c =>
-			c.data?.subscribed === true || c.data?.subscription_status === 'active'
+		const allCamerasHaveSubscription = cameras.every(
+			(c) => c.data?.subscribed === true || c.data?.subscription_status === 'active'
 		);
 
 		if (!allCamerasHaveSubscription) {

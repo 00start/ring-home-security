@@ -94,7 +94,7 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 				recordSystemUptime: vi.fn().mockResolvedValue(undefined),
 				calculateUptime: vi.fn(),
 				checkSystemHealth: vi.fn(),
-				getDowntimeIncidents: vi.fn(),
+				getDowntimeIncidents: vi.fn()
 			};
 
 			const timestamp = new Date();
@@ -122,10 +122,10 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 					uptime: thirtyDaysMs - actualDowntimeMs,
 					downtime: actualDowntimeMs,
 					uptimePercentage: 99.98, // Well above 99.9%
-					meets99_9Target: true,
+					meets99_9Target: true
 				}),
 				checkSystemHealth: vi.fn(),
-				getDowntimeIncidents: vi.fn(),
+				getDowntimeIncidents: vi.fn()
 			};
 
 			// Act
@@ -152,10 +152,10 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 					uptime: thirtyDaysMs - excessiveDowntimeMs,
 					downtime: excessiveDowntimeMs,
 					uptimePercentage: 99.72, // Below 99.9% target
-					meets99_9Target: false,
+					meets99_9Target: false
 				}),
 				checkSystemHealth: vi.fn(),
-				getDowntimeIncidents: vi.fn(),
+				getDowntimeIncidents: vi.fn()
 			};
 
 			// Act
@@ -190,11 +190,11 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 						{ name: 'ring-listener', isOnline: true, responseTime: 50 },
 						{ name: 'transcode-worker', isOnline: true, responseTime: 120 },
 						{ name: 'retention-worker', isOnline: true, responseTime: 80 },
-						{ name: 'database', isOnline: true, responseTime: 15 },
+						{ name: 'database', isOnline: true, responseTime: 15 }
 					],
-					lastCheck: new Date(),
+					lastCheck: new Date()
 				}),
-				getDowntimeIncidents: vi.fn(),
+				getDowntimeIncidents: vi.fn()
 			};
 
 			// Act
@@ -223,13 +223,13 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 							name: 'transcode-worker',
 							isOnline: false,
 							responseTime: 0,
-							lastError: 'Connection timeout',
+							lastError: 'Connection timeout'
 						},
-						{ name: 'database', isOnline: true, responseTime: 15 },
+						{ name: 'database', isOnline: true, responseTime: 15 }
 					],
-					lastCheck: new Date(),
+					lastCheck: new Date()
 				}),
-				getDowntimeIncidents: vi.fn(),
+				getDowntimeIncidents: vi.fn()
 			};
 
 			// Act
@@ -237,9 +237,7 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 
 			// Assert: Should detect unhealthy service
 			expect(health.isHealthy).toBe(false);
-			const failedService = health.services.find(
-				(s) => s.name === 'transcode-worker'
-			);
+			const failedService = health.services.find((s) => s.name === 'transcode-worker');
 			expect(failedService?.isOnline).toBe(false);
 			expect(failedService?.lastError).toBeDefined();
 		});
@@ -255,11 +253,11 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 					services: [
 						{ name: 'ring-listener', isOnline: true, responseTime: 45 },
 						{ name: 'transcode-worker', isOnline: true, responseTime: 150 },
-						{ name: 'database', isOnline: true, responseTime: 10 },
+						{ name: 'database', isOnline: true, responseTime: 10 }
 					],
-					lastCheck: new Date(),
+					lastCheck: new Date()
 				}),
-				getDowntimeIncidents: vi.fn(),
+				getDowntimeIncidents: vi.fn()
 			};
 
 			// Act
@@ -290,7 +288,7 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 						endTime: new Date('2025-01-15T10:45:00Z'),
 						duration: 15 * 60 * 1000, // 15 minutes
 						reason: 'Database connection lost',
-						affectedServices: ['ring-listener', 'database'],
+						affectedServices: ['ring-listener', 'database']
 					},
 					{
 						id: 'incident-2',
@@ -298,9 +296,9 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 						endTime: new Date('2025-01-22T14:10:00Z'),
 						duration: 10 * 60 * 1000, // 10 minutes
 						reason: 'Worker process crash',
-						affectedServices: ['transcode-worker'],
-					},
-				]),
+						affectedServices: ['transcode-worker']
+					}
+				])
 			};
 
 			// Act
@@ -327,16 +325,16 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 						startTime: new Date(),
 						endTime: new Date(),
 						duration: 20 * 60 * 1000, // 20 min
-						affectedServices: ['ring-listener'],
+						affectedServices: ['ring-listener']
 					},
 					{
 						id: 'incident-2',
 						startTime: new Date(),
 						endTime: new Date(),
 						duration: 15 * 60 * 1000, // 15 min
-						affectedServices: ['database'],
-					},
-				]),
+						affectedServices: ['database']
+					}
+				])
 			};
 
 			// Act
@@ -355,7 +353,7 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 				detectFailure: vi.fn().mockResolvedValue(true),
 				attemptRecovery: vi.fn(),
 				restartService: vi.fn(),
-				notifyAdministrators: vi.fn(),
+				notifyAdministrators: vi.fn()
 			};
 
 			// Act
@@ -373,10 +371,10 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 					success: true,
 					attemptsCount: 2,
 					recoveryTime: 5000, // 5 seconds
-					error: undefined,
+					error: undefined
 				}),
 				restartService: vi.fn(),
-				notifyAdministrators: vi.fn(),
+				notifyAdministrators: vi.fn()
 			};
 
 			// Act
@@ -394,7 +392,7 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 				detectFailure: vi.fn().mockResolvedValue(true),
 				attemptRecovery: vi.fn(),
 				restartService: vi.fn().mockResolvedValue(true),
-				notifyAdministrators: vi.fn(),
+				notifyAdministrators: vi.fn()
 			};
 
 			// Act
@@ -412,10 +410,10 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 					success: false,
 					attemptsCount: 3,
 					recoveryTime: 45000, // 45 seconds (timeout)
-					error: 'Service failed to respond after 3 restart attempts',
+					error: 'Service failed to respond after 3 restart attempts'
 				}),
 				restartService: vi.fn(),
-				notifyAdministrators: vi.fn(),
+				notifyAdministrators: vi.fn()
 			};
 
 			// Act
@@ -434,23 +432,21 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 				startTime: new Date(),
 				duration: 0,
 				reason: 'Database connection permanently lost',
-				affectedServices: ['ring-listener', 'database'],
+				affectedServices: ['ring-listener', 'database']
 			};
 
 			const mockRecoveryService: RecoveryService = {
 				detectFailure: vi.fn(),
 				attemptRecovery: vi.fn(),
 				restartService: vi.fn(),
-				notifyAdministrators: vi.fn().mockResolvedValue(undefined),
+				notifyAdministrators: vi.fn().mockResolvedValue(undefined)
 			};
 
 			// Act
 			await mockRecoveryService.notifyAdministrators(incident);
 
 			// Assert: Should send notification
-			expect(mockRecoveryService.notifyAdministrators).toHaveBeenCalledWith(
-				incident
-			);
+			expect(mockRecoveryService.notifyAdministrators).toHaveBeenCalledWith(incident);
 		});
 	});
 
@@ -463,10 +459,10 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 					isOnline: true,
 					lastSeen: new Date(),
 					batteryLevel: 85,
-					uptimePercentage: 99.95,
+					uptimePercentage: 99.95
 				}),
 				calculateCameraUptime: vi.fn(),
-				getAllCamerasStatus: vi.fn(),
+				getAllCamerasStatus: vi.fn()
 			};
 
 			// Act
@@ -482,7 +478,7 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 			const mockCameraService: CameraAvailabilityService = {
 				checkCameraStatus: vi.fn(),
 				calculateCameraUptime: vi.fn().mockResolvedValue(99.92), // 99.92% uptime
-				getAllCamerasStatus: vi.fn(),
+				getAllCamerasStatus: vi.fn()
 			};
 
 			// Act
@@ -506,8 +502,8 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 								isOnline: true,
 								lastSeen: new Date(),
 								batteryLevel: 85,
-								uptimePercentage: 99.95,
-							},
+								uptimePercentage: 99.95
+							}
 						],
 						[
 							'camera-2',
@@ -516,8 +512,8 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 								isOnline: true,
 								lastSeen: new Date(),
 								batteryLevel: 72,
-								uptimePercentage: 99.88,
-							},
+								uptimePercentage: 99.88
+							}
 						],
 						[
 							'camera-3',
@@ -526,11 +522,11 @@ describe('BO-5: System Reliability & Uptime Monitoring', () => {
 								isOnline: false,
 								lastSeen: new Date(Date.now() - 10 * 60 * 1000), // 10 min ago
 								batteryLevel: 5,
-								uptimePercentage: 98.5,
-							},
-						],
+								uptimePercentage: 98.5
+							}
+						]
 					])
-				),
+				)
 			};
 
 			// Act

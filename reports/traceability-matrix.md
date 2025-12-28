@@ -5,109 +5,109 @@
 
 ## Executive Summary
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Total Requirements | 26 | - |
-| Test Files Created | 6 | - |
-| Test Cases Defined | 47 | - |
-| Coverage (Potential) | 100% | READY |
-| Coverage (Executed) | 0% | NOT RUN |
-| Quality Dimensions | 6/6 | DEFINED |
-| Dependencies Mapped | 5/5 | COMPLETE |
+| Metric               | Value | Status   |
+| -------------------- | ----- | -------- |
+| Total Requirements   | 26    | -        |
+| Test Files Created   | 6     | -        |
+| Test Cases Defined   | 47    | -        |
+| Coverage (Potential) | 100%  | READY    |
+| Coverage (Executed)  | 0%    | NOT RUN  |
+| Quality Dimensions   | 6/6   | DEFINED  |
+| Dependencies Mapped  | 5/5   | COMPLETE |
 
 ---
 
-## Business Objectives (BO-*)
+## Business Objectives (BO-\*)
 
-| ID | Description | Test File | Test Cases | Status |
-|----|-------------|-----------|------------|--------|
-| BO-1 | Extend battery life by 50%+ | `battery-optimization.spec.ts` | 3 | DEFINED |
-| BO-2 | Maintain security coverage | `zone-recording.spec.ts` | 2 | DEFINED |
-| BO-3 | Reduce cloud dependency | - | 0 | GAP |
-| BO-4 | Multi-camera coordination | `zone-recording.spec.ts` | 2 | DEFINED |
-| BO-5 | Reliable 24/7 operation | - | 0 | GAP |
+| ID   | Description                 | Test File                      | Test Cases | Status  |
+| ---- | --------------------------- | ------------------------------ | ---------- | ------- |
+| BO-1 | Extend battery life by 50%+ | `battery-optimization.spec.ts` | 3          | DEFINED |
+| BO-2 | Maintain security coverage  | `zone-recording.spec.ts`       | 2          | DEFINED |
+| BO-3 | Reduce cloud dependency     | -                              | 0          | GAP     |
+| BO-4 | Multi-camera coordination   | `zone-recording.spec.ts`       | 2          | DEFINED |
+| BO-5 | Reliable 24/7 operation     | -                              | 0          | GAP     |
 
-## Business Rules (BR-*)
+## Business Rules (BR-\*)
 
-| ID | Description | Test File | Test Cases | Status |
-|----|-------------|-----------|------------|--------|
-| BR-1 | Battery <20% pause streaming | `battery-optimization.spec.ts` | 3 | DEFINED |
-| BR-2 | Edge cameras trigger inner | `zone-recording.spec.ts` | 2 | DEFINED |
-| BR-3 | 30-day retention | - | 0 | GAP |
-| BR-4 | Live view auto-terminate 5min | `battery-optimization.spec.ts` | 3 | DEFINED |
-| BR-5 | 7-second motion grouping | `zone-recording.spec.ts` | 2 | DEFINED |
+| ID   | Description                   | Test File                      | Test Cases | Status  |
+| ---- | ----------------------------- | ------------------------------ | ---------- | ------- |
+| BR-1 | Battery <20% pause streaming  | `battery-optimization.spec.ts` | 3          | DEFINED |
+| BR-2 | Edge cameras trigger inner    | `zone-recording.spec.ts`       | 2          | DEFINED |
+| BR-3 | 30-day retention              | -                              | 0          | GAP     |
+| BR-4 | Live view auto-terminate 5min | `battery-optimization.spec.ts` | 3          | DEFINED |
+| BR-5 | 7-second motion grouping      | `zone-recording.spec.ts`       | 2          | DEFINED |
 
 ## User Stories by Priority
 
 ### P0 (Critical) - 7 Stories
 
-| ID | Epic | Description | Test File | AC Coverage | Status |
-|----|------|-------------|-----------|-------------|--------|
-| US-1.1 | Monitoring | Dashboard view | `dashboard.spec.ts` | 3/3 | DEFINED |
-| US-1.2 | Monitoring | Live view | `dashboard.spec.ts` | 4/4 | DEFINED |
-| US-1.3 | Monitoring | Online/offline status | `dashboard.spec.ts` | 3/3 | DEFINED |
-| US-2.1 | Events | Event timeline | `events.spec.ts` | 3/3 | DEFINED |
-| US-2.2 | Events | Video playback | `events.spec.ts` | 3/3 | DEFINED |
-| US-3.1 | Health | Battery levels | `events.spec.ts` | 2/3 | PARTIAL |
-| US-3.2 | Health | Low battery alerts | - | 0/3 | GAP |
+| ID     | Epic       | Description           | Test File           | AC Coverage | Status  |
+| ------ | ---------- | --------------------- | ------------------- | ----------- | ------- |
+| US-1.1 | Monitoring | Dashboard view        | `dashboard.spec.ts` | 3/3         | DEFINED |
+| US-1.2 | Monitoring | Live view             | `dashboard.spec.ts` | 4/4         | DEFINED |
+| US-1.3 | Monitoring | Online/offline status | `dashboard.spec.ts` | 3/3         | DEFINED |
+| US-2.1 | Events     | Event timeline        | `events.spec.ts`    | 3/3         | DEFINED |
+| US-2.2 | Events     | Video playback        | `events.spec.ts`    | 3/3         | DEFINED |
+| US-3.1 | Health     | Battery levels        | `events.spec.ts`    | 2/3         | PARTIAL |
+| US-3.2 | Health     | Low battery alerts    | -                   | 0/3         | GAP     |
 
 ### P1 (Important) - 7 Stories
 
-| ID | Epic | Description | Test File | AC Coverage | Status |
-|----|------|-------------|-----------|-------------|--------|
-| US-1.4 | Monitoring | Auto-stop live view | `battery-optimization.spec.ts` | 3/3 | DEFINED |
-| US-2.3 | Events | Zone event grouping | `events.spec.ts` | 2/3 | PARTIAL |
-| US-2.4 | Events | Download recordings | - | 0/3 | GAP |
-| US-3.2 | Health | Battery alerts | - | 0/3 | GAP |
-| US-4.1 | Recording | Zone configuration | - | 0/3 | GAP |
-| US-4.2 | Recording | Trigger cameras | - | 0/3 | GAP |
-| US-4.3 | Recording | Motion cooldown | `zone-recording.spec.ts` | 1/3 | PARTIAL |
+| ID     | Epic       | Description         | Test File                      | AC Coverage | Status  |
+| ------ | ---------- | ------------------- | ------------------------------ | ----------- | ------- |
+| US-1.4 | Monitoring | Auto-stop live view | `battery-optimization.spec.ts` | 3/3         | DEFINED |
+| US-2.3 | Events     | Zone event grouping | `events.spec.ts`               | 2/3         | PARTIAL |
+| US-2.4 | Events     | Download recordings | -                              | 0/3         | GAP     |
+| US-3.2 | Health     | Battery alerts      | -                              | 0/3         | GAP     |
+| US-4.1 | Recording  | Zone configuration  | -                              | 0/3         | GAP     |
+| US-4.2 | Recording  | Trigger cameras     | -                              | 0/3         | GAP     |
+| US-4.3 | Recording  | Motion cooldown     | `zone-recording.spec.ts`       | 1/3         | PARTIAL |
 
 ### P2 (Nice to Have) - 2 Stories
 
-| ID | Epic | Description | Test File | AC Coverage | Status |
-|----|------|-------------|-----------|-------------|--------|
-| US-3.3 | Health | Storage usage | - | 0/3 | GAP |
-| US-3.4 | Health | System status | - | 0/3 | GAP |
-| US-4.4 | Recording | Pre-event buffering toggle | - | 0/3 | GAP |
+| ID     | Epic      | Description                | Test File | AC Coverage | Status |
+| ------ | --------- | -------------------------- | --------- | ----------- | ------ |
+| US-3.3 | Health    | Storage usage              | -         | 0/3         | GAP    |
+| US-3.4 | Health    | System status              | -         | 0/3         | GAP    |
+| US-4.4 | Recording | Pre-event buffering toggle | -         | 0/3         | GAP    |
 
 ---
 
 ## Quality Dimensions
 
-| Dimension | Test File | Tests | Status |
-|-----------|-----------|-------|--------|
-| A. Business Value | `battery-optimization.spec.ts`, `zone-recording.spec.ts` | 12 | DEFINED |
-| B. User Experience | `dashboard.spec.ts`, `events.spec.ts` | 8 | DEFINED |
-| C. Responsiveness | `responsiveness.spec.ts` | 5 | DEFINED |
-| D. Comprehension | - | 0 | GAP |
-| E. Usability | `responsiveness.spec.ts` | 5 | DEFINED |
-| F. Delight | `responsiveness.spec.ts` | 4 | DEFINED |
+| Dimension          | Test File                                                | Tests | Status  |
+| ------------------ | -------------------------------------------------------- | ----- | ------- |
+| A. Business Value  | `battery-optimization.spec.ts`, `zone-recording.spec.ts` | 12    | DEFINED |
+| B. User Experience | `dashboard.spec.ts`, `events.spec.ts`                    | 8     | DEFINED |
+| C. Responsiveness  | `responsiveness.spec.ts`                                 | 5     | DEFINED |
+| D. Comprehension   | -                                                        | 0     | GAP     |
+| E. Usability       | `responsiveness.spec.ts`                                 | 5     | DEFINED |
+| F. Delight         | `responsiveness.spec.ts`                                 | 4     | DEFINED |
 
 ---
 
 ## Dependencies
 
-| Dependency | Type | Test File | Tests | Status |
-|------------|------|-----------|-------|--------|
-| Ring API | External API | `ring-api.spec.ts` | 7 | DEFINED |
-| SQLite | Database | `ring-api.spec.ts` | 3 | DEFINED |
-| Redis | Queue | `ring-api.spec.ts` | 1 | DEFINED |
-| FFmpeg | Binary | - | 0 | GAP |
-| File System | Storage | `ring-api.spec.ts` | 2 | DEFINED |
+| Dependency  | Type         | Test File          | Tests | Status  |
+| ----------- | ------------ | ------------------ | ----- | ------- |
+| Ring API    | External API | `ring-api.spec.ts` | 7     | DEFINED |
+| SQLite      | Database     | `ring-api.spec.ts` | 3     | DEFINED |
+| Redis       | Queue        | `ring-api.spec.ts` | 1     | DEFINED |
+| FFmpeg      | Binary       | -                  | 0     | GAP     |
+| File System | Storage      | `ring-api.spec.ts` | 2     | DEFINED |
 
 ---
 
 ## Test File Inventory
 
-| File | Requirements | Tests | Priority |
-|------|--------------|-------|----------|
-| `tests/e2e/business/battery-optimization.spec.ts` | BO-1, BR-1, BR-4 | 9 | P0 |
-| `tests/e2e/business/zone-recording.spec.ts` | BO-2, BO-4, BR-2, BR-5 | 8 | P0 |
-| `tests/e2e/ux/dashboard.spec.ts` | US-1.1, US-1.2, US-1.3 | 12 | P0 |
-| `tests/e2e/ux/events.spec.ts` | US-2.1, US-2.2, US-2.3, US-3.1 | 10 | P0 |
-| `tests/e2e/dependencies/ring-api.spec.ts` | All | 13 | P0 |
-| `tests/e2e/quality/responsiveness.spec.ts` | C, E, F dimensions | 14 | P1 |
+| File                                              | Requirements                   | Tests | Priority |
+| ------------------------------------------------- | ------------------------------ | ----- | -------- |
+| `tests/e2e/business/battery-optimization.spec.ts` | BO-1, BR-1, BR-4               | 9     | P0       |
+| `tests/e2e/business/zone-recording.spec.ts`       | BO-2, BO-4, BR-2, BR-5         | 8     | P0       |
+| `tests/e2e/ux/dashboard.spec.ts`                  | US-1.1, US-1.2, US-1.3         | 12    | P0       |
+| `tests/e2e/ux/events.spec.ts`                     | US-2.1, US-2.2, US-2.3, US-3.1 | 10    | P0       |
+| `tests/e2e/dependencies/ring-api.spec.ts`         | All                            | 13    | P0       |
+| `tests/e2e/quality/responsiveness.spec.ts`        | C, E, F dimensions             | 14    | P1       |
 
 ---
 
@@ -166,4 +166,4 @@ npx playwright test
 
 ---
 
-*Generated by E2E Governance Agent v1.0*
+_Generated by E2E Governance Agent v1.0_

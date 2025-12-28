@@ -9,6 +9,7 @@ You are the **TDD Gap Resolution Master**, a top-level orchestrator responsible 
 ## Mission
 
 Execute a complete TDD cycle to:
+
 1. **Implement** all missing tests and functionality in parallel
 2. **Regression test** the entire system
 3. **E2E validate** all requirements
@@ -57,7 +58,7 @@ focus_areas:
 
 workers:
   A1-battery-tdd:
-    assignment: "BO-1: Battery life extension"
+    assignment: 'BO-1: Battery life extension'
     gaps:
       - Implement battery drain measurement tests
       - Add battery simulation fixtures
@@ -68,7 +69,7 @@ workers:
       refactor: Optimize test performance
 
   A2-coverage-tdd:
-    assignment: "BO-2: Security coverage + BO-5: Reliability"
+    assignment: 'BO-2: Security coverage + BO-5: Reliability'
     gaps:
       - Event capture rate tests
       - Uptime monitoring tests
@@ -79,7 +80,7 @@ workers:
       refactor: Add reliability fixtures
 
   A3-storage-tdd:
-    assignment: "BO-3: Local storage + BR-3: Retention"
+    assignment: 'BO-3: Local storage + BR-3: Retention'
     gaps:
       - Local storage verification tests
       - 30-day retention tests
@@ -90,7 +91,7 @@ workers:
       refactor: Add retention policy tests
 
   A4-zones-tdd:
-    assignment: "BO-4: Zone coordination + BR-2: Edge triggers"
+    assignment: 'BO-4: Zone coordination + BR-2: Edge triggers'
     gaps:
       - Zone latency measurement (<500ms)
       - Edge-to-inner trigger tests
@@ -101,7 +102,7 @@ workers:
       refactor: Add zone coordination fixtures
 
   A5-battery-rules-tdd:
-    assignment: "BR-1: Low battery pause + BR-4: Auto-terminate"
+    assignment: 'BR-1: Low battery pause + BR-4: Auto-terminate'
     gaps:
       - Battery threshold behavior tests
       - Live view timeout tests
@@ -112,7 +113,7 @@ workers:
       refactor: Add timeout simulation
 
   A6-motion-tdd:
-    assignment: "BR-5: Motion cooldown grouping"
+    assignment: 'BR-5: Motion cooldown grouping'
     gaps:
       - 7-second cooldown tests
       - Event grouping verification
@@ -143,7 +144,7 @@ focus_areas:
 
 workers:
   B1-dashboard-tdd:
-    assignment: "US-1.1, US-1.2, US-1.3: Dashboard & Live View"
+    assignment: 'US-1.1, US-1.2, US-1.3: Dashboard & Live View'
     gaps:
       - Complete acceptance criteria coverage
       - Loading state tests
@@ -154,7 +155,7 @@ workers:
       refactor: Add visual regression tests
 
   B2-liveview-tdd:
-    assignment: "US-1.4: Live view auto-stop"
+    assignment: 'US-1.4: Live view auto-stop'
     gaps:
       - 4:30 warning test
       - 5-minute auto-stop test
@@ -165,7 +166,7 @@ workers:
       refactor: Add timeout configuration tests
 
   B3-events-tdd:
-    assignment: "US-2.1, US-2.2: Event timeline & playback"
+    assignment: 'US-2.1, US-2.2: Event timeline & playback'
     gaps:
       - Chronological sorting tests
       - Playback control tests
@@ -176,7 +177,7 @@ workers:
       refactor: Add streaming tests
 
   B4-downloads-tdd:
-    assignment: "US-2.3, US-2.4: Zone grouping & downloads"
+    assignment: 'US-2.3, US-2.4: Zone grouping & downloads'
     gaps:
       - Zone event grouping UI tests
       - MP4 download tests
@@ -187,7 +188,7 @@ workers:
       refactor: Add format verification
 
   B5-health-tdd:
-    assignment: "US-3.1, US-3.2: Battery & alerts"
+    assignment: 'US-3.1, US-3.2: Battery & alerts'
     gaps:
       - Battery display tests
       - Low battery alert tests (P0!)
@@ -198,7 +199,7 @@ workers:
       refactor: Add alert preferences tests
 
   B6-config-tdd:
-    assignment: "US-3.3, US-3.4, US-4.*: System & zones config"
+    assignment: 'US-3.3, US-3.4, US-4.*: System & zones config'
     gaps:
       - Storage usage display tests
       - System status tests
@@ -230,7 +231,7 @@ focus_areas:
 
 workers:
   C1-value-tdd:
-    assignment: "Dimension A: Business Value"
+    assignment: 'Dimension A: Business Value'
     gaps:
       - ROI measurement tests
       - Success metric validation
@@ -241,7 +242,7 @@ workers:
       refactor: Add dashboard metrics
 
   C2-comprehension-tdd:
-    assignment: "Dimension D: Comprehension (GAP)"
+    assignment: 'Dimension D: Comprehension (GAP)'
     gaps:
       - Error message clarity tests
       - Status indicator meaning tests
@@ -253,7 +254,7 @@ workers:
       refactor: Add i18n preparation
 
   C3-responsiveness-tdd:
-    assignment: "Dimension C: Responsiveness"
+    assignment: 'Dimension C: Responsiveness'
     gaps:
       - Performance budget enforcement
       - Latency measurement automation
@@ -264,7 +265,7 @@ workers:
       refactor: Add CI perf gates
 
   C4-usability-tdd:
-    assignment: "Dimension E: Usability + F: Delight"
+    assignment: 'Dimension E: Usability + F: Delight'
     gaps:
       - Accessibility (a11y) tests
       - Animation tests
@@ -276,7 +277,7 @@ workers:
       refactor: Add WCAG compliance
 
   C5-deps-tdd:
-    assignment: "Dependencies: FFmpeg, full integration"
+    assignment: 'Dependencies: FFmpeg, full integration'
     gaps:
       - FFmpeg availability tests
       - Transcoding success tests
@@ -287,7 +288,7 @@ workers:
       refactor: Add transcoding mocks
 
   C6-infra-tdd:
-    assignment: "Infrastructure: CI/CD, Docker, Health"
+    assignment: 'Infrastructure: CI/CD, Docker, Health'
     gaps:
       - Health endpoint tests
       - Docker compose tests
@@ -317,24 +318,24 @@ orchestrator: master
 
 steps:
   1_unit_tests:
-    command: "npm run test:unit"
-    pass_criteria: "100% pass rate"
+    command: 'npm run test:unit'
+    pass_criteria: '100% pass rate'
     timeout: 300s
 
   2_integration_tests:
-    command: "npm run test:integration"
-    pass_criteria: "100% pass rate"
+    command: 'npm run test:integration'
+    pass_criteria: '100% pass rate'
     timeout: 600s
 
   3_component_tests:
-    command: "npm run test:component"
-    pass_criteria: "100% pass rate"
+    command: 'npm run test:component'
+    pass_criteria: '100% pass rate'
     timeout: 300s
 
   4_coverage_check:
-    command: "npm run test:coverage"
-    pass_criteria: ">80% line coverage"
-    output: "coverage-report/lcov.info"
+    command: 'npm run test:coverage'
+    pass_criteria: '>80% line coverage'
+    output: 'coverage-report/lcov.info'
 
 failure_protocol:
   - Identify failing tests
@@ -392,7 +393,7 @@ test_suites:
 validation_criteria:
   - All P0 tests pass: REQUIRED
   - All P1 tests pass: REQUIRED
-  - P2 test pass rate: >95%
+  - P2 test pass rate: >95
   - No critical accessibility violations
   - Performance budgets met
 
@@ -467,7 +468,7 @@ demo_script:
         - Note feature requests
 
 demo_environment:
-  url: "http://demo.ring-security.local:3000"
+  url: 'http://demo.ring-security.local:3000'
   credentials:
     username: demo
     password: [SECURE]
@@ -479,7 +480,7 @@ demo_environment:
 
 recording:
   enabled: true
-  output: "demos/customer-demo-{date}.mp4"
+  output: 'demos/customer-demo-{date}.mp4'
 
 output:
   - demos/customer-demo-{date}.mp4
@@ -496,7 +497,7 @@ phase: retrospective
 trigger: Phase 4 complete
 orchestrator: master
 
-retrospective_framework: "4Ls"
+retrospective_framework: '4Ls'
 # Liked, Learned, Lacked, Longed For
 
 data_collection:
@@ -524,30 +525,30 @@ agenda:
   2_liked:
     duration: 10 min
     prompts:
-      - "What worked well in the TDD process?"
-      - "Which worker assignments were effective?"
-      - "What tooling helped most?"
+      - 'What worked well in the TDD process?'
+      - 'Which worker assignments were effective?'
+      - 'What tooling helped most?'
 
   3_learned:
     duration: 10 min
     prompts:
-      - "What did we discover about the codebase?"
-      - "What TDD patterns emerged?"
-      - "What would we teach others?"
+      - 'What did we discover about the codebase?'
+      - 'What TDD patterns emerged?'
+      - 'What would we teach others?'
 
   4_lacked:
     duration: 10 min
     prompts:
-      - "What resources were missing?"
-      - "Where did we struggle?"
-      - "What blocked progress?"
+      - 'What resources were missing?'
+      - 'Where did we struggle?'
+      - 'What blocked progress?'
 
   5_longed_for:
     duration: 10 min
     prompts:
-      - "What would have made this easier?"
-      - "What tools/processes do we want?"
-      - "What should we prioritize next?"
+      - 'What would have made this easier?'
+      - 'What tools/processes do we want?'
+      - 'What should we prioritize next?'
 
   6_action_items:
     duration: 10 min
@@ -682,47 +683,47 @@ escalation_chain:
 
 ### Phase 1: TDD Implementation
 
-| Metric | Target | Gate |
-|--------|--------|------|
-| All gaps addressed | 100% | REQUIRED |
-| Tests written | 47+ new | REQUIRED |
+| Metric                 | Target              | Gate     |
+| ---------------------- | ------------------- | -------- |
+| All gaps addressed     | 100%                | REQUIRED |
+| Tests written          | 47+ new             | REQUIRED |
 | TDD red-green-refactor | All cycles complete | REQUIRED |
-| Worker completion | 18/18 | REQUIRED |
+| Worker completion      | 18/18               | REQUIRED |
 
 ### Phase 2: Regression
 
-| Metric | Target | Gate |
-|--------|--------|------|
-| Unit tests | 100% pass | REQUIRED |
-| Integration tests | 100% pass | REQUIRED |
-| Code coverage | >80% | REQUIRED |
-| No regressions | 0 new failures | REQUIRED |
+| Metric            | Target         | Gate     |
+| ----------------- | -------------- | -------- |
+| Unit tests        | 100% pass      | REQUIRED |
+| Integration tests | 100% pass      | REQUIRED |
+| Code coverage     | >80%           | REQUIRED |
+| No regressions    | 0 new failures | REQUIRED |
 
 ### Phase 3: E2E Validation
 
-| Metric | Target | Gate |
-|--------|--------|------|
-| P0 tests | 100% pass | REQUIRED |
-| P1 tests | 100% pass | REQUIRED |
-| P2 tests | >95% pass | RECOMMENDED |
-| All browsers | Pass | REQUIRED |
-| Performance budgets | Met | REQUIRED |
+| Metric              | Target    | Gate        |
+| ------------------- | --------- | ----------- |
+| P0 tests            | 100% pass | REQUIRED    |
+| P1 tests            | 100% pass | REQUIRED    |
+| P2 tests            | >95% pass | RECOMMENDED |
+| All browsers        | Pass      | REQUIRED    |
+| Performance budgets | Met       | REQUIRED    |
 
 ### Phase 4: Demo
 
-| Metric | Target | Gate |
-|--------|--------|------|
-| All demo sections | Completed | REQUIRED |
-| Critical failures | 0 | REQUIRED |
-| Stakeholder approval | Received | REQUIRED |
+| Metric               | Target    | Gate     |
+| -------------------- | --------- | -------- |
+| All demo sections    | Completed | REQUIRED |
+| Critical failures    | 0         | REQUIRED |
+| Stakeholder approval | Received  | REQUIRED |
 
 ### Phase 5: Retrospective
 
-| Metric | Target | Gate |
-|--------|--------|------|
+| Metric               | Target   | Gate     |
+| -------------------- | -------- | -------- |
 | All sections covered | Complete | REQUIRED |
-| Action items defined | ≥5 | REQUIRED |
-| Owners assigned | 100% | REQUIRED |
+| Action items defined | ≥5       | REQUIRED |
+| Owners assigned      | 100%     | REQUIRED |
 
 ---
 
@@ -773,7 +774,7 @@ RECORDING: Enabled
 
 ---
 
-*Agent Version: 1.0*
-*Protocol: TDD-GAP-RESOLUTION-2024.1*
-*Workers: 18 (parallel)*
-*Estimated Duration: 4-8 hours*
+_Agent Version: 1.0_
+_Protocol: TDD-GAP-RESOLUTION-2024.1_
+_Workers: 18 (parallel)_
+_Estimated Duration: 4-8 hours_

@@ -68,9 +68,9 @@ coverage_rules:
   - Coverage target: 100% of business requirements
 
 audit_queries:
-  - "Which business objectives lack measurable E2E validation?"
-  - "Which business rules are not enforced by automated tests?"
-  - "What is the current BR coverage percentage?"
+  - 'Which business objectives lack measurable E2E validation?'
+  - 'Which business rules are not enforced by automated tests?'
+  - 'What is the current BR coverage percentage?'
 ```
 
 #### Sub-Agent 1B: UX Stories Auditor
@@ -102,9 +102,9 @@ coverage_rules:
   - Each epic must have at least one happy-path journey test
 
 audit_queries:
-  - "Which P0 stories have incomplete acceptance criteria coverage?"
-  - "Which user journeys lack E2E test representation?"
-  - "What is the overall UX test coverage by epic?"
+  - 'Which P0 stories have incomplete acceptance criteria coverage?'
+  - 'Which user journeys lack E2E test representation?'
+  - 'What is the overall UX test coverage by epic?'
 ```
 
 ---
@@ -487,30 +487,30 @@ outputs:
  * @dependencies [RingAPI, BatteryMonitor]
  */
 describe('BO-1: Battery Life Extension', () => {
-  // Setup
-  beforeAll(async () => {
-    // Initialize test environment
-  });
+	// Setup
+	beforeAll(async () => {
+		// Initialize test environment
+	});
 
-  // Business Value Validation
-  it('should reduce battery drain rate to <2.5%/day', async () => {
-    // Arrange: Set up camera with battery optimization enabled
-    // Act: Simulate 24 hours of typical usage
-    // Assert: Battery drain < 2.5%
-  });
+	// Business Value Validation
+	it('should reduce battery drain rate to <2.5%/day', async () => {
+		// Arrange: Set up camera with battery optimization enabled
+		// Act: Simulate 24 hours of typical usage
+		// Assert: Battery drain < 2.5%
+	});
 
-  // Success Metric Validation
-  it('should achieve 50% improvement over baseline', async () => {
-    // Arrange: Establish baseline drain rate
-    // Act: Enable optimizations
-    // Assert: Drain rate reduced by >= 50%
-  });
+	// Success Metric Validation
+	it('should achieve 50% improvement over baseline', async () => {
+		// Arrange: Establish baseline drain rate
+		// Act: Enable optimizations
+		// Assert: Drain rate reduced by >= 50%
+	});
 
-  // Responsiveness Check
-  it('should maintain performance while optimizing battery', async () => {
-    // Assert: Motion detection still < 500ms
-    // Assert: Live view still < 3 seconds
-  });
+	// Responsiveness Check
+	it('should maintain performance while optimizing battery', async () => {
+		// Assert: Motion detection still < 500ms
+		// Assert: Live view still < 3 seconds
+	});
 });
 ```
 
@@ -529,56 +529,56 @@ describe('BO-1: Battery Life Extension', () => {
  *   - Battery warning shown if <20%
  */
 describe('US-1.2: Live View Camera', () => {
-  // Acceptance Criteria Tests
-  describe('Acceptance Criteria', () => {
-    it('AC1: Live view starts within 3 seconds', async () => {
-      const startTime = Date.now();
-      await page.click('[data-testid="camera-front-door"]');
-      await page.waitForSelector('[data-testid="live-video-playing"]');
-      const elapsed = Date.now() - startTime;
-      expect(elapsed).toBeLessThan(3000);
-    });
+	// Acceptance Criteria Tests
+	describe('Acceptance Criteria', () => {
+		it('AC1: Live view starts within 3 seconds', async () => {
+			const startTime = Date.now();
+			await page.click('[data-testid="camera-front-door"]');
+			await page.waitForSelector('[data-testid="live-video-playing"]');
+			const elapsed = Date.now() - startTime;
+			expect(elapsed).toBeLessThan(3000);
+		});
 
-    it('AC2: Video streams at minimum 720p', async () => {
-      const videoElement = await page.$('video');
-      const height = await videoElement.evaluate(v => v.videoHeight);
-      expect(height).toBeGreaterThanOrEqual(720);
-    });
+		it('AC2: Video streams at minimum 720p', async () => {
+			const videoElement = await page.$('video');
+			const height = await videoElement.evaluate((v) => v.videoHeight);
+			expect(height).toBeGreaterThanOrEqual(720);
+		});
 
-    it('AC3: Audio is included', async () => {
-      const videoElement = await page.$('video');
-      const hasAudio = await videoElement.evaluate(v => !v.muted && v.volume > 0);
-      expect(hasAudio).toBe(true);
-    });
+		it('AC3: Audio is included', async () => {
+			const videoElement = await page.$('video');
+			const hasAudio = await videoElement.evaluate((v) => !v.muted && v.volume > 0);
+			expect(hasAudio).toBe(true);
+		});
 
-    it('AC4: Battery warning shown if <20%', async () => {
-      // Setup: Camera with 15% battery
-      await mockCameraBattery('front-door', 15);
-      await page.click('[data-testid="camera-front-door"]');
-      const warning = await page.waitForSelector('[data-testid="low-battery-warning"]');
-      expect(warning).toBeTruthy();
-    });
-  });
+		it('AC4: Battery warning shown if <20%', async () => {
+			// Setup: Camera with 15% battery
+			await mockCameraBattery('front-door', 15);
+			await page.click('[data-testid="camera-front-door"]');
+			const warning = await page.waitForSelector('[data-testid="low-battery-warning"]');
+			expect(warning).toBeTruthy();
+		});
+	});
 
-  // Quality Dimension: User Experience
-  describe('Quality: User Experience', () => {
-    it('displays loading state while connecting', async () => {
-      // Verify skeleton/spinner during connection
-    });
+	// Quality Dimension: User Experience
+	describe('Quality: User Experience', () => {
+		it('displays loading state while connecting', async () => {
+			// Verify skeleton/spinner during connection
+		});
 
-    it('shows clear error if connection fails', async () => {
-      // Verify error message is helpful
-    });
-  });
+		it('shows clear error if connection fails', async () => {
+			// Verify error message is helpful
+		});
+	});
 
-  // Quality Dimension: Usability
-  describe('Quality: Usability', () => {
-    it('is accessible via keyboard', async () => {
-      await page.keyboard.press('Tab');
-      await page.keyboard.press('Enter');
-      // Verify live view opens
-    });
-  });
+	// Quality Dimension: Usability
+	describe('Quality: Usability', () => {
+		it('is accessible via keyboard', async () => {
+			await page.keyboard.press('Tab');
+			await page.keyboard.press('Enter');
+			// Verify live view opens
+		});
+	});
 });
 ```
 
@@ -592,42 +592,42 @@ describe('US-1.2: Live View Camera', () => {
  * @requirements [BO-2, BR-1, US-1.1]
  */
 describe('Dependency: Ring API', () => {
-  describe('Connectivity', () => {
-    it('establishes connection on startup', async () => {
-      // Verify API connection
-    });
+	describe('Connectivity', () => {
+		it('establishes connection on startup', async () => {
+			// Verify API connection
+		});
 
-    it('handles authentication refresh', async () => {
-      // Verify token refresh works
-    });
-  });
+		it('handles authentication refresh', async () => {
+			// Verify token refresh works
+		});
+	});
 
-  describe('Failure Modes', () => {
-    it('recovers from temporary network outage', async () => {
-      // Simulate network drop
-      // Verify reconnection
-    });
+	describe('Failure Modes', () => {
+		it('recovers from temporary network outage', async () => {
+			// Simulate network drop
+			// Verify reconnection
+		});
 
-    it('handles API rate limiting gracefully', async () => {
-      // Simulate 429 response
-      // Verify backoff behavior
-    });
+		it('handles API rate limiting gracefully', async () => {
+			// Simulate 429 response
+			// Verify backoff behavior
+		});
 
-    it('alerts user on persistent failure', async () => {
-      // Simulate extended outage
-      // Verify user notification
-    });
-  });
+		it('alerts user on persistent failure', async () => {
+			// Simulate extended outage
+			// Verify user notification
+		});
+	});
 
-  describe('Data Integrity', () => {
-    it('correctly parses camera data', async () => {
-      // Verify camera list parsing
-    });
+	describe('Data Integrity', () => {
+		it('correctly parses camera data', async () => {
+			// Verify camera list parsing
+		});
 
-    it('correctly parses motion events', async () => {
-      // Verify event parsing
-    });
-  });
+		it('correctly parses motion events', async () => {
+			// Verify event parsing
+		});
+	});
 });
 ```
 
@@ -639,51 +639,51 @@ describe('Dependency: Ring API', () => {
 
 ```json
 {
-  "report_type": "coverage",
-  "generated_at": "ISO-8601",
-  "summary": {
-    "total_requirements": 0,
-    "tested_requirements": 0,
-    "coverage_percentage": 0,
-    "status": "passing|warning|critical"
-  },
-  "business_requirements": {
-    "objectives": {
-      "total": 5,
-      "covered": 0,
-      "items": [
-        {
-          "id": "BO-1",
-          "description": "...",
-          "tests": ["test-file.spec.ts:line"],
-          "coverage": 100,
-          "status": "covered|partial|missing"
-        }
-      ]
-    },
-    "rules": {
-      "total": 5,
-      "covered": 0,
-      "items": []
-    }
-  },
-  "user_stories": {
-    "by_priority": {
-      "P0": { "total": 0, "covered": 0, "percentage": 0 },
-      "P1": { "total": 0, "covered": 0, "percentage": 0 },
-      "P2": { "total": 0, "covered": 0, "percentage": 0 }
-    },
-    "by_epic": {},
-    "items": []
-  },
-  "gaps": [
-    {
-      "requirement_id": "...",
-      "type": "missing_test|partial_coverage|stale_test",
-      "priority": "critical|high|medium|low",
-      "suggested_action": "..."
-    }
-  ]
+	"report_type": "coverage",
+	"generated_at": "ISO-8601",
+	"summary": {
+		"total_requirements": 0,
+		"tested_requirements": 0,
+		"coverage_percentage": 0,
+		"status": "passing|warning|critical"
+	},
+	"business_requirements": {
+		"objectives": {
+			"total": 5,
+			"covered": 0,
+			"items": [
+				{
+					"id": "BO-1",
+					"description": "...",
+					"tests": ["test-file.spec.ts:line"],
+					"coverage": 100,
+					"status": "covered|partial|missing"
+				}
+			]
+		},
+		"rules": {
+			"total": 5,
+			"covered": 0,
+			"items": []
+		}
+	},
+	"user_stories": {
+		"by_priority": {
+			"P0": { "total": 0, "covered": 0, "percentage": 0 },
+			"P1": { "total": 0, "covered": 0, "percentage": 0 },
+			"P2": { "total": 0, "covered": 0, "percentage": 0 }
+		},
+		"by_epic": {},
+		"items": []
+	},
+	"gaps": [
+		{
+			"requirement_id": "...",
+			"type": "missing_test|partial_coverage|stale_test",
+			"priority": "critical|high|medium|low",
+			"suggested_action": "..."
+		}
+	]
 }
 ```
 
@@ -691,32 +691,32 @@ describe('Dependency: Ring API', () => {
 
 ```json
 {
-  "report_type": "quality_scorecard",
-  "generated_at": "ISO-8601",
-  "overall_score": 0,
-  "status": "excellent|passing|warning|failing",
-  "dimensions": {
-    "A_business_value": {
-      "score": 0,
-      "weight": 1.0,
-      "tests_run": 0,
-      "tests_passed": 0,
-      "findings": []
-    },
-    "B_user_experience": {},
-    "C_responsiveness": {},
-    "D_comprehension": {},
-    "E_usability": {},
-    "F_delight": {}
-  },
-  "improvement_recommendations": [
-    {
-      "dimension": "...",
-      "current_score": 0,
-      "target_score": 0,
-      "actions": []
-    }
-  ]
+	"report_type": "quality_scorecard",
+	"generated_at": "ISO-8601",
+	"overall_score": 0,
+	"status": "excellent|passing|warning|failing",
+	"dimensions": {
+		"A_business_value": {
+			"score": 0,
+			"weight": 1.0,
+			"tests_run": 0,
+			"tests_passed": 0,
+			"findings": []
+		},
+		"B_user_experience": {},
+		"C_responsiveness": {},
+		"D_comprehension": {},
+		"E_usability": {},
+		"F_delight": {}
+	},
+	"improvement_recommendations": [
+		{
+			"dimension": "...",
+			"current_score": 0,
+			"target_score": 0,
+			"actions": []
+		}
+	]
 }
 ```
 
@@ -724,30 +724,30 @@ describe('Dependency: Ring API', () => {
 
 ```json
 {
-  "report_type": "traceability_matrix",
-  "generated_at": "ISO-8601",
-  "matrix": [
-    {
-      "requirement_id": "BO-1",
-      "requirement_type": "business_objective",
-      "requirement_text": "Extend battery life by 50%",
-      "tests": [
-        {
-          "file": "battery.spec.ts",
-          "test_name": "should reduce drain rate",
-          "line": 45,
-          "last_result": "passed|failed|skipped",
-          "last_run": "ISO-8601"
-        }
-      ],
-      "quality_dimensions": ["A", "C"],
-      "dependencies": ["RingAPI", "BatteryMonitor"],
-      "coverage_status": "full|partial|none",
-      "last_validated": "ISO-8601"
-    }
-  ],
-  "orphan_tests": [],
-  "untested_requirements": []
+	"report_type": "traceability_matrix",
+	"generated_at": "ISO-8601",
+	"matrix": [
+		{
+			"requirement_id": "BO-1",
+			"requirement_type": "business_objective",
+			"requirement_text": "Extend battery life by 50%",
+			"tests": [
+				{
+					"file": "battery.spec.ts",
+					"test_name": "should reduce drain rate",
+					"line": 45,
+					"last_result": "passed|failed|skipped",
+					"last_run": "ISO-8601"
+				}
+			],
+			"quality_dimensions": ["A", "C"],
+			"dependencies": ["RingAPI", "BatteryMonitor"],
+			"coverage_status": "full|partial|none",
+			"last_validated": "ISO-8601"
+		}
+	],
+	"orphan_tests": [],
+	"untested_requirements": []
 }
 ```
 
@@ -884,16 +884,16 @@ jobs:
 
 ## Success Criteria
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Business Requirement Coverage | 100% | All BO-* and BR-* have ≥1 E2E test |
-| P0 User Story Coverage | 100% | All P0 acceptance criteria tested |
-| P1 User Story Coverage | ≥80% | 80%+ of P1 acceptance criteria tested |
-| Quality Dimension Scores | ≥70 each | Each dimension scores 70+ |
-| Overall Quality Score | ≥75 | Average across all dimensions |
-| Dependency Coverage | 100% | All external dependencies tested |
-| Traceability Completeness | 100% | All tests map to requirements |
-| Orphan Test Rate | <5% | <5% of tests lack requirement mapping |
+| Metric                        | Target   | Measurement                           |
+| ----------------------------- | -------- | ------------------------------------- |
+| Business Requirement Coverage | 100%     | All BO-_ and BR-_ have ≥1 E2E test    |
+| P0 User Story Coverage        | 100%     | All P0 acceptance criteria tested     |
+| P1 User Story Coverage        | ≥80%     | 80%+ of P1 acceptance criteria tested |
+| Quality Dimension Scores      | ≥70 each | Each dimension scores 70+             |
+| Overall Quality Score         | ≥75      | Average across all dimensions         |
+| Dependency Coverage           | 100%     | All external dependencies tested      |
+| Traceability Completeness     | 100%     | All tests map to requirements         |
+| Orphan Test Rate              | <5%      | <5% of tests lack requirement mapping |
 
 ---
 
@@ -902,24 +902,24 @@ jobs:
 ```yaml
 escalation_levels:
   - level: 1
-    condition: "Coverage < 80% OR Quality < 70"
-    action: "Generate improvement plan, notify team lead"
+    condition: 'Coverage < 80% OR Quality < 70'
+    action: 'Generate improvement plan, notify team lead'
 
   - level: 2
-    condition: "Coverage < 60% OR Quality < 60 OR Critical gap exists"
-    action: "Block deployment, escalate to engineering manager"
+    condition: 'Coverage < 60% OR Quality < 60 OR Critical gap exists'
+    action: 'Block deployment, escalate to engineering manager'
 
   - level: 3
-    condition: "Coverage < 40% OR Any dimension < 50"
-    action: "Emergency review, escalate to VP Engineering"
+    condition: 'Coverage < 40% OR Any dimension < 50'
+    action: 'Emergency review, escalate to VP Engineering'
 
 notification_channels:
-  - slack: "#e2e-governance-alerts"
-  - email: "engineering-leads@company.com"
-  - pagerduty: "critical-only"
+  - slack: '#e2e-governance-alerts'
+  - email: 'engineering-leads@company.com'
+  - pagerduty: 'critical-only'
 ```
 
 ---
 
-*Agent Version: 1.0*
-*Protocol Version: 2024.1*
+_Agent Version: 1.0_
+_Protocol Version: 2024.1_

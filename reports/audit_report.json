@@ -1,461 +1,642 @@
 {
-  "audit_report": {
-    "timestamp": "2025-12-27T08:20:00Z",
-    "auditor": "ORCH-2: Audit & Gap Analysis Agent",
-    "sprint": "Sprint 1 (Battery Optimization & TDD Foundation)",
-    "audit_version": "1.0",
+	"audit_report": {
+		"timestamp": "2025-12-27T08:20:00Z",
+		"auditor": "ORCH-2: Audit & Gap Analysis Agent",
+		"sprint": "Sprint 1 (Battery Optimization & TDD Foundation)",
+		"audit_version": "1.0",
 
-    "previous_sprint": {
-      "sprint_id": 1,
-      "sprint_name": "Battery Optimization & TDD Foundation",
-      "completion_date": "2025-12-27",
-      "velocity": {
-        "estimated_hours": 14,
-        "actual_hours": 14,
-        "efficiency": "100%"
-      },
-      "p0_completed": [
-        {
-          "id": "BLK-001",
-          "title": "Add remaining data-testid attributes",
-          "effort": "2 hours",
-          "status": "complete",
-          "acceptance_criteria_met": true,
-          "notes": "E2E selector coverage increased by 90%+"
-        },
-        {
-          "id": "BLK-002",
-          "title": "Fix axe-core CDN dependency",
-          "effort": "1 hour",
-          "status": "complete",
-          "acceptance_criteria_met": true,
-          "notes": "Migrated to @axe-core/playwright v4.10.2"
-        },
-        {
-          "id": "BLK-003",
-          "title": "Create test database seeding",
-          "effort": "2 hours",
-          "status": "complete",
-          "acceptance_criteria_met": true,
-          "notes": "5 devices, 13 events, 11 recordings seeded"
-        }
-      ],
-      "p1_completed": [
-        {
-          "id": "GAP-001",
-          "title": "Implement battery warning banner",
-          "effort": "2 hours",
-          "status": "complete",
-          "acceptance_criteria_met": true,
-          "notes": "23 unit tests passing, 3 severity levels implemented"
-        },
-        {
-          "id": "GAP-002",
-          "title": "Implement pre-buffer toggle in settings",
-          "effort": "2 hours",
-          "status": "complete",
-          "acceptance_criteria_met": true,
-          "notes": "25 unit tests passing, battery impact warning included"
-        },
-        {
-          "id": "GAP-003",
-          "title": "Fix pre-existing type errors",
-          "effort": "2 hours",
-          "status": "complete",
-          "acceptance_criteria_met": true,
-          "notes": "0 type errors, reduced warnings from 16 to 15"
-        },
-        {
-          "id": "GAP-004",
-          "title": "Add missing requirement tests",
-          "effort": "3 hours",
-          "status": "complete",
-          "acceptance_criteria_met": true,
-          "notes": "57 new unit tests for BR-3, BR-4, BO-3"
-        }
-      ],
-      "p2_completed": [],
-      "summary": {
-        "total_items": 7,
-        "completed_items": 7,
-        "completion_rate": "100%",
-        "p0_completion_rate": "100%",
-        "p1_completion_rate": "100%",
-        "p2_deferred": 2
-      }
-    },
+		"previous_sprint": {
+			"sprint_id": 1,
+			"sprint_name": "Battery Optimization & TDD Foundation",
+			"completion_date": "2025-12-27",
+			"velocity": {
+				"estimated_hours": 14,
+				"actual_hours": 14,
+				"efficiency": "100%"
+			},
+			"p0_completed": [
+				{
+					"id": "BLK-001",
+					"title": "Add remaining data-testid attributes",
+					"effort": "2 hours",
+					"status": "complete",
+					"acceptance_criteria_met": true,
+					"notes": "E2E selector coverage increased by 90%+"
+				},
+				{
+					"id": "BLK-002",
+					"title": "Fix axe-core CDN dependency",
+					"effort": "1 hour",
+					"status": "complete",
+					"acceptance_criteria_met": true,
+					"notes": "Migrated to @axe-core/playwright v4.10.2"
+				},
+				{
+					"id": "BLK-003",
+					"title": "Create test database seeding",
+					"effort": "2 hours",
+					"status": "complete",
+					"acceptance_criteria_met": true,
+					"notes": "5 devices, 13 events, 11 recordings seeded"
+				}
+			],
+			"p1_completed": [
+				{
+					"id": "GAP-001",
+					"title": "Implement battery warning banner",
+					"effort": "2 hours",
+					"status": "complete",
+					"acceptance_criteria_met": true,
+					"notes": "23 unit tests passing, 3 severity levels implemented"
+				},
+				{
+					"id": "GAP-002",
+					"title": "Implement pre-buffer toggle in settings",
+					"effort": "2 hours",
+					"status": "complete",
+					"acceptance_criteria_met": true,
+					"notes": "25 unit tests passing, battery impact warning included"
+				},
+				{
+					"id": "GAP-003",
+					"title": "Fix pre-existing type errors",
+					"effort": "2 hours",
+					"status": "complete",
+					"acceptance_criteria_met": true,
+					"notes": "0 type errors, reduced warnings from 16 to 15"
+				},
+				{
+					"id": "GAP-004",
+					"title": "Add missing requirement tests",
+					"effort": "3 hours",
+					"status": "complete",
+					"acceptance_criteria_met": true,
+					"notes": "57 new unit tests for BR-3, BR-4, BO-3"
+				}
+			],
+			"p2_completed": [],
+			"summary": {
+				"total_items": 7,
+				"completed_items": 7,
+				"completion_rate": "100%",
+				"p0_completion_rate": "100%",
+				"p1_completion_rate": "100%",
+				"p2_deferred": 2
+			}
+		},
 
-    "remaining_gaps": [
-      {
-        "id": "TEST-001",
-        "type": "blocker",
-        "priority": "P1",
-        "title": "Fix Playwright E2E test configuration",
-        "description": "E2E tests being picked up by Vitest instead of running through Playwright. Authentication setup timing out.",
-        "impact": "High - Blocks automated E2E testing",
-        "estimated_effort": "2 hours",
-        "root_causes": [
-          "vite.config.ts lacks test configuration to exclude tests/e2e/**",
-          "Vitest picking up all .spec.ts files including E2E tests",
-          "Auth setup timeout - page redirect from /login? to / not completing"
-        ],
-        "recommended_fixes": [
-          "Add test.exclude configuration to vite.config.ts",
-          "Exclude tests/e2e/**, tests/setup/**, tests/helpers/** from Vitest",
-          "Debug authentication flow in tests/setup/auth.setup.ts",
-          "Verify dev server runs properly during E2E test execution"
-        ],
-        "acceptance_criteria": [
-          "Vitest only runs tests in tests/unit/**",
-          "Playwright runs tests in tests/e2e/**",
-          "Auth setup completes successfully",
-          "All E2E test suites can execute"
-        ],
-        "blocking": true,
-        "dependencies": []
-      },
-      {
-        "id": "IMP-001",
-        "type": "improvement",
-        "priority": "P2",
-        "title": "Performance optimization",
-        "description": "Dashboard load time exceeding 30 seconds in some test runs",
-        "impact": "Medium - Affects user experience",
-        "estimated_effort": "3 hours",
-        "root_causes": [
-          "Possible excessive re-renders",
-          "Unoptimized database queries",
-          "Large data sets without virtualization"
-        ],
-        "recommended_fixes": [
-          "Add performance profiling",
-          "Implement memoization for expensive calculations",
-          "Optimize device/event list rendering",
-          "Add loading states and skeleton screens",
-          "Consider pagination for large event lists"
-        ],
-        "acceptance_criteria": [
-          "Dashboard loads in <2 seconds (95th percentile)",
-          "Performance metrics collected and monitored",
-          "Reduced re-render count"
-        ],
-        "blocking": false,
-        "dependencies": []
-      },
-      {
-        "id": "IMP-002",
-        "type": "improvement",
-        "priority": "P2",
-        "title": "Accessibility improvements",
-        "description": "15 accessibility warnings from svelte-check affecting WCAG 2.1 AA compliance",
-        "impact": "Medium - Compliance and usability",
-        "estimated_effort": "4 hours",
-        "warning_breakdown": {
-          "missing_aria_labels": 5,
-          "missing_keyboard_handlers": 2,
-          "label_associations": 4,
-          "state_references": 3,
-          "invalid_nesting": 1
-        },
-        "recommended_fixes": [
-          "Add aria-label to icon buttons (Modal close, Video fullscreen, Toast dismiss, Settings info)",
-          "Add keyboard event handlers for click events (Modal backdrop)",
-          "Fix form label associations (Settings page: Username, Version, Environment, Timeline filters)",
-          "Add tabindex to dialog role elements (Modal component)",
-          "Fix invalid button nesting in EventCard component"
-        ],
-        "acceptance_criteria": [
-          "svelte-check reports 0 warnings",
-          "All interactive elements keyboard accessible",
-          "Screen reader compatibility verified",
-          "WCAG 2.1 AA compliance achieved"
-        ],
-        "blocking": false,
-        "dependencies": []
-      }
-    ],
+		"remaining_gaps": [
+			{
+				"id": "TEST-001",
+				"type": "blocker",
+				"priority": "P1",
+				"title": "Fix Playwright E2E test configuration",
+				"description": "E2E tests being picked up by Vitest instead of running through Playwright. Authentication setup timing out.",
+				"impact": "High - Blocks automated E2E testing",
+				"estimated_effort": "2 hours",
+				"root_causes": [
+					"vite.config.ts lacks test configuration to exclude tests/e2e/**",
+					"Vitest picking up all .spec.ts files including E2E tests",
+					"Auth setup timeout - page redirect from /login? to / not completing"
+				],
+				"recommended_fixes": [
+					"Add test.exclude configuration to vite.config.ts",
+					"Exclude tests/e2e/**, tests/setup/**, tests/helpers/** from Vitest",
+					"Debug authentication flow in tests/setup/auth.setup.ts",
+					"Verify dev server runs properly during E2E test execution"
+				],
+				"acceptance_criteria": [
+					"Vitest only runs tests in tests/unit/**",
+					"Playwright runs tests in tests/e2e/**",
+					"Auth setup completes successfully",
+					"All E2E test suites can execute"
+				],
+				"blocking": true,
+				"dependencies": []
+			},
+			{
+				"id": "IMP-001",
+				"type": "improvement",
+				"priority": "P2",
+				"title": "Performance optimization",
+				"description": "Dashboard load time exceeding 30 seconds in some test runs",
+				"impact": "Medium - Affects user experience",
+				"estimated_effort": "3 hours",
+				"root_causes": [
+					"Possible excessive re-renders",
+					"Unoptimized database queries",
+					"Large data sets without virtualization"
+				],
+				"recommended_fixes": [
+					"Add performance profiling",
+					"Implement memoization for expensive calculations",
+					"Optimize device/event list rendering",
+					"Add loading states and skeleton screens",
+					"Consider pagination for large event lists"
+				],
+				"acceptance_criteria": [
+					"Dashboard loads in <2 seconds (95th percentile)",
+					"Performance metrics collected and monitored",
+					"Reduced re-render count"
+				],
+				"blocking": false,
+				"dependencies": []
+			},
+			{
+				"id": "IMP-002",
+				"type": "improvement",
+				"priority": "P2",
+				"title": "Accessibility improvements",
+				"description": "15 accessibility warnings from svelte-check affecting WCAG 2.1 AA compliance",
+				"impact": "Medium - Compliance and usability",
+				"estimated_effort": "4 hours",
+				"warning_breakdown": {
+					"missing_aria_labels": 5,
+					"missing_keyboard_handlers": 2,
+					"label_associations": 4,
+					"state_references": 3,
+					"invalid_nesting": 1
+				},
+				"recommended_fixes": [
+					"Add aria-label to icon buttons (Modal close, Video fullscreen, Toast dismiss, Settings info)",
+					"Add keyboard event handlers for click events (Modal backdrop)",
+					"Fix form label associations (Settings page: Username, Version, Environment, Timeline filters)",
+					"Add tabindex to dialog role elements (Modal component)",
+					"Fix invalid button nesting in EventCard component"
+				],
+				"acceptance_criteria": [
+					"svelte-check reports 0 warnings",
+					"All interactive elements keyboard accessible",
+					"Screen reader compatibility verified",
+					"WCAG 2.1 AA compliance achieved"
+				],
+				"blocking": false,
+				"dependencies": []
+			}
+		],
 
-    "coverage_status": {
-      "requirements_total": 26,
-      "requirements_with_tests": 26,
-      "requirements_covered": 26,
-      "requirements_uncovered": [],
-      "coverage_percentage": 100,
-      "coverage_breakdown": {
-        "business_objectives": {
-          "total": 5,
-          "covered": 5,
-          "items": [
-            { "id": "BO-1", "title": "Battery life extension", "tests": ["unit/business/reliability.test.ts", "e2e/business/battery-optimization.spec.ts"], "status": "covered" },
-            { "id": "BO-2", "title": "Comprehensive security coverage", "tests": ["e2e/business/zone-recording.spec.ts", "e2e/dependencies/ring-api.spec.ts"], "status": "covered" },
-            { "id": "BO-3", "title": "Reduce cloud dependency", "tests": ["unit/local-storage.test.ts", "unit/business/storage.test.ts", "e2e/quality/comprehension.spec.ts"], "status": "covered" },
-            { "id": "BO-4", "title": "Multi-camera coordination", "tests": ["e2e/business/zone-recording.spec.ts", "e2e/quality/responsiveness.spec.ts"], "status": "covered" },
-            { "id": "BO-5", "title": "24/7 operation", "tests": ["unit/business/reliability.test.ts", "e2e/dependencies/ffmpeg.spec.ts"], "status": "covered" }
-          ]
-        },
-        "business_rules": {
-          "total": 5,
-          "covered": 5,
-          "items": [
-            { "id": "BR-1", "title": "Low battery streaming pause", "tests": ["e2e/business/battery-optimization.spec.ts", "e2e/dependencies/ring-api.spec.ts"], "status": "covered" },
-            { "id": "BR-2", "title": "Edge camera zone triggering", "tests": ["e2e/business/zone-recording.spec.ts", "e2e/dependencies/infrastructure.spec.ts"], "status": "covered" },
-            { "id": "BR-3", "title": "30-day retention", "tests": ["unit/retention-policy.test.ts", "unit/business/storage.test.ts", "e2e/dependencies/ffmpeg.spec.ts"], "status": "covered" },
-            { "id": "BR-4", "title": "Live view auto-termination", "tests": ["unit/live-view-timeout.test.ts", "e2e/business/battery-optimization.spec.ts"], "status": "covered" },
-            { "id": "BR-5", "title": "Motion cooldown grouping", "tests": ["e2e/business/zone-recording.spec.ts"], "status": "covered" }
-          ]
-        },
-        "user_stories": {
-          "total": 16,
-          "covered": 16,
-          "items": [
-            { "id": "US-1.1", "title": "Dashboard camera view", "tests": ["e2e/ux/dashboard.spec.ts"], "status": "covered" },
-            { "id": "US-1.2", "title": "Live view", "tests": ["e2e/ux/dashboard.spec.ts"], "status": "covered" },
-            { "id": "US-1.3", "title": "Online/offline status", "tests": ["e2e/ux/dashboard.spec.ts", "e2e/quality/comprehension.spec.ts"], "status": "covered" },
-            { "id": "US-1.4", "title": "Auto-stop live view", "tests": ["e2e/business/battery-optimization.spec.ts"], "status": "covered" },
-            { "id": "US-2.1", "title": "Event timeline", "tests": ["e2e/ux/events.spec.ts"], "status": "covered" },
-            { "id": "US-2.2", "title": "Video playback", "tests": ["e2e/ux/events.spec.ts"], "status": "covered" },
-            { "id": "US-2.3", "title": "Zone-triggered events", "tests": ["e2e/ux/events.spec.ts"], "status": "covered" },
-            { "id": "US-2.4", "title": "Download recordings", "tests": ["e2e/ux/downloads.spec.ts"], "status": "covered" },
-            { "id": "US-3.1", "title": "Battery levels", "tests": ["e2e/ux/events.spec.ts"], "status": "covered" },
-            { "id": "US-3.2", "title": "Battery alerts", "tests": ["e2e/ux/alerts.spec.ts", "unit/battery-warning.test.ts"], "status": "covered" },
-            { "id": "US-3.3", "title": "Storage usage", "tests": ["e2e/ux/settings.spec.ts"], "status": "covered" },
-            { "id": "US-3.4", "title": "System status", "tests": ["e2e/ux/settings.spec.ts"], "status": "covered" },
-            { "id": "US-4.1", "title": "Zone configuration", "tests": ["e2e/ux/settings.spec.ts"], "status": "covered" },
-            { "id": "US-4.2", "title": "Trigger cameras", "tests": ["e2e/ux/settings.spec.ts"], "status": "covered" },
-            { "id": "US-4.3", "title": "Motion cooldown", "tests": ["e2e/ux/settings.spec.ts"], "status": "covered" },
-            { "id": "US-4.4", "title": "Pre-event buffering", "tests": ["e2e/ux/settings.spec.ts", "unit/pre-buffer-toggle.test.ts"], "status": "covered" }
-          ]
-        }
-      },
-      "notes": [
-        "All requirements have test coverage defined",
-        "E2E tests exist but cannot execute due to TEST-001 configuration issue",
-        "Unit test coverage is comprehensive and passing"
-      ]
-    },
+		"coverage_status": {
+			"requirements_total": 26,
+			"requirements_with_tests": 26,
+			"requirements_covered": 26,
+			"requirements_uncovered": [],
+			"coverage_percentage": 100,
+			"coverage_breakdown": {
+				"business_objectives": {
+					"total": 5,
+					"covered": 5,
+					"items": [
+						{
+							"id": "BO-1",
+							"title": "Battery life extension",
+							"tests": [
+								"unit/business/reliability.test.ts",
+								"e2e/business/battery-optimization.spec.ts"
+							],
+							"status": "covered"
+						},
+						{
+							"id": "BO-2",
+							"title": "Comprehensive security coverage",
+							"tests": ["e2e/business/zone-recording.spec.ts", "e2e/dependencies/ring-api.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "BO-3",
+							"title": "Reduce cloud dependency",
+							"tests": [
+								"unit/local-storage.test.ts",
+								"unit/business/storage.test.ts",
+								"e2e/quality/comprehension.spec.ts"
+							],
+							"status": "covered"
+						},
+						{
+							"id": "BO-4",
+							"title": "Multi-camera coordination",
+							"tests": [
+								"e2e/business/zone-recording.spec.ts",
+								"e2e/quality/responsiveness.spec.ts"
+							],
+							"status": "covered"
+						},
+						{
+							"id": "BO-5",
+							"title": "24/7 operation",
+							"tests": ["unit/business/reliability.test.ts", "e2e/dependencies/ffmpeg.spec.ts"],
+							"status": "covered"
+						}
+					]
+				},
+				"business_rules": {
+					"total": 5,
+					"covered": 5,
+					"items": [
+						{
+							"id": "BR-1",
+							"title": "Low battery streaming pause",
+							"tests": [
+								"e2e/business/battery-optimization.spec.ts",
+								"e2e/dependencies/ring-api.spec.ts"
+							],
+							"status": "covered"
+						},
+						{
+							"id": "BR-2",
+							"title": "Edge camera zone triggering",
+							"tests": [
+								"e2e/business/zone-recording.spec.ts",
+								"e2e/dependencies/infrastructure.spec.ts"
+							],
+							"status": "covered"
+						},
+						{
+							"id": "BR-3",
+							"title": "30-day retention",
+							"tests": [
+								"unit/retention-policy.test.ts",
+								"unit/business/storage.test.ts",
+								"e2e/dependencies/ffmpeg.spec.ts"
+							],
+							"status": "covered"
+						},
+						{
+							"id": "BR-4",
+							"title": "Live view auto-termination",
+							"tests": [
+								"unit/live-view-timeout.test.ts",
+								"e2e/business/battery-optimization.spec.ts"
+							],
+							"status": "covered"
+						},
+						{
+							"id": "BR-5",
+							"title": "Motion cooldown grouping",
+							"tests": ["e2e/business/zone-recording.spec.ts"],
+							"status": "covered"
+						}
+					]
+				},
+				"user_stories": {
+					"total": 16,
+					"covered": 16,
+					"items": [
+						{
+							"id": "US-1.1",
+							"title": "Dashboard camera view",
+							"tests": ["e2e/ux/dashboard.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-1.2",
+							"title": "Live view",
+							"tests": ["e2e/ux/dashboard.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-1.3",
+							"title": "Online/offline status",
+							"tests": ["e2e/ux/dashboard.spec.ts", "e2e/quality/comprehension.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-1.4",
+							"title": "Auto-stop live view",
+							"tests": ["e2e/business/battery-optimization.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-2.1",
+							"title": "Event timeline",
+							"tests": ["e2e/ux/events.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-2.2",
+							"title": "Video playback",
+							"tests": ["e2e/ux/events.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-2.3",
+							"title": "Zone-triggered events",
+							"tests": ["e2e/ux/events.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-2.4",
+							"title": "Download recordings",
+							"tests": ["e2e/ux/downloads.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-3.1",
+							"title": "Battery levels",
+							"tests": ["e2e/ux/events.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-3.2",
+							"title": "Battery alerts",
+							"tests": ["e2e/ux/alerts.spec.ts", "unit/battery-warning.test.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-3.3",
+							"title": "Storage usage",
+							"tests": ["e2e/ux/settings.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-3.4",
+							"title": "System status",
+							"tests": ["e2e/ux/settings.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-4.1",
+							"title": "Zone configuration",
+							"tests": ["e2e/ux/settings.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-4.2",
+							"title": "Trigger cameras",
+							"tests": ["e2e/ux/settings.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-4.3",
+							"title": "Motion cooldown",
+							"tests": ["e2e/ux/settings.spec.ts"],
+							"status": "covered"
+						},
+						{
+							"id": "US-4.4",
+							"title": "Pre-event buffering",
+							"tests": ["e2e/ux/settings.spec.ts", "unit/pre-buffer-toggle.test.ts"],
+							"status": "covered"
+						}
+					]
+				}
+			},
+			"notes": [
+				"All requirements have test coverage defined",
+				"E2E tests exist but cannot execute due to TEST-001 configuration issue",
+				"Unit test coverage is comprehensive and passing"
+			]
+		},
 
-    "quality_status": {
-      "type_checking": {
-        "status": "PASS",
-        "errors": 0,
-        "warnings": 15,
-        "files_checked": 10,
-        "improvement_from_sprint_start": "35 errors resolved, 1 warning reduced"
-      },
-      "unit_tests": {
-        "status": "PASS",
-        "total_tests": 139,
-        "passing_tests": 139,
-        "failing_tests": 0,
-        "test_suites": 8,
-        "execution_time": "2.26s",
-        "improvement_from_sprint_start": "+74 tests (+114%)"
-      },
-      "e2e_tests": {
-        "status": "BLOCKED",
-        "total_test_files": 13,
-        "executable": 0,
-        "blocked": 13,
-        "blocker_issue": "TEST-001",
-        "notes": "Test framework operational, configuration prevents execution"
-      },
-      "a11y_warnings": {
-        "status": "WARN",
-        "total_warnings": 15,
-        "improvement_from_sprint_start": "-1 warning",
-        "breakdown": [
-          { "file": "Modal.svelte", "warnings": 2, "types": ["interactive_supports_focus", "click_events_have_key_events"] },
-          { "file": "Input.svelte", "warnings": 1, "types": ["state_referenced_locally"] },
-          { "file": "Select.svelte", "warnings": 1, "types": ["state_referenced_locally"] },
-          { "file": "DeviceCard.svelte", "warnings": 1, "types": ["element_implicitly_closed"] },
-          { "file": "EventCard.svelte", "warnings": 2, "types": ["state_referenced_locally", "node_invalid_placement_ssr"] },
-          { "file": "VideoPlayer.svelte", "warnings": 1, "types": ["a11y_consider_explicit_label"] },
-          { "file": "ToastContainer.svelte", "warnings": 1, "types": ["a11y_consider_explicit_label"] },
-          { "file": "devices/[id]/+page.svelte", "warnings": 1, "types": ["a11y_consider_explicit_label"] },
-          { "file": "settings/+page.svelte", "warnings": 2, "types": ["a11y_label_has_associated_control"] },
-          { "file": "timeline/+page.svelte", "warnings": 2, "types": ["a11y_label_has_associated_control"] }
-        ]
-      },
-      "code_quality": {
-        "todos_fixmes": 0,
-        "linting_errors": 0,
-        "test_data_seeding": "automated",
-        "cdn_dependencies": 0,
-        "database": "automated with WAL mode"
-      }
-    },
+		"quality_status": {
+			"type_checking": {
+				"status": "PASS",
+				"errors": 0,
+				"warnings": 15,
+				"files_checked": 10,
+				"improvement_from_sprint_start": "35 errors resolved, 1 warning reduced"
+			},
+			"unit_tests": {
+				"status": "PASS",
+				"total_tests": 139,
+				"passing_tests": 139,
+				"failing_tests": 0,
+				"test_suites": 8,
+				"execution_time": "2.26s",
+				"improvement_from_sprint_start": "+74 tests (+114%)"
+			},
+			"e2e_tests": {
+				"status": "BLOCKED",
+				"total_test_files": 13,
+				"executable": 0,
+				"blocked": 13,
+				"blocker_issue": "TEST-001",
+				"notes": "Test framework operational, configuration prevents execution"
+			},
+			"a11y_warnings": {
+				"status": "WARN",
+				"total_warnings": 15,
+				"improvement_from_sprint_start": "-1 warning",
+				"breakdown": [
+					{
+						"file": "Modal.svelte",
+						"warnings": 2,
+						"types": ["interactive_supports_focus", "click_events_have_key_events"]
+					},
+					{ "file": "Input.svelte", "warnings": 1, "types": ["state_referenced_locally"] },
+					{ "file": "Select.svelte", "warnings": 1, "types": ["state_referenced_locally"] },
+					{ "file": "DeviceCard.svelte", "warnings": 1, "types": ["element_implicitly_closed"] },
+					{
+						"file": "EventCard.svelte",
+						"warnings": 2,
+						"types": ["state_referenced_locally", "node_invalid_placement_ssr"]
+					},
+					{
+						"file": "VideoPlayer.svelte",
+						"warnings": 1,
+						"types": ["a11y_consider_explicit_label"]
+					},
+					{
+						"file": "ToastContainer.svelte",
+						"warnings": 1,
+						"types": ["a11y_consider_explicit_label"]
+					},
+					{
+						"file": "devices/[id]/+page.svelte",
+						"warnings": 1,
+						"types": ["a11y_consider_explicit_label"]
+					},
+					{
+						"file": "settings/+page.svelte",
+						"warnings": 2,
+						"types": ["a11y_label_has_associated_control"]
+					},
+					{
+						"file": "timeline/+page.svelte",
+						"warnings": 2,
+						"types": ["a11y_label_has_associated_control"]
+					}
+				]
+			},
+			"code_quality": {
+				"todos_fixmes": 0,
+				"linting_errors": 0,
+				"test_data_seeding": "automated",
+				"cdn_dependencies": 0,
+				"database": "automated with WAL mode"
+			}
+		},
 
-    "recommendations": [
-      {
-        "priority": "P1",
-        "category": "Testing Infrastructure",
-        "title": "Fix E2E test configuration immediately",
-        "rationale": "E2E tests exist but cannot run, blocking full regression testing and preventing validation of user stories",
-        "action_items": [
-          "Add vite.config.ts test configuration to exclude tests/e2e/**",
-          "Create vitest.config.ts if needed for better separation",
-          "Debug and fix authentication setup timeout",
-          "Verify all 13 E2E test suites execute successfully"
-        ],
-        "effort": "2 hours",
-        "impact": "Unblocks 13 test files with comprehensive E2E coverage",
-        "tracked_as": "TEST-001"
-      },
-      {
-        "priority": "P2",
-        "category": "Performance",
-        "title": "Address dashboard performance issues",
-        "rationale": "Dashboard load times >30s observed in testing, far exceeding <2s requirement",
-        "action_items": [
-          "Profile dashboard rendering with Chrome DevTools",
-          "Implement React.memo or Svelte component memoization",
-          "Add virtualization for large device/event lists",
-          "Optimize database queries with EXPLAIN QUERY PLAN",
-          "Add loading states and skeleton screens"
-        ],
-        "effort": "3 hours",
-        "impact": "Improves user experience, meets US-1.1 acceptance criteria",
-        "tracked_as": "IMP-001"
-      },
-      {
-        "priority": "P2",
-        "category": "Accessibility",
-        "title": "Resolve accessibility warnings for WCAG compliance",
-        "rationale": "15 warnings affect screen reader users and keyboard navigation",
-        "action_items": [
-          "Add aria-label attributes to 5 icon-only buttons",
-          "Add keyboard event handlers to 2 click-only elements",
-          "Fix 4 form label associations",
-          "Fix button nesting issue in EventCard",
-          "Add tabindex to Modal dialog element"
-        ],
-        "effort": "4 hours",
-        "impact": "Achieves WCAG 2.1 AA compliance, improves accessibility for all users",
-        "tracked_as": "IMP-002"
-      },
-      {
-        "priority": "P3",
-        "category": "Future Features",
-        "title": "Multi-clip download feature",
-        "rationale": "Convenience feature for downloading zone-triggered event groups",
-        "action_items": [
-          "Design multi-select UI for event timeline",
-          "Implement ZIP archive creation for multiple videos",
-          "Add progress indicator for large downloads"
-        ],
-        "effort": "4 hours",
-        "impact": "Enhanced user experience for incident investigation",
-        "tracked_as": "FTR-001"
-      },
-      {
-        "priority": "P3",
-        "category": "Future Features",
-        "title": "Zone trigger latency measurement",
-        "rationale": "Validate <500ms cascade trigger SLA requirement",
-        "action_items": [
-          "Add timing instrumentation to zone trigger logic",
-          "Create performance monitoring dashboard",
-          "Implement alerting for SLA violations"
-        ],
-        "effort": "3 hours",
-        "impact": "Validates BO-4 success metric, enables performance monitoring",
-        "tracked_as": "FTR-002"
-      }
-    ],
+		"recommendations": [
+			{
+				"priority": "P1",
+				"category": "Testing Infrastructure",
+				"title": "Fix E2E test configuration immediately",
+				"rationale": "E2E tests exist but cannot run, blocking full regression testing and preventing validation of user stories",
+				"action_items": [
+					"Add vite.config.ts test configuration to exclude tests/e2e/**",
+					"Create vitest.config.ts if needed for better separation",
+					"Debug and fix authentication setup timeout",
+					"Verify all 13 E2E test suites execute successfully"
+				],
+				"effort": "2 hours",
+				"impact": "Unblocks 13 test files with comprehensive E2E coverage",
+				"tracked_as": "TEST-001"
+			},
+			{
+				"priority": "P2",
+				"category": "Performance",
+				"title": "Address dashboard performance issues",
+				"rationale": "Dashboard load times >30s observed in testing, far exceeding <2s requirement",
+				"action_items": [
+					"Profile dashboard rendering with Chrome DevTools",
+					"Implement React.memo or Svelte component memoization",
+					"Add virtualization for large device/event lists",
+					"Optimize database queries with EXPLAIN QUERY PLAN",
+					"Add loading states and skeleton screens"
+				],
+				"effort": "3 hours",
+				"impact": "Improves user experience, meets US-1.1 acceptance criteria",
+				"tracked_as": "IMP-001"
+			},
+			{
+				"priority": "P2",
+				"category": "Accessibility",
+				"title": "Resolve accessibility warnings for WCAG compliance",
+				"rationale": "15 warnings affect screen reader users and keyboard navigation",
+				"action_items": [
+					"Add aria-label attributes to 5 icon-only buttons",
+					"Add keyboard event handlers to 2 click-only elements",
+					"Fix 4 form label associations",
+					"Fix button nesting issue in EventCard",
+					"Add tabindex to Modal dialog element"
+				],
+				"effort": "4 hours",
+				"impact": "Achieves WCAG 2.1 AA compliance, improves accessibility for all users",
+				"tracked_as": "IMP-002"
+			},
+			{
+				"priority": "P3",
+				"category": "Future Features",
+				"title": "Multi-clip download feature",
+				"rationale": "Convenience feature for downloading zone-triggered event groups",
+				"action_items": [
+					"Design multi-select UI for event timeline",
+					"Implement ZIP archive creation for multiple videos",
+					"Add progress indicator for large downloads"
+				],
+				"effort": "4 hours",
+				"impact": "Enhanced user experience for incident investigation",
+				"tracked_as": "FTR-001"
+			},
+			{
+				"priority": "P3",
+				"category": "Future Features",
+				"title": "Zone trigger latency measurement",
+				"rationale": "Validate <500ms cascade trigger SLA requirement",
+				"action_items": [
+					"Add timing instrumentation to zone trigger logic",
+					"Create performance monitoring dashboard",
+					"Implement alerting for SLA violations"
+				],
+				"effort": "3 hours",
+				"impact": "Validates BO-4 success metric, enables performance monitoring",
+				"tracked_as": "FTR-002"
+			}
+		],
 
-    "sprint_2_backlog": {
-      "priority_order": [
-        {
-          "id": "TEST-001",
-          "priority": "P1",
-          "title": "Fix Playwright E2E test configuration",
-          "effort": "2 hours",
-          "reason": "Critical blocker for E2E testing automation"
-        },
-        {
-          "id": "IMP-001",
-          "priority": "P2",
-          "title": "Performance optimization",
-          "effort": "3 hours",
-          "reason": "User experience impact, requirement violation"
-        },
-        {
-          "id": "IMP-002",
-          "priority": "P2",
-          "title": "Accessibility improvements",
-          "effort": "4 hours",
-          "reason": "Compliance and usability improvement"
-        }
-      ],
-      "total_estimated_effort": "9 hours",
-      "velocity_target": "100% of P1, 50-100% of P2",
-      "stretch_goals": ["FTR-001", "FTR-002"]
-    },
+		"sprint_2_backlog": {
+			"priority_order": [
+				{
+					"id": "TEST-001",
+					"priority": "P1",
+					"title": "Fix Playwright E2E test configuration",
+					"effort": "2 hours",
+					"reason": "Critical blocker for E2E testing automation"
+				},
+				{
+					"id": "IMP-001",
+					"priority": "P2",
+					"title": "Performance optimization",
+					"effort": "3 hours",
+					"reason": "User experience impact, requirement violation"
+				},
+				{
+					"id": "IMP-002",
+					"priority": "P2",
+					"title": "Accessibility improvements",
+					"effort": "4 hours",
+					"reason": "Compliance and usability improvement"
+				}
+			],
+			"total_estimated_effort": "9 hours",
+			"velocity_target": "100% of P1, 50-100% of P2",
+			"stretch_goals": ["FTR-001", "FTR-002"]
+		},
 
-    "risk_assessment": {
-      "low_risk": [
-        "Unit test coverage comprehensive (139 tests passing)",
-        "Type safety achieved (0 errors)",
-        "Core battery features complete and tested",
-        "Test data seeding automated and reliable",
-        "No technical debt in code (0 TODOs/FIXMEs)"
-      ],
-      "medium_risk": [
-        "E2E test automation blocked by configuration (TEST-001)",
-        "Performance concerns with dashboard load times",
-        "15 accessibility warnings could affect compliance audit"
-      ],
-      "high_risk": [],
-      "critical_risk": [],
-      "overall_risk_level": "LOW",
-      "notes": "All critical path items resolved in Sprint 1. Remaining issues are manageable and well-documented."
-    },
+		"risk_assessment": {
+			"low_risk": [
+				"Unit test coverage comprehensive (139 tests passing)",
+				"Type safety achieved (0 errors)",
+				"Core battery features complete and tested",
+				"Test data seeding automated and reliable",
+				"No technical debt in code (0 TODOs/FIXMEs)"
+			],
+			"medium_risk": [
+				"E2E test automation blocked by configuration (TEST-001)",
+				"Performance concerns with dashboard load times",
+				"15 accessibility warnings could affect compliance audit"
+			],
+			"high_risk": [],
+			"critical_risk": [],
+			"overall_risk_level": "LOW",
+			"notes": "All critical path items resolved in Sprint 1. Remaining issues are manageable and well-documented."
+		},
 
-    "sprint_1_metrics": {
-      "velocity": {
-        "planned_story_points": 14,
-        "completed_story_points": 14,
-        "velocity": "100%"
-      },
-      "quality": {
-        "test_growth": "+114%",
-        "error_reduction": "100% (35→0)",
-        "warning_reduction": "6.25% (16→15)",
-        "e2e_selector_coverage": "+850%"
-      },
-      "features": {
-        "battery_warning_banner": "complete",
-        "pre_buffer_toggle": "complete",
-        "retention_policy": "complete",
-        "live_view_timeout": "complete",
-        "test_data_seeding": "complete"
-      },
-      "grade": "A-",
-      "notes": "Excellent execution on all committed items. Minor E2E configuration issues discovered but properly tracked."
-    },
+		"sprint_1_metrics": {
+			"velocity": {
+				"planned_story_points": 14,
+				"completed_story_points": 14,
+				"velocity": "100%"
+			},
+			"quality": {
+				"test_growth": "+114%",
+				"error_reduction": "100% (35→0)",
+				"warning_reduction": "6.25% (16→15)",
+				"e2e_selector_coverage": "+850%"
+			},
+			"features": {
+				"battery_warning_banner": "complete",
+				"pre_buffer_toggle": "complete",
+				"retention_policy": "complete",
+				"live_view_timeout": "complete",
+				"test_data_seeding": "complete"
+			},
+			"grade": "A-",
+			"notes": "Excellent execution on all committed items. Minor E2E configuration issues discovered but properly tracked."
+		},
 
-    "conclusion": {
-      "sprint_1_status": "SUCCESSFULLY_COMPLETED",
-      "readiness_for_sprint_2": "READY",
-      "overall_health": "EXCELLENT",
-      "key_achievements": [
-        "100% completion of P0 blockers (3/3)",
-        "100% completion of P1 gaps (4/4)",
-        "139 comprehensive unit tests (100% passing)",
-        "Type-safe codebase (0 errors)",
-        "Automated test infrastructure operational",
-        "100% requirements coverage (all 26 requirements have tests)"
-      ],
-      "areas_for_improvement": [
-        "E2E test execution (blocked by configuration)",
-        "Dashboard performance optimization",
-        "Accessibility compliance (15 warnings)"
-      ],
-      "next_steps": [
-        "Prioritize TEST-001 for Sprint 2 start",
-        "Continue with IMP-001 and IMP-002 if time permits",
-        "Monitor unit test coverage as new features added"
-      ]
-    }
-  }
+		"conclusion": {
+			"sprint_1_status": "SUCCESSFULLY_COMPLETED",
+			"readiness_for_sprint_2": "READY",
+			"overall_health": "EXCELLENT",
+			"key_achievements": [
+				"100% completion of P0 blockers (3/3)",
+				"100% completion of P1 gaps (4/4)",
+				"139 comprehensive unit tests (100% passing)",
+				"Type-safe codebase (0 errors)",
+				"Automated test infrastructure operational",
+				"100% requirements coverage (all 26 requirements have tests)"
+			],
+			"areas_for_improvement": [
+				"E2E test execution (blocked by configuration)",
+				"Dashboard performance optimization",
+				"Accessibility compliance (15 warnings)"
+			],
+			"next_steps": [
+				"Prioritize TEST-001 for Sprint 2 start",
+				"Continue with IMP-001 and IMP-002 if time permits",
+				"Monitor unit test coverage as new features added"
+			]
+		}
+	}
 }

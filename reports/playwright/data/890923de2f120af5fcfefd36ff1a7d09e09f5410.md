@@ -2,79 +2,79 @@
 
 ```yaml
 - generic [ref=e3]:
-  - link "Skip to main content" [ref=e4] [cursor=pointer]:
-    - /url: "#main-content"
-  - navigation [ref=e6]:
-    - generic [ref=e8]:
-      - generic [ref=e9]:
-        - generic [ref=e10]:
-          - img [ref=e11]
-          - generic [ref=e13]: Ring Security
-        - generic [ref=e14]:
-          - link "Dashboard" [ref=e15] [cursor=pointer]:
-            - /url: /
-            - img [ref=e16]
-            - text: Dashboard
-          - link "Timeline" [ref=e18] [cursor=pointer]:
-            - /url: /timeline
-            - img [ref=e19]
-            - text: Timeline
-          - link "Devices" [ref=e21] [cursor=pointer]:
-            - /url: /devices
-            - img [ref=e22]
-            - text: Devices
-          - link "Recordings" [ref=e24] [cursor=pointer]:
-            - /url: /recordings
-            - img [ref=e25]
-            - text: Recordings
-          - link "Settings" [ref=e27] [cursor=pointer]:
-            - /url: /settings
-            - img [ref=e28]
-            - text: Settings
-      - generic [ref=e30]:
-        - generic [ref=e31]: admin
-        - button "Logout" [active] [ref=e32] [cursor=pointer]
-  - main [ref=e33]:
-    - generic [ref=e34]:
-      - generic [ref=e35]:
-        - heading "Dashboard" [level=1] [ref=e36]
-        - paragraph [ref=e37]: Monitor your home security devices and events
-      - generic [ref=e38]:
-        - generic [ref=e40]:
-          - generic [ref=e41]:
-            - paragraph [ref=e42]: Total Devices
-            - paragraph [ref=e43]: "0"
-          - img [ref=e45]
-        - generic [ref=e48]:
-          - generic [ref=e49]:
-            - paragraph [ref=e50]: Online
-            - paragraph [ref=e51]: 0 / 0
-          - img [ref=e53]
-        - generic [ref=e56]:
-          - generic [ref=e57]:
-            - paragraph [ref=e58]: Events Today
-            - paragraph [ref=e59]: "0"
-          - img [ref=e61]
-        - generic [ref=e64]:
-          - generic [ref=e65]:
-            - paragraph [ref=e66]: Storage Used
-            - paragraph [ref=e67]: 10.16 KB
-          - img [ref=e69]
-      - generic [ref=e71]:
-        - generic [ref=e72]:
-          - generic [ref=e73]:
-            - heading "Devices" [level=2] [ref=e74]
-            - link "View all" [ref=e75] [cursor=pointer]:
-              - /url: /devices
-          - generic [ref=e77]:
-            - img [ref=e78]
-            - paragraph [ref=e80]: No devices found. Start the Ring listener to discover devices.
-        - generic [ref=e81]:
-          - generic [ref=e82]:
-            - heading "Recent Events" [level=2] [ref=e83]
-            - link "View all" [ref=e84] [cursor=pointer]:
-              - /url: /timeline
-          - generic [ref=e86]:
-            - img [ref=e87]
-            - paragraph [ref=e89]: No events yet. Events will appear here when detected.
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+        - /url: '#main-content'
+    - navigation [ref=e6]:
+        - generic [ref=e8]:
+            - generic [ref=e9]:
+                - generic [ref=e10]:
+                    - img [ref=e11]
+                    - generic [ref=e13]: Ring Security
+                - generic [ref=e14]:
+                    - link "Dashboard" [ref=e15] [cursor=pointer]:
+                        - /url: /
+                        - img [ref=e16]
+                        - text: Dashboard
+                    - link "Timeline" [ref=e18] [cursor=pointer]:
+                        - /url: /timeline
+                        - img [ref=e19]
+                        - text: Timeline
+                    - link "Devices" [ref=e21] [cursor=pointer]:
+                        - /url: /devices
+                        - img [ref=e22]
+                        - text: Devices
+                    - link "Recordings" [ref=e24] [cursor=pointer]:
+                        - /url: /recordings
+                        - img [ref=e25]
+                        - text: Recordings
+                    - link "Settings" [ref=e27] [cursor=pointer]:
+                        - /url: /settings
+                        - img [ref=e28]
+                        - text: Settings
+            - generic [ref=e30]:
+                - generic [ref=e31]: admin
+                - button "Logout" [active] [ref=e32] [cursor=pointer]
+    - main [ref=e33]:
+        - generic [ref=e34]:
+            - generic [ref=e35]:
+                - heading "Dashboard" [level=1] [ref=e36]
+                - paragraph [ref=e37]: Monitor your home security devices and events
+            - generic [ref=e38]:
+                - generic [ref=e40]:
+                    - generic [ref=e41]:
+                        - paragraph [ref=e42]: Total Devices
+                        - paragraph [ref=e43]: '0'
+                    - img [ref=e45]
+                - generic [ref=e48]:
+                    - generic [ref=e49]:
+                        - paragraph [ref=e50]: Online
+                        - paragraph [ref=e51]: 0 / 0
+                    - img [ref=e53]
+                - generic [ref=e56]:
+                    - generic [ref=e57]:
+                        - paragraph [ref=e58]: Events Today
+                        - paragraph [ref=e59]: '0'
+                    - img [ref=e61]
+                - generic [ref=e64]:
+                    - generic [ref=e65]:
+                        - paragraph [ref=e66]: Storage Used
+                        - paragraph [ref=e67]: 10.16 KB
+                    - img [ref=e69]
+            - generic [ref=e71]:
+                - generic [ref=e72]:
+                    - generic [ref=e73]:
+                        - heading "Devices" [level=2] [ref=e74]
+                        - link "View all" [ref=e75] [cursor=pointer]:
+                            - /url: /devices
+                    - generic [ref=e77]:
+                        - img [ref=e78]
+                        - paragraph [ref=e80]: No devices found. Start the Ring listener to discover devices.
+                - generic [ref=e81]:
+                    - generic [ref=e82]:
+                        - heading "Recent Events" [level=2] [ref=e83]
+                        - link "View all" [ref=e84] [cursor=pointer]:
+                            - /url: /timeline
+                    - generic [ref=e86]:
+                        - img [ref=e87]
+                        - paragraph [ref=e89]: No events yet. Events will appear here when detected.
 ```

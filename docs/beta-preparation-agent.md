@@ -49,30 +49,30 @@ Prepare Ring Home Security for beta launch to 50 users by completing Sprint 3 (P
 ```yaml
 execution_model: parallel_with_gates
 phases:
-  - name: "Phase 1: Parallel Sprint & Backlog Work"
+  - name: 'Phase 1: Parallel Sprint & Backlog Work'
     orchestrators: [ORCH-1, ORCH-2, ORCH-3]
     blocking: false
     parallel: true
     output: completed_features.json
 
-  - name: "Phase 2: E2E Validation & Regression"
+  - name: 'Phase 2: E2E Validation & Regression'
     orchestrator: ORCH-4
     depends_on: [Phase 1]
     output: e2e_validation.json, regression_results.json
 
-  - name: "Phase 3: Retrospective & Beta Report"
+  - name: 'Phase 3: Retrospective & Beta Report'
     worker: WORK-R
     depends_on: [Phase 2]
     output: beta_readiness_report.md, launch_decision.json
 
 gate_criteria:
   launch_gate:
-    unit_tests: "100% pass rate"
-    e2e_tests: ">90% pass rate"
+    unit_tests: '100% pass rate'
+    e2e_tests: '>90% pass rate'
     type_errors: 0
     critical_bugs: 0
-    p1_items: "100% complete"
-    documentation: "updated"
+    p1_items: '100% complete'
+    documentation: 'updated'
 ```
 
 ---
@@ -80,22 +80,23 @@ gate_criteria:
 ## ORCHESTRATOR 1: Sprint 3 P1 & P2
 
 ### Mission
+
 Complete all Sprint 3 items (TEST-001, IMP-001, IMP-002) using TDD methodology with 3 parallel workers.
 
 ### Worker Allocation
 
-| Worker | Item | Priority | Effort | Responsibilities |
-|--------|------|----------|--------|------------------|
-| W1.1 | TEST-001 | P1 | 2h | Fix E2E test configuration |
-| W1.2 | IMP-001 | P2 | 3h | Performance optimization |
-| W1.3 | IMP-002 | P2 | 4h | Accessibility improvements |
+| Worker | Item     | Priority | Effort | Responsibilities           |
+| ------ | -------- | -------- | ------ | -------------------------- |
+| W1.1   | TEST-001 | P1       | 2h     | Fix E2E test configuration |
+| W1.2   | IMP-001  | P2       | 3h     | Performance optimization   |
+| W1.3   | IMP-002  | P2       | 4h     | Accessibility improvements |
 
 ### Execution Protocol
 
 ```yaml
 worker_W1.1_e2e_config:
   item: TEST-001
-  title: "Fix Playwright E2E Test Configuration"
+  title: 'Fix Playwright E2E Test Configuration'
   priority: P1
   estimated_effort: 2 hours
 
@@ -125,9 +126,9 @@ worker_W1.1_e2e_config:
 
     4_verify:
       commands:
-        - "npm test" # Unit tests only (no Playwright errors)
-        - "npx playwright test --project=setup" # Auth works
-        - "npx playwright test tests/e2e/smoke/" # Smoke tests pass
+        - 'npm test' # Unit tests only (no Playwright errors)
+        - 'npx playwright test --project=setup' # Auth works
+        - 'npx playwright test tests/e2e/smoke/' # Smoke tests pass
 
     5_document:
       - Update tests/setup/README.md
@@ -136,12 +137,12 @@ worker_W1.1_e2e_config:
   output:
     files_modified: []
     tests_added: []
-    pass_rate: "X%"
+    pass_rate: 'X%'
     blockers_remaining: []
 
 worker_W1.2_performance:
   item: IMP-001
-  title: "Performance Optimization"
+  title: 'Performance Optimization'
   priority: P2
   estimated_effort: 3 hours
 
@@ -159,10 +160,10 @@ worker_W1.2_performance:
 
     2_write_performance_tests:
       tests:
-        - "Dashboard renders in <3 seconds"
-        - "API responses cached for 30 seconds"
-        - "Lazy loading active for off-screen content"
-        - "No redundant API calls on navigation"
+        - 'Dashboard renders in <3 seconds'
+        - 'API responses cached for 30 seconds'
+        - 'Lazy loading active for off-screen content'
+        - 'No redundant API calls on navigation'
 
     3_implement_optimizations:
       actions:
@@ -186,14 +187,14 @@ worker_W1.2_performance:
       - Document performance targets
 
   output:
-    load_time_before: "X seconds"
-    load_time_after: "X seconds"
-    cache_hit_rate: "X%"
+    load_time_before: 'X seconds'
+    load_time_after: 'X seconds'
+    cache_hit_rate: 'X%'
     tests_added: []
 
 worker_W1.3_accessibility:
   item: IMP-002
-  title: "Accessibility Improvements"
+  title: 'Accessibility Improvements'
   priority: P2
   estimated_effort: 4 hours
 
@@ -212,11 +213,11 @@ worker_W1.3_accessibility:
 
     2_write_a11y_tests:
       tests:
-        - "Modal has proper focus trap"
-        - "All buttons have accessible names"
-        - "Form inputs have associated labels"
-        - "Keyboard navigation works on all pages"
-        - "Skip link navigates to main content"
+        - 'Modal has proper focus trap'
+        - 'All buttons have accessible names'
+        - 'Form inputs have associated labels'
+        - 'Keyboard navigation works on all pages'
+        - 'Skip link navigates to main content'
       file: tests/unit/accessibility-compliance.test.ts
 
     3_fix_violations:
@@ -246,7 +247,7 @@ worker_W1.3_accessibility:
   output:
     violations_before: 15
     violations_after: 0
-    wcag_level: "AA"
+    wcag_level: 'AA'
     tests_added: []
 ```
 
@@ -254,26 +255,26 @@ worker_W1.3_accessibility:
 
 ```json
 {
-  "sprint3_results": {
-    "TEST-001": {
-      "status": "complete|partial|blocked",
-      "e2e_pass_rate": "X%",
-      "files_modified": [],
-      "tests_added": []
-    },
-    "IMP-001": {
-      "status": "complete|partial|blocked",
-      "load_time_improvement": "X%",
-      "cache_hit_rate": "X%"
-    },
-    "IMP-002": {
-      "status": "complete|partial|blocked",
-      "violations_fixed": 15,
-      "wcag_level": "AA"
-    }
-  },
-  "total_tests_added": 0,
-  "blockers": []
+	"sprint3_results": {
+		"TEST-001": {
+			"status": "complete|partial|blocked",
+			"e2e_pass_rate": "X%",
+			"files_modified": [],
+			"tests_added": []
+		},
+		"IMP-001": {
+			"status": "complete|partial|blocked",
+			"load_time_improvement": "X%",
+			"cache_hit_rate": "X%"
+		},
+		"IMP-002": {
+			"status": "complete|partial|blocked",
+			"violations_fixed": 15,
+			"wcag_level": "AA"
+		}
+	},
+	"total_tests_added": 0,
+	"blockers": []
 }
 ```
 
@@ -282,14 +283,15 @@ worker_W1.3_accessibility:
 ## ORCHESTRATOR 2: Future Backlog Set 1 (P3)
 
 ### Mission
+
 Implement FTR-001 (Multi-clip download) and FTR-002 (Zone trigger latency) using TDD with 2 parallel workers.
 
 ### Worker Allocation
 
-| Worker | Item | Priority | Effort | Responsibilities |
-|--------|------|----------|--------|------------------|
-| W2.1 | FTR-001 | P3 | 4h | Multi-clip download feature |
-| W2.2 | FTR-002 | P3 | 3h | Zone trigger latency measurement |
+| Worker | Item    | Priority | Effort | Responsibilities                 |
+| ------ | ------- | -------- | ------ | -------------------------------- |
+| W2.1   | FTR-001 | P3       | 4h     | Multi-clip download feature      |
+| W2.2   | FTR-002 | P3       | 3h     | Zone trigger latency measurement |
 
 ### Execution Protocol
 
@@ -431,21 +433,22 @@ worker_W2.2_latency:
 ## ORCHESTRATOR 3: Future Backlog Set 2 (P3)
 
 ### Mission
+
 Implement FTR-003 (Hardware acceleration) and FTR-004 (Adaptive bitrate) using TDD with 2 parallel workers.
 
 ### Worker Allocation
 
-| Worker | Item | Priority | Effort | Responsibilities |
-|--------|------|----------|--------|------------------|
-| W3.1 | FTR-003 | P3 | 4h | Hardware acceleration detection |
-| W3.2 | FTR-004 | P3 | 5h | Adaptive bitrate streaming |
+| Worker | Item    | Priority | Effort | Responsibilities                |
+| ------ | ------- | -------- | ------ | ------------------------------- |
+| W3.1   | FTR-003 | P3       | 4h     | Hardware acceleration detection |
+| W3.2   | FTR-004 | P3       | 5h     | Adaptive bitrate streaming      |
 
 ### Execution Protocol
 
 ```yaml
 worker_W3.1_hardware_accel:
   item: FTR-003
-  title: "Hardware Acceleration Detection"
+  title: 'Hardware Acceleration Detection'
   priority: P3
   estimated_effort: 4 hours
 
@@ -458,12 +461,12 @@ worker_W3.1_hardware_accel:
     1_write_tests_first:
       file: tests/unit/hardware-acceleration.test.ts
       tests:
-        - "Detects NVIDIA GPU with NVENC support"
-        - "Detects Intel GPU with VAAPI support"
-        - "Detects macOS VideoToolbox support"
-        - "Falls back to software encoding when no GPU"
-        - "Logs encoding performance metrics"
-        - "Handles GPU detection errors gracefully"
+        - 'Detects NVIDIA GPU with NVENC support'
+        - 'Detects Intel GPU with VAAPI support'
+        - 'Detects macOS VideoToolbox support'
+        - 'Falls back to software encoding when no GPU'
+        - 'Logs encoding performance metrics'
+        - 'Handles GPU detection errors gracefully'
 
     2_implement_detection:
       files:
@@ -497,14 +500,14 @@ worker_W3.1_hardware_accel:
       - Verify fallback works
 
   output:
-    gpu_detected: "none|nvidia|intel|apple"
-    encoder_used: "nvenc|vaapi|videotoolbox|libx264"
-    speedup_factor: "X.Xx"
+    gpu_detected: 'none|nvidia|intel|apple'
+    encoder_used: 'nvenc|vaapi|videotoolbox|libx264'
+    speedup_factor: 'X.Xx'
     tests_added: []
 
 worker_W3.2_adaptive_bitrate:
   item: FTR-004
-  title: "Adaptive Bitrate Streaming"
+  title: 'Adaptive Bitrate Streaming'
   priority: P3
   estimated_effort: 5 hours
 
@@ -518,13 +521,13 @@ worker_W3.2_adaptive_bitrate:
     1_write_tests_first:
       file: tests/unit/adaptive-bitrate.test.ts
       tests:
-        - "Uses high quality (1080p) when battery >50%"
-        - "Uses medium quality (720p) when battery 20-50%"
-        - "Uses low quality (480p) when battery <20%"
-        - "User override persists across sessions"
+        - 'Uses high quality (1080p) when battery >50%'
+        - 'Uses medium quality (720p) when battery 20-50%'
+        - 'Uses low quality (480p) when battery <20%'
+        - 'User override persists across sessions'
         - "Quality changes don't interrupt playback"
-        - "Shows current quality indicator"
-        - "Battery level triggers quality recalculation"
+        - 'Shows current quality indicator'
+        - 'Battery level triggers quality recalculation'
 
     2_implement_quality_tiers:
       files:
@@ -568,8 +571,8 @@ worker_W3.2_adaptive_bitrate:
       - Verify quality transitions
 
   output:
-    quality_tiers_implemented: ["high", "medium", "low"]
-    battery_thresholds: { "high": 50, "medium": 20, "low": 0 }
+    quality_tiers_implemented: ['high', 'medium', 'low']
+    battery_thresholds: { 'high': 50, 'medium': 20, 'low': 0 }
     tests_added: []
 ```
 
@@ -578,21 +581,22 @@ worker_W3.2_adaptive_bitrate:
 ## ORCHESTRATOR 4: E2E Validation & Regression
 
 ### Mission
+
 Run comprehensive E2E tests, regression testing, and fix any issues discovered. Gate for beta launch.
 
 ### Worker Allocation
 
-| Worker | Specialization | Responsibilities |
-|--------|---------------|------------------|
-| W4.1 | E2E Test Runner | Execute full E2E suite |
-| W4.2 | Regression Analyzer | Compare results, identify regressions |
-| W4.3 | Bug Fixer | Fix any critical/high issues |
+| Worker | Specialization      | Responsibilities                      |
+| ------ | ------------------- | ------------------------------------- |
+| W4.1   | E2E Test Runner     | Execute full E2E suite                |
+| W4.2   | Regression Analyzer | Compare results, identify regressions |
+| W4.3   | Bug Fixer           | Fix any critical/high issues          |
 
 ### Execution Protocol
 
 ```yaml
 worker_W4.1_e2e_runner:
-  title: "Full E2E Test Execution"
+  title: 'Full E2E Test Execution'
 
   pre_requisites:
     - ORCH-1 W1.1 (TEST-001) must be complete
@@ -602,13 +606,13 @@ worker_W4.1_e2e_runner:
   execution:
     1_setup:
       commands:
-        - "npm run dev &"
-        - "sleep 10"
-        - "npx playwright test --project=setup"
+        - 'npm run dev &'
+        - 'sleep 10'
+        - 'npx playwright test --project=setup'
 
     2_run_full_suite:
       commands:
-        - "npx playwright test --reporter=json --output=reports/e2e-full-results.json"
+        - 'npx playwright test --reporter=json --output=reports/e2e-full-results.json'
       categories:
         - tests/e2e/business/*.spec.ts
         - tests/e2e/ux/*.spec.ts
@@ -622,7 +626,7 @@ worker_W4.1_e2e_runner:
         failed: 0
         skipped: 0
         flaky: 0
-        pass_rate: "X%"
+        pass_rate: 'X%'
 
     4_categorize_failures:
       categories:
@@ -634,14 +638,14 @@ worker_W4.1_e2e_runner:
 
   output:
     e2e_results:
-      pass_rate: "X%"
+      pass_rate: 'X%'
       failures_by_category: {}
       critical_failures: []
       screenshots: []
       traces: []
 
 worker_W4.2_regression_analyzer:
-  title: "Regression Analysis"
+  title: 'Regression Analysis'
 
   inputs:
     - reports/e2e-full-results.json
@@ -684,7 +688,7 @@ worker_W4.2_regression_analyzer:
       recommended_fixes: []
 
 worker_W4.3_bug_fixer:
-  title: "Critical Bug Resolution"
+  title: 'Critical Bug Resolution'
 
   inputs:
     - regression_report.recommended_fixes
@@ -711,47 +715,47 @@ worker_W4.3_bug_fixer:
 
   output:
     bugs_fixed:
-      - id: ""
-        severity: ""
+      - id: ''
+        severity: ''
         files_changed: []
-        test_added: ""
+        test_added: ''
     bugs_remaining:
-      - id: ""
-        severity: ""
-        reason: ""
-        workaround: ""
+      - id: ''
+        severity: ''
+        reason: ''
+        workaround: ''
 ```
 
 ### E2E Validation Output Schema
 
 ```json
 {
-  "e2e_validation": {
-    "timestamp": "",
-    "environment": {
-      "node_version": "",
-      "playwright_version": "",
-      "browser": "chromium"
-    },
-    "results": {
-      "total": 0,
-      "passed": 0,
-      "failed": 0,
-      "skipped": 0,
-      "pass_rate": "X%"
-    },
-    "regressions": {
-      "count": 0,
-      "details": []
-    },
-    "bugs_fixed": [],
-    "bugs_remaining": [],
-    "launch_gate": {
-      "e2e_pass_rate_met": true,
-      "critical_bugs_resolved": true,
-      "recommendation": "PASS|FAIL"
-    }
-  }
+	"e2e_validation": {
+		"timestamp": "",
+		"environment": {
+			"node_version": "",
+			"playwright_version": "",
+			"browser": "chromium"
+		},
+		"results": {
+			"total": 0,
+			"passed": 0,
+			"failed": 0,
+			"skipped": 0,
+			"pass_rate": "X%"
+		},
+		"regressions": {
+			"count": 0,
+			"details": []
+		},
+		"bugs_fixed": [],
+		"bugs_remaining": [],
+		"launch_gate": {
+			"e2e_pass_rate_met": true,
+			"critical_bugs_resolved": true,
+			"recommendation": "PASS|FAIL"
+		}
+	}
 }
 ```
 
@@ -760,13 +764,14 @@ worker_W4.3_bug_fixer:
 ## WORKER-R: Retrospective & Beta Report
 
 ### Mission
+
 Create comprehensive beta readiness report and launch decision document based on all orchestrator outputs.
 
 ### Execution Protocol
 
 ```yaml
 worker_retrospective:
-  title: "Beta Readiness Assessment"
+  title: 'Beta Readiness Assessment'
 
   inputs:
     - Sprint 3 results (ORCH-1)
@@ -791,8 +796,8 @@ worker_retrospective:
     2_launch_decision:
       file: reports/launch-decision.json
       schema:
-        decision: "GO|NO-GO|CONDITIONAL"
-        confidence: "HIGH|MEDIUM|LOW"
+        decision: 'GO|NO-GO|CONDITIONAL'
+        confidence: 'HIGH|MEDIUM|LOW'
         conditions: []
         blockers: []
         risks: []
@@ -829,29 +834,33 @@ worker_retrospective:
 **Confidence Level: [HIGH/MEDIUM/LOW]**
 
 ### Key Metrics
-| Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
-| Unit Tests | 100% pass | X% | |
-| E2E Tests | >90% pass | X% | |
-| Type Errors | 0 | X | |
-| Critical Bugs | 0 | X | |
-| P1 Items Complete | 100% | X% | |
+
+| Metric            | Target    | Actual | Status |
+| ----------------- | --------- | ------ | ------ |
+| Unit Tests        | 100% pass | X%     |        |
+| E2E Tests         | >90% pass | X%     |        |
+| Type Errors       | 0         | X      |        |
+| Critical Bugs     | 0         | X      |        |
+| P1 Items Complete | 100%      | X%     |        |
 
 ---
 
 ## Sprint 3 Completion
 
 ### TEST-001: E2E Configuration
+
 - Status: [COMPLETE/PARTIAL/BLOCKED]
 - E2E Pass Rate: X%
 - Notes:
 
 ### IMP-001: Performance
+
 - Status: [COMPLETE/PARTIAL/BLOCKED]
 - Load Time: X seconds (target: <3s)
 - Notes:
 
 ### IMP-002: Accessibility
+
 - Status: [COMPLETE/PARTIAL/BLOCKED]
 - WCAG Level: [A/AA/AAA]
 - Violations Remaining: X
@@ -861,27 +870,29 @@ worker_retrospective:
 
 ## Feature Completion Matrix
 
-| Feature | Status | Tests | Notes |
-|---------|--------|-------|-------|
-| Battery Optimization | | | |
-| Zone Recording | | | |
-| Live View | | | |
-| Event Timeline | | | |
-| Multi-Clip Download | | | |
-| Latency Metrics | | | |
-| Hardware Accel | | | |
-| Adaptive Bitrate | | | |
+| Feature              | Status | Tests | Notes |
+| -------------------- | ------ | ----- | ----- |
+| Battery Optimization |        |       |       |
+| Zone Recording       |        |       |       |
+| Live View            |        |       |       |
+| Event Timeline       |        |       |       |
+| Multi-Clip Download  |        |       |       |
+| Latency Metrics      |        |       |       |
+| Hardware Accel       |        |       |       |
+| Adaptive Bitrate     |        |       |       |
 
 ---
 
 ## Known Issues & Workarounds
 
 ### P1 Issues (Must Fix Before GA)
+
 1. [Issue description]
    - Workaround: [steps]
    - Fix ETA: [date]
 
 ### P2 Issues (Fix Post-Beta)
+
 1. [Issue description]
    - Impact: [low/medium]
 
@@ -903,24 +914,28 @@ worker_retrospective:
 [Detailed recommendation with reasoning]
 
 ### Conditions for Launch
+
 1. [Condition 1]
 2. [Condition 2]
 
 ### Risks
+
 | Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| | | | |
+| ---- | ----------- | ------ | ---------- |
+|      |             |        |            |
 
 ---
 
 ## Post-Beta Roadmap
 
 ### Week 1 Post-Launch
+
 - Monitor key metrics
 - Address critical feedback
 - Fix any blocking issues
 
 ### Week 2-4
+
 - Scale infrastructure if needed
 - Implement high-priority feedback
 - Prepare for GA launch
@@ -1000,52 +1015,52 @@ launch_gate:
 ```yaml
 sprint_3_success:
   TEST-001:
-    e2e_pass_rate: ">90%"
+    e2e_pass_rate: '>90%'
     no_playwright_errors: true
   IMP-001:
-    dashboard_load_time: "<3 seconds"
-    cache_hit_rate: ">80%"
+    dashboard_load_time: '<3 seconds'
+    cache_hit_rate: '>80%'
   IMP-002:
-    wcag_level: "AA"
+    wcag_level: 'AA'
     critical_violations: 0
 
 backlog_success:
   FTR-001:
-    multi_clip_merge: "working"
+    multi_clip_merge: 'working'
     max_clips: 10
   FTR-002:
-    latency_p95: "<500ms"
+    latency_p95: '<500ms'
     metrics_visible: true
   FTR-003:
-    gpu_detection: "working"
-    fallback: "graceful"
+    gpu_detection: 'working'
+    fallback: 'graceful'
   FTR-004:
     quality_tiers: 3
-    battery_adaptation: "working"
+    battery_adaptation: 'working'
 
 beta_launch_success:
-  total_test_coverage: ">80%"
-  e2e_pass_rate: ">90%"
+  total_test_coverage: '>80%'
+  e2e_pass_rate: '>90%'
   critical_bugs: 0
-  documentation: "complete"
-  monitoring: "active"
-  rollback_plan: "tested"
+  documentation: 'complete'
+  monitoring: 'active'
+  rollback_plan: 'tested'
 ```
 
 ---
 
 ## Output Artifacts
 
-| Artifact | Path | Description |
-|----------|------|-------------|
-| Sprint 3 Results | `reports/sprint3-results.json` | P1/P2 completion status |
-| Backlog Results | `reports/backlog-results.json` | P3 feature completion |
-| E2E Results | `reports/e2e-full-results.json` | Full test suite results |
-| Regression Report | `reports/regression-report.json` | Before/after comparison |
-| Beta Readiness | `reports/beta-readiness-report.md` | Launch recommendation |
-| Launch Decision | `reports/launch-decision.json` | GO/NO-GO with conditions |
-| Post-Beta Backlog | `reports/post-beta-backlog.json` | Remaining work items |
-| Monitoring Checklist | `reports/beta-monitoring-checklist.md` | What to watch |
+| Artifact             | Path                                   | Description              |
+| -------------------- | -------------------------------------- | ------------------------ |
+| Sprint 3 Results     | `reports/sprint3-results.json`         | P1/P2 completion status  |
+| Backlog Results      | `reports/backlog-results.json`         | P3 feature completion    |
+| E2E Results          | `reports/e2e-full-results.json`        | Full test suite results  |
+| Regression Report    | `reports/regression-report.json`       | Before/after comparison  |
+| Beta Readiness       | `reports/beta-readiness-report.md`     | Launch recommendation    |
+| Launch Decision      | `reports/launch-decision.json`         | GO/NO-GO with conditions |
+| Post-Beta Backlog    | `reports/post-beta-backlog.json`       | Remaining work items     |
+| Monitoring Checklist | `reports/beta-monitoring-checklist.md` | What to watch            |
 
 ---
 
@@ -1072,7 +1087,7 @@ npx playwright test --reporter=json
 
 ---
 
-*Beta Preparation Agent v1.0*
-*Total Scope: 25 hours (Sprint 3: 9h + Backlog: 16h + E2E: 4h + Report: 2h)*
-*Parallel Capacity: 4 Orchestrators + 12 Workers*
-*Launch Target: Beta with 50 users*
+_Beta Preparation Agent v1.0_
+_Total Scope: 25 hours (Sprint 3: 9h + Backlog: 16h + E2E: 4h + Report: 2h)_
+_Parallel Capacity: 4 Orchestrators + 12 Workers_
+_Launch Target: Beta with 50 users_
