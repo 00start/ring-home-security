@@ -41,10 +41,21 @@ CREATE TABLE IF NOT EXISTS recordings (
     duration REAL NOT NULL DEFAULT 0,
     file_size INTEGER NOT NULL DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
+    quality TEXT CHECK (quality IS NULL OR quality IN ('high', 'medium', 'low')),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (device_id) REFERENCES devices(id),
     FOREIGN KEY (event_id) REFERENCES events(id)
+);
+
+-- Device retention configuration table (STOR-004)
+CREATE TABLE IF NOT EXISTS device_retention_config (
+    device_id TEXT PRIMARY KEY,
+    retention_days INTEGER NOT NULL,
+    priority TEXT NOT NULL DEFAULT 'normal' CHECK (priority IN ('critical', 'normal', 'low')),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE
 );
 
 -- Users table for authentication
@@ -80,5 +91,7 @@ CREATE INDEX IF NOT EXISTS idx_events_device_timestamp ON events(device_id, time
 CREATE INDEX IF NOT EXISTS idx_recordings_device_id ON recordings(device_id);
 CREATE INDEX IF NOT EXISTS idx_recordings_created_at ON recordings(created_at);
 CREATE INDEX IF NOT EXISTS idx_recordings_status ON recordings(status);
+CREATE INDEX IF NOT EXISTS idx_recordings_quality ON recordings(quality);
 CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at);
+CREATE INDEX IF NOT EXISTS idx_device_retention_config_device_id ON device_retention_config(device_id);

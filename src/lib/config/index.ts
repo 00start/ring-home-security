@@ -23,6 +23,37 @@ const configSchema = z.object({
 
 	// Retention
 	retentionDays: z.coerce.number().default(30),
+	// Storage threshold for cleanup (percentage, 0 = disabled)
+	storageWarningThreshold: z.coerce.number().default(70),
+	storageCriticalThreshold: z.coerce.number().default(85),
+	storageCleanupTarget: z.coerce.number().default(60),
+	// Maximum storage in GB (0 = unlimited)
+	maxStorageGB: z.coerce.number().default(0),
+
+	// Video Quality (STOR-001)
+	defaultVideoQuality: z.enum(['high', 'medium', 'low']).default('medium'),
+	// CRF values for each quality level (0-51, lower = higher quality)
+	videoQualityHighCrf: z.coerce.number().default(18),
+	videoQualityMediumCrf: z.coerce.number().default(23),
+	videoQualityLowCrf: z.coerce.number().default(28),
+	// FFmpeg presets for each quality level
+	videoQualityHighPreset: z.string().default('slower'),
+	videoQualityMediumPreset: z.string().default('fast'),
+	videoQualityLowPreset: z.string().default('veryfast'),
+
+	// Thumbnail Settings (STOR-002)
+	thumbnailFormat: z.enum(['jpeg', 'webp']).default('webp'),
+	thumbnailWidth: z.coerce.number().default(240),
+	thumbnailQuality: z.coerce.number().default(80),
+	thumbnailTimestamp: z.coerce.number().default(1),
+
+	// Priority-Based Retention (STOR-004)
+	// Retention multiplier for critical events (motion, ding)
+	retentionCriticalMultiplier: z.coerce.number().default(1.5),
+	// Retention multiplier for normal events (door_open, door_close)
+	retentionNormalMultiplier: z.coerce.number().default(1.0),
+	// Retention multiplier for low priority events (device_online, device_offline)
+	retentionLowMultiplier: z.coerce.number().default(0.5),
 
 	// Server
 	port: z.coerce.number().default(3000),
@@ -73,6 +104,24 @@ function loadConfig() {
 		thumbnailsPath: env.THUMBNAILS_PATH,
 		logsPath: env.LOGS_PATH,
 		retentionDays: env.RETENTION_DAYS,
+		storageWarningThreshold: env.STORAGE_WARNING_THRESHOLD,
+		storageCriticalThreshold: env.STORAGE_CRITICAL_THRESHOLD,
+		storageCleanupTarget: env.STORAGE_CLEANUP_TARGET,
+		maxStorageGB: env.MAX_STORAGE_GB,
+		defaultVideoQuality: env.DEFAULT_VIDEO_QUALITY,
+		videoQualityHighCrf: env.VIDEO_QUALITY_HIGH_CRF,
+		videoQualityMediumCrf: env.VIDEO_QUALITY_MEDIUM_CRF,
+		videoQualityLowCrf: env.VIDEO_QUALITY_LOW_CRF,
+		videoQualityHighPreset: env.VIDEO_QUALITY_HIGH_PRESET,
+		videoQualityMediumPreset: env.VIDEO_QUALITY_MEDIUM_PRESET,
+		videoQualityLowPreset: env.VIDEO_QUALITY_LOW_PRESET,
+		thumbnailFormat: env.THUMBNAIL_FORMAT,
+		thumbnailWidth: env.THUMBNAIL_WIDTH,
+		thumbnailQuality: env.THUMBNAIL_QUALITY,
+		thumbnailTimestamp: env.THUMBNAIL_TIMESTAMP,
+		retentionCriticalMultiplier: env.RETENTION_CRITICAL_MULTIPLIER,
+		retentionNormalMultiplier: env.RETENTION_NORMAL_MULTIPLIER,
+		retentionLowMultiplier: env.RETENTION_LOW_MULTIPLIER,
 		port: env.PORT,
 		host: env.HOST,
 		authSecret: env.AUTH_SECRET,

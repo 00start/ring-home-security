@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { EventCard, Button, Select, Modal, VideoPlayer, LogViewer } from '$lib/components';
+	import { EventCard, Button, Select, Modal, VideoPlayer } from '$lib/components';
 	import {
 		events,
 		fetchEvents,
@@ -85,7 +86,28 @@
 				View and filter all security events
 			</p>
 		</div>
-		<LogViewer compact defaultFile="ring-listener.log" />
+		<Button
+			variant="secondary"
+			data-testid="system-logs-button"
+			aria-label="View system logs in settings"
+			onclick={() => goto('/settings#logs')}
+		>
+			<svg
+				class="mr-2 h-4 w-4"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+				aria-hidden="true"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M4 17l6-6-6-6M12 19h8"
+				/>
+			</svg>
+			View System Logs
+		</Button>
 	</div>
 
 	<!-- Filters -->
