@@ -22,151 +22,155 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
  * Initialize and seed the test database
  */
 export default async function globalSetup() {
-  console.log('🌱 Starting global test setup...');
+	console.log('🌱 Starting global test setup...');
 
-  // Set test environment variables
-  process.env.NODE_ENV = 'test';
-  process.env.DATABASE_PATH = './data/test-ring-security.db';
+	// Set test environment variables
+	process.env.NODE_ENV = 'test';
+	process.env.DATABASE_PATH = './data/test-ring-security.db';
 
-  // Ensure data directory exists
-  const dataDir = './data';
-  if (!existsSync(dataDir)) {
-    mkdirSync(dataDir, { recursive: true });
-  }
+	// Ensure data directory exists
+	const dataDir = './data';
+	if (!existsSync(dataDir)) {
+		mkdirSync(dataDir, { recursive: true });
+	}
 
-  // Initialize database
-  console.log('📦 Initializing test database...');
-  const db = new Database('./data/test-ring-security.db');
+	// Initialize database
+	console.log('📦 Initializing test database...');
+	const db = new Database('./data/test-ring-security.db');
 
-  // Enable WAL mode and foreign keys
-  db.pragma('journal_mode = WAL');
-  db.pragma('foreign_keys = ON');
+	// Enable WAL mode and foreign keys
+	db.pragma('journal_mode = WAL');
+	db.pragma('foreign_keys = ON');
 
-  // Load schema
-  const schemaPath = join(__dirname, '../../src/lib/db/schema.sql');
-  const schema = readFileSync(schemaPath, 'utf-8');
+	// Load schema
+	const schemaPath = join(__dirname, '../../src/lib/db/schema.sql');
+	const schema = readFileSync(schemaPath, 'utf-8');
 
-  // Execute schema statements
-  console.log('🏗️  Creating database schema...');
-  const statements = schema
-    .split('\n')
-    .filter((line) => !line.trim().startsWith('--'))
-    .join('\n')
-    .split(';')
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+	// Execute schema statements
+	console.log('🏗️  Creating database schema...');
+	const statements = schema
+		.split('\n')
+		.filter((line) => !line.trim().startsWith('--'))
+		.join('\n')
+		.split(';')
+		.map((s) => s.trim())
+		.filter((s) => s.length > 0);
 
-  for (const statement of statements) {
-    try {
-      db.exec(statement);
-    } catch (error) {
-      // Ignore "already exists" errors
-      if (error instanceof Error && !error.message.includes('already exists')) {
-        console.error('Failed to execute statement:', error);
-        throw error;
-      }
-    }
-  }
+	for (const statement of statements) {
+		try {
+			db.exec(statement);
+		} catch (error) {
+			// Ignore "already exists" errors
+			if (error instanceof Error && !error.message.includes('already exists')) {
+				console.error('Failed to execute statement:', error);
+				throw error;
+			}
+		}
+	}
 
-  // Clear existing test data
-  console.log('🧹 Clearing existing test data...');
-  db.prepare('DELETE FROM recordings').run();
-  db.prepare('DELETE FROM events').run();
-  db.prepare('DELETE FROM devices').run();
+	// Clear existing test data
+	console.log('🧹 Clearing existing test data...');
+	db.prepare('DELETE FROM recordings').run();
+	db.prepare('DELETE FROM events').run();
+	db.prepare('DELETE FROM devices').run();
 
-  // Seed devices
-  console.log(`🎥 Seeding ${seedDevices.length} devices...`);
-  const deviceStmt = db.prepare(`
+	// Seed devices
+	console.log(`🎥 Seeding ${seedDevices.length} devices...`);
+	const deviceStmt = db.prepare(`
     INSERT INTO devices (id, name, type, subtype, location, battery_level, is_online, last_seen)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  for (const device of seedDevices) {
-    deviceStmt.run(
-      device.id,
-      device.name,
-      device.type,
-      device.subtype || null,
-      device.location || null,
-      device.batteryLevel ?? null,
-      device.isOnline ? 1 : 0,
-      device.lastSeen
-    );
-  }
+	for (const device of seedDevices) {
+		deviceStmt.run(
+			device.id,
+			device.name,
+			device.type,
+			device.subtype || null,
+			device.location || null,
+			device.batteryLevel ?? null,
+			device.isOnline ? 1 : 0,
+			device.lastSeen
+		);
+	}
 
-  console.log(`✅ Seeded ${seedDevices.length} devices`);
+	console.log(`✅ Seeded ${seedDevices.length} devices`);
 
-  // Seed events
-  console.log(`📅 Seeding ${seedEvents.length} events...`);
-  const eventStmt = db.prepare(`
+	// Seed events
+	console.log(`📅 Seeding ${seedEvents.length} events...`);
+	const eventStmt = db.prepare(`
     INSERT INTO events (id, device_id, device_name, event_type, timestamp, metadata, recording_id)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
 
-  for (const event of seedEvents) {
-    eventStmt.run(
-      event.id,
-      event.deviceId,
-      event.deviceName,
-      event.eventType,
-      event.timestamp,
-      event.metadata,
-      event.recordingId || null
-    );
-  }
+	for (const event of seedEvents) {
+		eventStmt.run(
+			event.id,
+			event.deviceId,
+			event.deviceName,
+			event.eventType,
+			event.timestamp,
+			event.metadata,
+			event.recordingId || null
+		);
+	}
 
-  console.log(`✅ Seeded ${seedEvents.length} events`);
+	console.log(`✅ Seeded ${seedEvents.length} events`);
 
-  // Seed recordings
-  console.log(`🎬 Seeding ${seedRecordings.length} recordings...`);
-  const recordingStmt = db.prepare(`
+	// Seed recordings
+	console.log(`🎬 Seeding ${seedRecordings.length} recordings...`);
+	const recordingStmt = db.prepare(`
     INSERT INTO recordings (id, device_id, event_id, file_path, thumbnail_path, duration, file_size, status, created_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  for (const recording of seedRecordings) {
-    recordingStmt.run(
-      recording.id,
-      recording.deviceId,
-      recording.eventId,
-      recording.filePath,
-      recording.thumbnailPath || null,
-      recording.duration,
-      recording.fileSize,
-      recording.status,
-      recording.createdAt
-    );
-  }
+	for (const recording of seedRecordings) {
+		recordingStmt.run(
+			recording.id,
+			recording.deviceId,
+			recording.eventId,
+			recording.filePath,
+			recording.thumbnailPath || null,
+			recording.duration,
+			recording.fileSize,
+			recording.status,
+			recording.createdAt
+		);
+	}
 
-  console.log(`✅ Seeded ${seedRecordings.length} recordings`);
+	console.log(`✅ Seeded ${seedRecordings.length} recordings`);
 
-  // Verify seeding
-  const deviceCount = db.prepare('SELECT COUNT(*) as count FROM devices').get() as { count: number };
-  const eventCount = db.prepare('SELECT COUNT(*) as count FROM events').get() as { count: number };
-  const recordingCount = db.prepare('SELECT COUNT(*) as count FROM recordings').get() as { count: number };
+	// Verify seeding
+	const deviceCount = db.prepare('SELECT COUNT(*) as count FROM devices').get() as {
+		count: number;
+	};
+	const eventCount = db.prepare('SELECT COUNT(*) as count FROM events').get() as { count: number };
+	const recordingCount = db.prepare('SELECT COUNT(*) as count FROM recordings').get() as {
+		count: number;
+	};
 
-  console.log('\n📊 Seed Summary:');
-  console.log(`   Devices: ${deviceCount.count}`);
-  console.log(`   Events: ${eventCount.count}`);
-  console.log(`   Recordings: ${recordingCount.count}`);
+	console.log('\n📊 Seed Summary:');
+	console.log(`   Devices: ${deviceCount.count}`);
+	console.log(`   Events: ${eventCount.count}`);
+	console.log(`   Recordings: ${recordingCount.count}`);
 
-  // Verify acceptance criteria
-  console.log('\n✅ Acceptance Criteria:');
-  console.log(`   ✓ Seeded 3+ devices: ${deviceCount.count >= 3 ? 'PASS' : 'FAIL'}`);
-  console.log(`   ✓ Seeded 10+ events: ${eventCount.count >= 10 ? 'PASS' : 'FAIL'}`);
-  console.log(`   ✓ Events have recordings: ${recordingCount.count > 0 ? 'PASS' : 'FAIL'}`);
-  console.log(`   ✓ Zone configurations: PASS (3 zones defined)`);
+	// Verify acceptance criteria
+	console.log('\n✅ Acceptance Criteria:');
+	console.log(`   ✓ Seeded 3+ devices: ${deviceCount.count >= 3 ? 'PASS' : 'FAIL'}`);
+	console.log(`   ✓ Seeded 10+ events: ${eventCount.count >= 10 ? 'PASS' : 'FAIL'}`);
+	console.log(`   ✓ Events have recordings: ${recordingCount.count > 0 ? 'PASS' : 'FAIL'}`);
+	console.log(`   ✓ Zone configurations: PASS (3 zones defined)`);
 
-  // Close database
-  db.close();
+	// Close database
+	db.close();
 
-  console.log('\n✨ Global test setup complete!\n');
+	console.log('\n✨ Global test setup complete!\n');
 }
 
 // Run setup if executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  globalSetup().catch(error => {
-    console.error('Global setup failed:', error);
-    process.exit(1);
-  });
+	globalSetup().catch((error) => {
+		console.error('Global setup failed:', error);
+		process.exit(1);
+	});
 }

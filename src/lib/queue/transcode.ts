@@ -37,7 +37,9 @@ export function getTranscodeQueue(): Queue<TranscodeJobData, TranscodeJobResult>
 	return transcodeQueue;
 }
 
-export async function addTranscodeJob(data: TranscodeJobData): Promise<Job<TranscodeJobData, TranscodeJobResult>> {
+export async function addTranscodeJob(
+	data: TranscodeJobData
+): Promise<Job<TranscodeJobData, TranscodeJobResult>> {
 	const queue = getTranscodeQueue();
 
 	const job = await queue.add('transcode', data, {

@@ -1,6 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { recordingsRepo } from '$lib/db';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-recording');
 
 export const GET: RequestHandler = async ({ params }) => {
 	try {
@@ -15,7 +18,7 @@ export const GET: RequestHandler = async ({ params }) => {
 			data: recording
 		});
 	} catch (error) {
-		console.error('Failed to get recording:', error);
+		logger.error({ error, recordingId: params.id }, 'Failed to get recording');
 		return json({ success: false, error: 'Failed to get recording' }, { status: 500 });
 	}
 };

@@ -8,6 +8,9 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { latencyTracker } from '$lib/server/services/latency-tracker';
 import type { TimeRange } from '$lib/server/services/latency-tracker';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-latency');
 
 interface RecordLatencyRequest {
 	type: 'trigger' | 'follower_start';
@@ -28,10 +31,13 @@ export const GET: RequestHandler = async ({ url }) => {
 		const zoneId = url.searchParams.get('zoneId');
 
 		if (!zoneId) {
-			return json({
-				success: false,
-				error: 'zoneId is required'
-			}, { status: 400 });
+			return json(
+				{
+					success: false,
+					error: 'zoneId is required'
+				},
+				{ status: 400 }
+			);
 		}
 
 		// Parse time range
@@ -76,11 +82,14 @@ export const GET: RequestHandler = async ({ url }) => {
 			}
 		});
 	} catch (error) {
-		console.error('Failed to get latency metrics:', error);
-		return json({
-			success: false,
-			error: 'Failed to get latency metrics'
-		}, { status: 500 });
+		logger.error({ error }, 'Failed to get latency metrics');
+		return json(
+			{
+				success: false,
+				error: 'Failed to get latency metrics'
+			},
+			{ status: 500 }
+		);
 	}
 };
 
@@ -94,14 +103,17 @@ export const GET: RequestHandler = async ({ url }) => {
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json() as RecordLatencyRequest;
+		const body = (await request.json()) as RecordLatencyRequest;
 		const { type, zoneId, cameraId, timestamp = Date.now() } = body;
 
 		if (!type || !zoneId || !cameraId) {
-			return json({
-				success: false,
-				error: 'type, zoneId, and cameraId are required'
-			}, { status: 400 });
+			return json(
+				{
+					success: false,
+					error: 'type, zoneId, and cameraId are required'
+				},
+				{ status: 400 }
+			);
 		}
 
 		if (type === 'trigger') {
@@ -119,17 +131,20 @@ export const POST: RequestHandler = async ({ request }) => {
 			const latency = latencyTracker.recordFollowerStart(zoneId, cameraId, timestamp);
 
 			if (latency === null) {
-				return json({
-					success: false,
-					error: 'No trigger found for this zone',
-					data: {
-						type: 'follower_start',
-						zoneId,
-						cameraId,
-						timestamp,
-						latency: null
-					}
-				}, { status: 400 });
+				return json(
+					{
+						success: false,
+						error: 'No trigger found for this zone',
+						data: {
+							type: 'follower_start',
+							zoneId,
+							cameraId,
+							timestamp,
+							latency: null
+						}
+					},
+					{ status: 400 }
+				);
 			}
 
 			// Check SLA
@@ -151,17 +166,23 @@ export const POST: RequestHandler = async ({ request }) => {
 				}
 			});
 		} else {
-			return json({
-				success: false,
-				error: 'Invalid type. Must be "trigger" or "follower_start"'
-			}, { status: 400 });
+			return json(
+				{
+					success: false,
+					error: 'Invalid type. Must be "trigger" or "follower_start"'
+				},
+				{ status: 400 }
+			);
 		}
 	} catch (error) {
-		console.error('Failed to record latency measurement:', error);
-		return json({
-			success: false,
-			error: 'Failed to record latency measurement'
-		}, { status: 500 });
+		logger.error({ error }, 'Failed to record latency measurement');
+		return json(
+			{
+				success: false,
+				error: 'Failed to record latency measurement'
+			},
+			{ status: 500 }
+		);
 	}
 };
 
@@ -183,10 +204,13 @@ export const DELETE: RequestHandler = async ({ url }) => {
 			}
 		});
 	} catch (error) {
-		console.error('Failed to clear metrics:', error);
-		return json({
-			success: false,
-			error: 'Failed to clear metrics'
-		}, { status: 500 });
+		logger.error({ error }, 'Failed to clear metrics');
+		return json(
+			{
+				success: false,
+				error: 'Failed to clear metrics'
+			},
+			{ status: 500 }
+		);
 	}
 };

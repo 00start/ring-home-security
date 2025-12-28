@@ -18,7 +18,7 @@ function createEventSelectionStore() {
 		 * Respects max selection limit
 		 */
 		toggleSelection: (eventId: string) => {
-			update(selected => {
+			update((selected) => {
 				const newSet = new Set(selected);
 				if (newSet.has(eventId)) {
 					newSet.delete(eventId);
@@ -33,7 +33,7 @@ function createEventSelectionStore() {
 		 * Select a specific event (only if under limit)
 		 */
 		select: (eventId: string) => {
-			update(selected => {
+			update((selected) => {
 				const newSet = new Set(selected);
 				if (newSet.size < MAX_SELECTION) {
 					newSet.add(eventId);
@@ -46,7 +46,7 @@ function createEventSelectionStore() {
 		 * Deselect a specific event
 		 */
 		deselect: (eventId: string) => {
-			update(selected => {
+			update((selected) => {
 				const newSet = new Set(selected);
 				newSet.delete(eventId);
 				return newSet;
@@ -98,22 +98,13 @@ function createEventSelectionStore() {
 export const eventSelection = createEventSelectionStore();
 
 // Derived stores for convenience
-export const selectedCount = derived(
-	eventSelection,
-	$selection => $selection.size
-);
+export const selectedCount = derived(eventSelection, ($selection) => $selection.size);
 
 export const canSelectMore = derived(
 	eventSelection,
-	$selection => $selection.size < MAX_SELECTION
+	($selection) => $selection.size < MAX_SELECTION
 );
 
-export const hasSelection = derived(
-	eventSelection,
-	$selection => $selection.size > 0
-);
+export const hasSelection = derived(eventSelection, ($selection) => $selection.size > 0);
 
-export const selectedArray = derived(
-	eventSelection,
-	$selection => Array.from($selection)
-);
+export const selectedArray = derived(eventSelection, ($selection) => Array.from($selection));

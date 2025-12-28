@@ -37,7 +37,10 @@ export async function getRingApi(): Promise<RingApi> {
 		cameraStatusPollingSeconds: config.ringPollingIntervalSeconds
 	});
 
-	logger.info({ pollingInterval: config.ringPollingIntervalSeconds }, 'Ring API status polling interval configured');
+	logger.info(
+		{ pollingInterval: config.ringPollingIntervalSeconds },
+		'Ring API status polling interval configured'
+	);
 
 	// Handle token refresh and persist new token
 	ringApi.onRefreshTokenUpdated.subscribe({
@@ -128,19 +131,31 @@ export function mapDeviceType(device: RingDevice): DeviceTypeInfo {
 	}
 
 	// Misc devices (base stations, keypads, range extenders, etc.)
-	if (deviceType.includes('hub') || deviceType.includes('base_station') || deviceType === 'hub.redsky') {
+	if (
+		deviceType.includes('hub') ||
+		deviceType.includes('base_station') ||
+		deviceType === 'hub.redsky'
+	) {
 		return { type: 'misc', subtype: 'base_station' };
 	}
 	if (deviceType.includes('keypad')) {
 		return { type: 'misc', subtype: 'keypad' };
 	}
-	if (deviceType.includes('range') || deviceType.includes('extender') || deviceType === 'range-extender.zwave') {
+	if (
+		deviceType.includes('range') ||
+		deviceType.includes('extender') ||
+		deviceType === 'range-extender.zwave'
+	) {
 		return { type: 'misc', subtype: 'range_extender' };
 	}
 	if (deviceType.includes('siren')) {
 		return { type: 'misc', subtype: 'siren' };
 	}
-	if (deviceType.includes('security-panel') || deviceType.includes('alarm') || deviceType === 'security-panel') {
+	if (
+		deviceType.includes('security-panel') ||
+		deviceType.includes('alarm') ||
+		deviceType === 'security-panel'
+	) {
 		return { type: 'misc', subtype: 'base_station' };
 	}
 

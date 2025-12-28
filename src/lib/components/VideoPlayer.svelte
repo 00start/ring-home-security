@@ -62,7 +62,11 @@
 	}
 </script>
 
-<div data-testid="video-player" data-recording-id={recording.id} class="relative overflow-hidden rounded-lg bg-black">
+<div
+	data-testid="video-player"
+	data-recording-id={recording.id}
+	class="relative overflow-hidden rounded-lg bg-black"
+>
 	<video
 		bind:this={videoElement}
 		src={getVideoUrl(recording.id)}
@@ -71,8 +75,8 @@
 		class="w-full"
 		{autoplay}
 		preload="metadata"
-		onplay={() => isPlaying = true}
-		onpause={() => isPlaying = false}
+		onplay={() => (isPlaying = true)}
+		onpause={() => (isPlaying = false)}
 		ontimeupdate={handleTimeUpdate}
 		onloadedmetadata={handleLoadedMetadata}
 	>
@@ -119,7 +123,12 @@
 				aria-label="Toggle fullscreen"
 			>
 				<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+					/>
 				</svg>
 			</button>
 		</div>

@@ -12,7 +12,7 @@ import {
 	DEFAULT_QUALITY_PREFERENCE,
 	type QualityPreference,
 	type QualityMode,
-	type QualityTierName,
+	type QualityTierName
 } from '$lib/constants/quality-tiers.js';
 
 const STORAGE_KEY = 'ring-quality-preferences';
@@ -84,7 +84,7 @@ function createQualityPreferencesStore() {
 		update((prefs) => {
 			const updated: QualityPreference = {
 				mode,
-				tier: mode === 'auto' ? null : prefs.tier || 'medium',
+				tier: mode === 'auto' ? null : prefs.tier || 'medium'
 			};
 			save(updated);
 			return updated;
@@ -107,7 +107,7 @@ function createQualityPreferencesStore() {
 		update((prefs) => {
 			const updated: QualityPreference = {
 				mode: 'manual',
-				tier,
+				tier
 			};
 			save(updated);
 			return updated;
@@ -224,7 +224,7 @@ function createQualityPreferencesStore() {
 		isAutoMode,
 		isManualMode,
 		getManualTier,
-		reset,
+		reset
 	};
 }
 

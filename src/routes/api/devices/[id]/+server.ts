@@ -1,6 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { devicesRepo } from '$lib/db';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-device');
 
 export const GET: RequestHandler = async ({ params }) => {
 	try {
@@ -15,7 +18,7 @@ export const GET: RequestHandler = async ({ params }) => {
 			data: device
 		});
 	} catch (error) {
-		console.error('Failed to get device:', error);
+		logger.error({ error, deviceId: params.id }, 'Failed to get device');
 		return json({ success: false, error: 'Failed to get device' }, { status: 500 });
 	}
 };

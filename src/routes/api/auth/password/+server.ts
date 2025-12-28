@@ -2,6 +2,9 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { authRepo } from '$lib/db';
 import { hash } from '@node-rs/argon2';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-auth-password');
 
 const HASH_OPTIONS = {
 	memoryCost: 19456,
@@ -19,10 +22,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const { currentPassword, newPassword } = await request.json();
 
 		if (!currentPassword || !newPassword) {
-			return json(
-				{ success: false, error: 'Current and new password required' },
-				{ status: 400 }
-			);
+			return json({ success: false, error: 'Current and new password required' }, { status: 400 });
 		}
 
 		// Validate current password
@@ -44,7 +44,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		return json({ success: true });
 	} catch (error) {
-		console.error('Password change error:', error);
+		logger.error({ error }, 'Password change error');
 		return json({ success: false, error: 'Failed to change password' }, { status: 500 });
 	}
 };

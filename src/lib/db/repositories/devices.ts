@@ -25,7 +25,9 @@ export function getAllDevices(): Device[] {
 
 export function getDevicesByType(type: DeviceType): Device[] {
 	const db = getDatabase();
-	const rows = db.prepare('SELECT * FROM devices WHERE type = ? ORDER BY name').all(type) as DeviceRow[];
+	const rows = db
+		.prepare('SELECT * FROM devices WHERE type = ? ORDER BY name')
+		.all(type) as DeviceRow[];
 	return rows.map(rowToDevice);
 }
 

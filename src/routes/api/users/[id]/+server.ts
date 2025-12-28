@@ -1,6 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { authRepo } from '$lib/db';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-user');
 
 export const DELETE: RequestHandler = async ({ locals, params }) => {
 	if (!locals.user) {
@@ -35,7 +38,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 			return json({ success: false, error: 'Failed to delete user' }, { status: 500 });
 		}
 	} catch (error) {
-		console.error('Failed to delete user:', error);
+		logger.error({ error, userId: id }, 'Failed to delete user');
 		return json({ success: false, error: 'Failed to delete user' }, { status: 500 });
 	}
 };

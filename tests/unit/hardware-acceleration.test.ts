@@ -15,9 +15,11 @@ let mockExecOutput: { stdout: string; stderr: string } = { stdout: '', stderr: '
 let mockExecError: Error | null = null;
 
 vi.mock('child_process', () => ({
-	exec: vi.fn((cmd: string, callback: (error: Error | null, stdout: string, stderr: string) => void) => {
-		callback(mockExecError, mockExecOutput.stdout, mockExecOutput.stderr);
-	}),
+	exec: vi.fn(
+		(cmd: string, callback: (error: Error | null, stdout: string, stderr: string) => void) => {
+			callback(mockExecError, mockExecOutput.stdout, mockExecOutput.stderr);
+		}
+	)
 }));
 
 describe('Hardware Acceleration', () => {
@@ -39,7 +41,7 @@ describe('Hardware Acceleration', () => {
 				hasNVENC: false,
 				hasVAAPI: false,
 				hasVideoToolbox: false,
-				preferredEncoder: 'libx264',
+				preferredEncoder: 'libx264'
 			};
 
 			expect(capabilities).toHaveProperty('hasNVENC');
@@ -54,7 +56,7 @@ describe('Hardware Acceleration', () => {
 				hasNVENC: true,
 				hasVAAPI: false,
 				hasVideoToolbox: false,
-				preferredEncoder: 'h264_nvenc',
+				preferredEncoder: 'h264_nvenc'
 			};
 
 			expect(capabilities.hasNVENC).toBe(true);
@@ -67,7 +69,7 @@ describe('Hardware Acceleration', () => {
 				hasNVENC: false,
 				hasVAAPI: true,
 				hasVideoToolbox: false,
-				preferredEncoder: 'h264_vaapi',
+				preferredEncoder: 'h264_vaapi'
 			};
 
 			expect(capabilities.hasVAAPI).toBe(true);
@@ -80,7 +82,7 @@ describe('Hardware Acceleration', () => {
 				hasNVENC: false,
 				hasVAAPI: false,
 				hasVideoToolbox: true,
-				preferredEncoder: 'h264_videotoolbox',
+				preferredEncoder: 'h264_videotoolbox'
 			};
 
 			expect(capabilities.hasVideoToolbox).toBe(true);
@@ -93,7 +95,7 @@ describe('Hardware Acceleration', () => {
 				hasNVENC: false,
 				hasVAAPI: false,
 				hasVideoToolbox: false,
-				preferredEncoder: 'libx264',
+				preferredEncoder: 'libx264'
 			};
 
 			expect(capabilities.hasNVENC).toBe(false);
@@ -110,7 +112,7 @@ describe('Hardware Acceleration', () => {
 				hasNVENC: true,
 				hasVAAPI: true,
 				hasVideoToolbox: false,
-				preferredEncoder: 'h264_nvenc',
+				preferredEncoder: 'h264_nvenc'
 			};
 
 			expect(capabilities.preferredEncoder).toBe('h264_nvenc');
@@ -121,7 +123,7 @@ describe('Hardware Acceleration', () => {
 				hasNVENC: false,
 				hasVAAPI: true,
 				hasVideoToolbox: false,
-				preferredEncoder: 'h264_vaapi',
+				preferredEncoder: 'h264_vaapi'
 			};
 
 			expect(capabilities.preferredEncoder).toBe('h264_vaapi');
@@ -133,7 +135,7 @@ describe('Hardware Acceleration', () => {
 				hasNVENC: false,
 				hasVAAPI: false,
 				hasVideoToolbox: true,
-				preferredEncoder: 'h264_videotoolbox',
+				preferredEncoder: 'h264_videotoolbox'
 			};
 
 			expect(capabilities.preferredEncoder).toBe('h264_videotoolbox');
@@ -150,7 +152,7 @@ describe('Hardware Acceleration', () => {
 				hasNVENC: true,
 				hasVAAPI: false,
 				hasVideoToolbox: false,
-				preferredEncoder: 'h264_nvenc',
+				preferredEncoder: 'h264_nvenc'
 			};
 
 			cache.set(cacheKey, capabilities);
@@ -169,7 +171,7 @@ describe('Hardware Acceleration', () => {
 				hasNVENC: true,
 				hasVAAPI: false,
 				hasVideoToolbox: false,
-				preferredEncoder: 'h264_nvenc',
+				preferredEncoder: 'h264_nvenc'
 			};
 			cache.set(cacheKey, firstDetection);
 
@@ -195,7 +197,7 @@ describe('Hardware Acceleration', () => {
 					hasNVENC: false,
 					hasVAAPI: false,
 					hasVideoToolbox: false,
-					preferredEncoder: 'libx264',
+					preferredEncoder: 'libx264'
 				};
 			}
 
@@ -210,7 +212,7 @@ describe('Hardware Acceleration', () => {
 				hasNVENC: false,
 				hasVAAPI: false,
 				hasVideoToolbox: false,
-				preferredEncoder: 'libx264',
+				preferredEncoder: 'libx264'
 			};
 
 			expect(capabilities.preferredEncoder).toBe('libx264');
@@ -222,7 +224,7 @@ describe('Hardware Acceleration', () => {
 				hasNVENC: false,
 				hasVAAPI: true,
 				hasVideoToolbox: false,
-				preferredEncoder: 'h264_vaapi',
+				preferredEncoder: 'h264_vaapi'
 			};
 
 			expect(capabilities.hasVAAPI).toBe(true);
@@ -241,37 +243,37 @@ describe('Hardware Acceleration', () => {
 						hasNVENC: true,
 						hasVAAPI: false,
 						hasVideoToolbox: false,
-						preferredEncoder: 'h264_nvenc',
+						preferredEncoder: 'h264_nvenc'
 					},
-					expected: 'h264_nvenc',
+					expected: 'h264_nvenc'
 				},
 				{
 					caps: {
 						hasNVENC: false,
 						hasVAAPI: true,
 						hasVideoToolbox: false,
-						preferredEncoder: 'h264_vaapi',
+						preferredEncoder: 'h264_vaapi'
 					},
-					expected: 'h264_vaapi',
+					expected: 'h264_vaapi'
 				},
 				{
 					caps: {
 						hasNVENC: false,
 						hasVAAPI: false,
 						hasVideoToolbox: true,
-						preferredEncoder: 'h264_videotoolbox',
+						preferredEncoder: 'h264_videotoolbox'
 					},
-					expected: 'h264_videotoolbox',
+					expected: 'h264_videotoolbox'
 				},
 				{
 					caps: {
 						hasNVENC: false,
 						hasVAAPI: false,
 						hasVideoToolbox: false,
-						preferredEncoder: 'libx264',
+						preferredEncoder: 'libx264'
 					},
-					expected: 'libx264',
-				},
+					expected: 'libx264'
+				}
 			];
 
 			testCases.forEach(({ caps, expected }) => {
@@ -303,7 +305,7 @@ describe('Hardware Acceleration', () => {
 		it('measures encoding speed difference', () => {
 			const metrics = {
 				software: { fps: 30, time: 1000 },
-				hardware: { fps: 150, time: 200 },
+				hardware: { fps: 150, time: 200 }
 			};
 
 			const speedup = metrics.hardware.fps / metrics.software.fps;

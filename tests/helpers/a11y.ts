@@ -12,40 +12,43 @@ import AxeBuilder from '@axe-core/playwright';
  * @param options.autoAssert - Automatically assert no violations (default: true)
  * @returns Axe results object
  */
-export async function checkAccessibility(page: Page, options?: {
-  skipRules?: string[];
-  includeOnly?: string[];
-  tags?: string[];
-  autoAssert?: boolean;
-}) {
-  const builder = new AxeBuilder({ page });
+export async function checkAccessibility(
+	page: Page,
+	options?: {
+		skipRules?: string[];
+		includeOnly?: string[];
+		tags?: string[];
+		autoAssert?: boolean;
+	}
+) {
+	const builder = new AxeBuilder({ page });
 
-  if (options?.skipRules) {
-    builder.disableRules(options.skipRules);
-  }
+	if (options?.skipRules) {
+		builder.disableRules(options.skipRules);
+	}
 
-  if (options?.includeOnly) {
-    // Run only specific rules
-    builder.include('*'); // Include everything, then filter
-    const rulesToRun = options.includeOnly;
-    builder.options({
-      runOnly: {
-        type: 'rule',
-        values: rulesToRun
-      }
-    });
-  }
+	if (options?.includeOnly) {
+		// Run only specific rules
+		builder.include('*'); // Include everything, then filter
+		const rulesToRun = options.includeOnly;
+		builder.options({
+			runOnly: {
+				type: 'rule',
+				values: rulesToRun
+			}
+		});
+	}
 
-  if (options?.tags) {
-    builder.withTags(options.tags);
-  }
+	if (options?.tags) {
+		builder.withTags(options.tags);
+	}
 
-  const results = await builder.analyze();
+	const results = await builder.analyze();
 
-  // Auto-assert no violations unless explicitly disabled
-  if (options?.autoAssert !== false) {
-    expect(results.violations).toEqual([]);
-  }
+	// Auto-assert no violations unless explicitly disabled
+	if (options?.autoAssert !== false) {
+		expect(results.violations).toEqual([]);
+	}
 
-  return results;
+	return results;
 }

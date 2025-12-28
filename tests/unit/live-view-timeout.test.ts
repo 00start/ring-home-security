@@ -57,7 +57,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 			checkSessionTimeout: vi.fn(),
 			resetActivityTimer: vi.fn(),
 			getWarningTimeRemaining: vi.fn(),
-			sendTimeoutWarning: vi.fn(),
+			sendTimeoutWarning: vi.fn()
 		};
 	});
 
@@ -76,7 +76,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 				startTime: new Date(),
 				lastActivity: new Date(),
 				isActive: true,
-				autoTerminateMinutes: 10,
+				autoTerminateMinutes: 10
 			};
 
 			let sessionActive = true;
@@ -113,7 +113,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 				startTime: new Date(),
 				lastActivity: new Date(),
 				isActive: true,
-				autoTerminateMinutes: 10,
+				autoTerminateMinutes: 10
 			};
 
 			let sessionActive = true;
@@ -149,7 +149,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 				startTime: new Date(),
 				lastActivity: new Date(),
 				isActive: true,
-				autoTerminateMinutes: 10,
+				autoTerminateMinutes: 10
 			};
 
 			mockService.checkSessionTimeout = vi.fn().mockImplementation((sess) => {
@@ -182,7 +182,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 				startTime: new Date(),
 				lastActivity: new Date(),
 				isActive: true,
-				autoTerminateMinutes: 10,
+				autoTerminateMinutes: 10
 			};
 
 			let lastActivityTime = session.lastActivity;
@@ -223,7 +223,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 				startTime: new Date(),
 				lastActivity: lastActivityTime,
 				isActive: true,
-				autoTerminateMinutes: 10,
+				autoTerminateMinutes: 10
 			};
 
 			mockService.resetActivityTimer = vi.fn().mockImplementation(() => {
@@ -262,7 +262,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 				startTime: new Date(),
 				lastActivity: lastActivityTime,
 				isActive: true,
-				autoTerminateMinutes: 10,
+				autoTerminateMinutes: 10
 			};
 
 			mockService.resetActivityTimer = vi.fn().mockImplementation(() => {
@@ -301,7 +301,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 				startTime: new Date(),
 				lastActivity: new Date(),
 				isActive: true,
-				autoTerminateMinutes: 10,
+				autoTerminateMinutes: 10
 			};
 
 			const warningMinutes = 8;
@@ -344,7 +344,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 				startTime: new Date(),
 				lastActivity: new Date(),
 				isActive: true,
-				autoTerminateMinutes: 10,
+				autoTerminateMinutes: 10
 			};
 
 			mockService.getWarningTimeRemaining = vi.fn().mockImplementation((sess) => {
@@ -385,7 +385,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 				startTime: new Date(),
 				lastActivity: lastActivityTime,
 				isActive: true,
-				autoTerminateMinutes: 10,
+				autoTerminateMinutes: 10
 			};
 
 			let warningSent = false;
@@ -434,7 +434,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 				startTime: new Date(),
 				lastActivity: new Date(),
 				isActive: true,
-				autoTerminateMinutes: 10,
+				autoTerminateMinutes: 10
 			};
 
 			let sessionActive = true;
@@ -475,7 +475,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 				startTime: new Date(),
 				lastActivity: new Date(),
 				isActive: true,
-				autoTerminateMinutes: 10,
+				autoTerminateMinutes: 10
 			};
 
 			mockService.checkSessionTimeout = vi.fn().mockImplementation((sess) => {
@@ -506,7 +506,7 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 					startTime: new Date(),
 					lastActivity: new Date(),
 					isActive: true,
-					autoTerminateMinutes: 10,
+					autoTerminateMinutes: 10
 				},
 				{
 					id: 'session-13',
@@ -515,13 +515,13 @@ describe('BR-4: Live View Auto-Termination After 10 Minutes', () => {
 					startTime: new Date(),
 					lastActivity: new Date(),
 					isActive: true,
-					autoTerminateMinutes: 10,
-				},
+					autoTerminateMinutes: 10
+				}
 			];
 
 			const activityTimes = new Map<string, Date>([
 				['session-12', sessions[0].lastActivity],
-				['session-13', sessions[1].lastActivity],
+				['session-13', sessions[1].lastActivity]
 			]);
 
 			mockService.checkSessionTimeout = vi.fn().mockImplementation((sess) => {

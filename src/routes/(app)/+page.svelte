@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { StatCard, DeviceCard, EventCard, LiveViewModal, BatteryWarningBanner } from '$lib/components';
 	import {
-		stats,
-		fetchStats,
-		devices,
-		fetchDevices,
-		events,
-		fetchEvents
-	} from '$lib/stores';
+		StatCard,
+		DeviceCard,
+		EventCard,
+		LiveViewModal,
+		BatteryWarningBanner
+	} from '$lib/components';
+	import { stats, fetchStats, devices, fetchDevices, events, fetchEvents } from '$lib/stores';
 	import { formatBytes } from '$lib/utils';
 	import type { Device } from '$lib/types';
 
@@ -90,7 +89,10 @@
 	{:else}
 		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4" data-testid="loading-skeleton">
 			{#each Array(4) as _}
-				<div class="h-32 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-700" data-testid="camera-skeleton"></div>
+				<div
+					class="h-32 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-700"
+					data-testid="camera-skeleton"
+				></div>
 			{/each}
 		</div>
 	{/if}
@@ -100,18 +102,27 @@
 		<div>
 			<div class="mb-4 flex items-center justify-between">
 				<h2 class="text-lg font-medium text-zinc-900 dark:text-white">Devices</h2>
-				<a
-					href="/devices"
-					class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
-				>
+				<a href="/devices" class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
 					View all
 				</a>
 			</div>
 			<div class="space-y-4">
 				{#if $devices.length === 0}
-					<div class="rounded-lg border border-zinc-200 bg-white p-8 text-center dark:border-zinc-700 dark:bg-zinc-800">
-						<svg class="mx-auto h-12 w-12 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+					<div
+						class="rounded-lg border border-zinc-200 bg-white p-8 text-center dark:border-zinc-700 dark:bg-zinc-800"
+					>
+						<svg
+							class="mx-auto h-12 w-12 text-zinc-400"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+							/>
 						</svg>
 						<p class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
 							No devices found. Start the Ring listener to discover devices.
@@ -121,7 +132,7 @@
 					{#each prioritizedDevices.slice(0, 4) as device}
 						<DeviceCard
 							{device}
-							onclick={() => window.location.href = `/devices/${device.id}`}
+							onclick={() => (window.location.href = `/devices/${device.id}`)}
 							onLiveView={() => handleLiveView(device)}
 						/>
 					{/each}
@@ -133,18 +144,27 @@
 		<div>
 			<div class="mb-4 flex items-center justify-between">
 				<h2 class="text-lg font-medium text-zinc-900 dark:text-white">Recent Events</h2>
-				<a
-					href="/timeline"
-					class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
-				>
+				<a href="/timeline" class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
 					View all
 				</a>
 			</div>
 			<div class="space-y-3">
 				{#if $events.length === 0}
-					<div class="rounded-lg border border-zinc-200 bg-white p-8 text-center dark:border-zinc-700 dark:bg-zinc-800">
-						<svg class="mx-auto h-12 w-12 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+					<div
+						class="rounded-lg border border-zinc-200 bg-white p-8 text-center dark:border-zinc-700 dark:bg-zinc-800"
+					>
+						<svg
+							class="mx-auto h-12 w-12 text-zinc-400"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+							/>
 						</svg>
 						<p class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
 							No events yet. Events will appear here when detected.
@@ -152,7 +172,10 @@
 					</div>
 				{:else}
 					{#each $events.slice(0, 5) as event}
-						<EventCard {event} onclick={() => window.location.href = `/timeline?event=${event.id}`} />
+						<EventCard
+							{event}
+							onclick={() => (window.location.href = `/timeline?event=${event.id}`)}
+						/>
 					{/each}
 				{/if}
 			</div>
@@ -161,8 +184,4 @@
 </div>
 
 <!-- Live View Modal -->
-<LiveViewModal
-	device={liveViewDevice}
-	bind:open={showLiveViewModal}
-	onclose={closeLiveView}
-/>
+<LiveViewModal device={liveViewDevice} bind:open={showLiveViewModal} onclose={closeLiveView} />

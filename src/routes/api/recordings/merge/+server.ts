@@ -9,6 +9,9 @@ import type { RequestHandler } from './$types';
 import { recordingsRepo } from '$lib/db';
 import { v4 as uuidv4 } from 'uuid';
 import type { Recording } from '$lib/types';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-recordings-merge');
 
 // In-memory job storage (in production, this would be Redis or similar)
 const mergeJobs = new Map<string, MergeJob>();
@@ -93,9 +96,7 @@ function validateRecordings(recordingIds: string[]): ValidationResult {
  * Sort recordings by creation date (chronological order)
  */
 function sortRecordingsChronologically(recordings: Recording[]): Recording[] {
-	return [...recordings].sort((a, b) =>
-		a.createdAt.getTime() - b.createdAt.getTime()
-	);
+	return [...recordings].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
 /**
@@ -103,23 +104,26 @@ function sortRecordingsChronologically(recordings: Recording[]): Recording[] {
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json() as MergeRequest;
+		const body = (await request.json()) as MergeRequest;
 		const { recordingIds } = body;
 
 		// Validate recordings
 		const validation = validateRecordings(recordingIds);
 
 		if (!validation.valid) {
-			return json({
-				success: false,
-				error: validation.errors.join('; '),
-				details: validation
-			}, { status: 400 });
+			return json(
+				{
+					success: false,
+					error: validation.errors.join('; '),
+					details: validation
+				},
+				{ status: 400 }
+			);
 		}
 
 		// Sort recordings chronologically
 		const sortedRecordings = sortRecordingsChronologically(validation.validRecordings);
-		const sortedIds = sortedRecordings.map(r => r.id);
+		const sortedIds = sortedRecordings.map((r) => r.id);
 
 		// Create merge job
 		const jobId = uuidv4();
@@ -150,11 +154,14 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 		});
 	} catch (error) {
-		console.error('Failed to queue merge job:', error);
-		return json({
-			success: false,
-			error: 'Failed to queue merge job'
-		}, { status: 500 });
+		logger.error({ error }, 'Failed to queue merge job');
+		return json(
+			{
+				success: false,
+				error: 'Failed to queue merge job'
+			},
+			{ status: 500 }
+		);
 	}
 };
 
@@ -166,19 +173,25 @@ export const GET: RequestHandler = async ({ url }) => {
 		const jobId = url.searchParams.get('jobId');
 
 		if (!jobId) {
-			return json({
-				success: false,
-				error: 'Job ID is required'
-			}, { status: 400 });
+			return json(
+				{
+					success: false,
+					error: 'Job ID is required'
+				},
+				{ status: 400 }
+			);
 		}
 
 		const job = mergeJobs.get(jobId);
 
 		if (!job) {
-			return json({
-				success: false,
-				error: 'Job not found'
-			}, { status: 404 });
+			return json(
+				{
+					success: false,
+					error: 'Job not found'
+				},
+				{ status: 404 }
+			);
 		}
 
 		return json({
@@ -196,11 +209,14 @@ export const GET: RequestHandler = async ({ url }) => {
 			}
 		});
 	} catch (error) {
-		console.error('Failed to get merge job status:', error);
-		return json({
-			success: false,
-			error: 'Failed to get merge job status'
-		}, { status: 500 });
+		logger.error({ error }, 'Failed to get merge job status');
+		return json(
+			{
+				success: false,
+				error: 'Failed to get merge job status'
+			},
+			{ status: 500 }
+		);
 	}
 };
 

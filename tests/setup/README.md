@@ -80,8 +80,8 @@ The global setup runs automatically before all tests via `playwright.config.ts`:
 
 ```typescript
 export default defineConfig({
-  globalSetup: './tests/setup/global-setup.ts',
-  // ...
+	globalSetup: './tests/setup/global-setup.ts'
+	// ...
 });
 ```
 
@@ -96,16 +96,15 @@ import { test, expect } from '@playwright/test';
 import { setupApiMocks, getSeedData } from '../setup/mock-api';
 
 test('my test', async ({ page }) => {
-  // Setup API mocks to use seeded data
-  await setupApiMocks(page);
+	// Setup API mocks to use seeded data
+	await setupApiMocks(page);
 
-  // Navigate to page
-  await page.goto('/');
+	// Navigate to page
+	await page.goto('/');
 
-  // Test will use seeded data instead of real API
-  const seedData = getSeedData();
-  expect(await page.locator('[data-testid="camera-card"]').count())
-    .toBe(seedData.devices.length);
+	// Test will use seeded data instead of real API
+	const seedData = getSeedData();
+	expect(await page.locator('[data-testid="camera-card"]').count()).toBe(seedData.devices.length);
 });
 ```
 
@@ -150,15 +149,15 @@ To add more seed data, edit `seed.ts`:
 ```typescript
 // Add a new device
 export const seedDevices = [
-  // ... existing devices
-  {
-    id: 'test-camera-6',
-    name: 'New Camera',
-    type: 'camera',
-    isOnline: true,
-    batteryLevel: 75,
-    // ...
-  },
+	// ... existing devices
+	{
+		id: 'test-camera-6',
+		name: 'New Camera',
+		type: 'camera',
+		isOnline: true,
+		batteryLevel: 75
+		// ...
+	}
 ];
 ```
 

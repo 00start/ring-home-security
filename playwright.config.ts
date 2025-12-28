@@ -7,52 +7,52 @@ import { defineConfig, devices } from '@playwright/test';
  * Updated by ORCH-3: Create Test Database Seeding
  */
 export default defineConfig({
-  testDir: './tests/e2e',
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  timeout: 30000,
-  globalSetup: './tests/setup/global-setup.ts',
-  reporter: [
-    ['html', { outputFolder: 'reports/playwright' }],
-    ['json', { outputFile: 'reports/test-results.json' }],
-  ],
-  use: {
-    baseURL: 'http://localhost:5173',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-  },
-  projects: [
-    // Setup project - runs first to authenticate
-    {
-      name: 'setup',
-      testMatch: /.*\.setup\.ts/,
-      testDir: './tests/setup',
-    },
-    // Chromium tests - depend on setup for auth
-    {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json',
-      },
-      dependencies: ['setup'],
-    },
-    // Mobile tests - depend on setup for auth
-    {
-      name: 'mobile',
-      use: {
-        ...devices['iPhone 13'],
-        storageState: 'playwright/.auth/user.json',
-      },
-      dependencies: ['setup'],
-    },
-  ],
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-  },
+	testDir: './tests/e2e',
+	fullyParallel: true,
+	forbidOnly: !!process.env.CI,
+	retries: process.env.CI ? 2 : 0,
+	workers: process.env.CI ? 1 : undefined,
+	timeout: 30000,
+	globalSetup: './tests/setup/global-setup.ts',
+	reporter: [
+		['html', { outputFolder: 'reports/playwright' }],
+		['json', { outputFile: 'reports/test-results.json' }]
+	],
+	use: {
+		baseURL: 'http://localhost:5173',
+		trace: 'on-first-retry',
+		screenshot: 'only-on-failure'
+	},
+	projects: [
+		// Setup project - runs first to authenticate
+		{
+			name: 'setup',
+			testMatch: /.*\.setup\.ts/,
+			testDir: './tests/setup'
+		},
+		// Chromium tests - depend on setup for auth
+		{
+			name: 'chromium',
+			use: {
+				...devices['Desktop Chrome'],
+				storageState: 'playwright/.auth/user.json'
+			},
+			dependencies: ['setup']
+		},
+		// Mobile tests - depend on setup for auth
+		{
+			name: 'mobile',
+			use: {
+				...devices['iPhone 13'],
+				storageState: 'playwright/.auth/user.json'
+			},
+			dependencies: ['setup']
+		}
+	],
+	webServer: {
+		command: 'npm run dev',
+		url: 'http://localhost:5173',
+		reuseExistingServer: !process.env.CI,
+		timeout: 120000
+	}
 });

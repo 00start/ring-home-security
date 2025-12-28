@@ -32,7 +32,7 @@
 
 	// Get the effective quality tier
 	let effectiveTier = $derived(
-		isAutoMode ? recommendedTier : (preference.tier || 'medium')
+		isAutoMode ? recommendedTier : preference.tier || 'medium'
 	) as QualityTierName;
 
 	// Get tier config for display
@@ -83,7 +83,7 @@
 			type="button"
 			onclick={toggleMode}
 			data-testid="quality-mode-toggle"
-			class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 {isAutoMode
+			class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none {isAutoMode
 				? 'bg-blue-600'
 				: 'bg-zinc-200 dark:bg-zinc-600'}"
 		>
@@ -97,10 +97,7 @@
 	</div>
 
 	<!-- Current Quality Indicator -->
-	<div
-		class="mb-4 rounded-md bg-zinc-50 p-3 dark:bg-zinc-700/50"
-		data-testid="quality-indicator"
-	>
+	<div class="mb-4 rounded-md bg-zinc-50 p-3 dark:bg-zinc-700/50" data-testid="quality-indicator">
 		<div class="flex items-center justify-between">
 			<div>
 				<p class="text-xs text-zinc-500 dark:text-zinc-400">Current Quality</p>
@@ -211,9 +208,7 @@
 					/>
 				</svg>
 				<div class="ml-3">
-					<p class="text-xs font-medium text-blue-800 dark:text-blue-300">
-						Battery Optimization
-					</p>
+					<p class="text-xs font-medium text-blue-800 dark:text-blue-300">Battery Optimization</p>
 					<p class="mt-1 text-xs text-blue-700 dark:text-blue-400">
 						Quality automatically adjusts:
 						<br />

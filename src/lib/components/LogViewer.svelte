@@ -121,7 +121,9 @@
 	});
 
 	// Parse and format JSON log lines
-	function parseLogLine(line: string): { level: string; time: string; msg: string; rest: any } | null {
+	function parseLogLine(
+		line: string
+	): { level: string; time: string; msg: string; rest: Record<string, unknown> } | null {
 		try {
 			const parsed = JSON.parse(line);
 			const levelMap: Record<number, string> = {
@@ -214,14 +216,14 @@
 					</Select>
 
 					<div class="flex gap-2">
-						<Button
-							size="sm"
-							variant="ghost"
-							onclick={() => fetchLogContent()}
-							loading={loading}
-						>
+						<Button size="sm" variant="ghost" onclick={() => fetchLogContent()} {loading}>
 							<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+								/>
 							</svg>
 						</Button>
 						<Button
@@ -230,8 +232,13 @@
 							onclick={toggleAutoRefresh}
 						>
 							{#if autoRefresh}
-								<svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+								<svg class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M5 13l4 4L19 7"
+									/>
 								</svg>
 							{/if}
 							Auto-Refresh
@@ -249,10 +256,26 @@
 			{#if error}
 				<div class="rounded-lg bg-red-50 p-4 dark:bg-red-900/20">
 					<div class="flex items-center gap-2">
-						<svg class="h-5 w-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+						<svg
+							class="h-5 w-5 text-red-600 dark:text-red-400"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+							/>
 						</svg>
-						<p data-testid="error-message" data-error-type="log-viewer" class="text-sm text-red-600 dark:text-red-400">{error}</p>
+						<p
+							data-testid="error-message"
+							data-error-type="log-viewer"
+							class="text-sm text-red-600 dark:text-red-400"
+						>
+							{error}
+						</p>
 					</div>
 				</div>
 			{/if}
@@ -266,8 +289,13 @@
 				>
 					{#if logData.lines.length === 0}
 						<div class="flex flex-col items-center justify-center py-12 text-zinc-500">
-							<svg class="h-12 w-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+							<svg class="mb-3 h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+								/>
 							</svg>
 							<p>No log entries</p>
 						</div>
@@ -275,22 +303,28 @@
 						{#each logData.lines as line}
 							{@const parsed = parseLogLine(line)}
 							{#if parsed}
-								<div class="group mb-1 rounded px-2 py-1 hover:bg-zinc-800/50 transition-colors">
+								<div class="group mb-1 rounded px-2 py-1 transition-colors hover:bg-zinc-800/50">
 									<div class="flex items-start gap-3">
-										<span class="text-zinc-500 shrink-0">{parsed.time}</span>
-										<span class="shrink-0 w-14 text-right font-semibold {getLevelColor(parsed.level)} {getLevelBg(parsed.level)} px-1.5 py-0.5 rounded text-[10px]">
+										<span class="shrink-0 text-zinc-500">{parsed.time}</span>
+										<span
+											class="w-14 shrink-0 text-right font-semibold {getLevelColor(
+												parsed.level
+											)} {getLevelBg(parsed.level)} rounded px-1.5 py-0.5 text-[10px]"
+										>
 											{parsed.level}
 										</span>
-										<span class="text-zinc-300 flex-1">{parsed.msg}</span>
+										<span class="flex-1 text-zinc-300">{parsed.msg}</span>
 									</div>
 									{#if Object.keys(parsed.rest).length > 0}
-										<div class="ml-24 mt-1 text-zinc-500 text-[10px] hidden group-hover:block">
+										<div class="mt-1 ml-24 hidden text-[10px] text-zinc-500 group-hover:block">
 											{JSON.stringify(parsed.rest, null, 2)}
 										</div>
 									{/if}
 								</div>
 							{:else}
-								<div class="mb-1 rounded px-2 py-1 text-zinc-400 hover:bg-zinc-800/50 transition-colors">
+								<div
+									class="mb-1 rounded px-2 py-1 text-zinc-400 transition-colors hover:bg-zinc-800/50"
+								>
 									{line}
 								</div>
 							{/if}
@@ -300,7 +334,9 @@
 			{:else if loading}
 				<div class="flex items-center justify-center py-12">
 					<div class="flex flex-col items-center gap-3">
-						<div class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+						<div
+							class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
+						></div>
 						<p class="text-sm text-zinc-500 dark:text-zinc-400">Loading logs...</p>
 					</div>
 				</div>
@@ -308,7 +344,12 @@
 				<div class="flex items-center justify-center py-12 text-zinc-500 dark:text-zinc-400">
 					<div class="flex flex-col items-center gap-3">
 						<svg class="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+							/>
 						</svg>
 						<p>Select a log file to view</p>
 					</div>

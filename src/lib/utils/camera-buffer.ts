@@ -213,7 +213,10 @@ export class CameraBuffer {
 	private async startStream(): Promise<void> {
 		try {
 			this.isActive = true;
-			logger.info({ cameraId: this.cameraId, cameraName: this.cameraName }, 'Starting buffer stream');
+			logger.info(
+				{ cameraId: this.cameraId, cameraName: this.cameraName },
+				'Starting buffer stream'
+			);
 
 			this.streamSession = await this.camera.streamVideo({
 				output: [
@@ -392,7 +395,12 @@ export class CameraBuffer {
 			await this.recordPostEvent(postEventPath);
 
 			// Step 3: Concatenate pre and post event footage
-			await this.concatenateRecordings(preEventPath, postEventPath, outputPath, preEventData.length > 0);
+			await this.concatenateRecordings(
+				preEventPath,
+				postEventPath,
+				outputPath,
+				preEventData.length > 0
+			);
 
 			logger.info({ cameraId: this.cameraId, eventId, outputPath }, 'Event recording completed');
 
@@ -404,7 +412,10 @@ export class CameraBuffer {
 
 			return true;
 		} catch (error) {
-			logger.error({ error, cameraId: this.cameraId, eventId }, 'Failed to capture event recording');
+			logger.error(
+				{ error, cameraId: this.cameraId, eventId },
+				'Failed to capture event recording'
+			);
 			return false;
 		} finally {
 			this.isCapturing = false;
@@ -453,9 +464,12 @@ export class CameraBuffer {
 				});
 
 				// Wait for recording to complete
-				const timeout = setTimeout(() => {
-					postEventSession.stop();
-				}, (config.bufferPostEventSeconds + 10) * 1000);
+				const timeout = setTimeout(
+					() => {
+						postEventSession.stop();
+					},
+					(config.bufferPostEventSeconds + 10) * 1000
+				);
 
 				postEventSession.onCallEnded.subscribe(() => {
 					clearTimeout(timeout);

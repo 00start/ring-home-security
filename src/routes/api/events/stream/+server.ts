@@ -1,5 +1,8 @@
 import type { RequestHandler } from './$types';
 import { eventsRepo } from '$lib/db';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-events-stream');
 
 export const GET: RequestHandler = async ({ request }) => {
 	const encoder = new TextEncoder();
@@ -64,7 +67,7 @@ export const GET: RequestHandler = async ({ request }) => {
 						}
 					}
 				} catch (error) {
-					console.error('SSE error:', error);
+					logger.error({ error }, 'SSE error');
 				}
 			}, 2000);
 

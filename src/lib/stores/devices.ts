@@ -12,13 +12,9 @@ export const devices = writable<Device[]>([]);
 export const loading = writable(false);
 export const error = writable<string | null>(null);
 
-export const onlineDevices = derived(devices, ($devices) =>
-	$devices.filter((d) => d.isOnline)
-);
+export const onlineDevices = derived(devices, ($devices) => $devices.filter((d) => d.isOnline));
 
-export const offlineDevices = derived(devices, ($devices) =>
-	$devices.filter((d) => !d.isOnline)
-);
+export const offlineDevices = derived(devices, ($devices) => $devices.filter((d) => !d.isOnline));
 
 export const devicesByType = derived(devices, ($devices) => {
 	return {

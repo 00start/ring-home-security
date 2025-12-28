@@ -13,265 +13,265 @@ import type { CameraZone } from '../../src/lib/utils/camera-zones.js';
  * Seed Devices - 3+ devices with varying states
  */
 export const seedDevices = [
-  {
-    id: 'test-camera-1',
-    name: 'Front Door Camera',
-    type: 'doorbell' as const,
-    isOnline: true,
-    batteryLevel: 85,
-    location: JSON.stringify({ lat: 37.7749, lng: -122.4194, name: 'Front Door' }),
-    lastSeen: new Date().toISOString(),
-  },
-  {
-    id: 'test-camera-2',
-    name: 'Backyard Camera',
-    type: 'camera' as const,
-    subtype: 'stick_up_cam',
-    isOnline: true,
-    batteryLevel: 15, // Low battery for testing warnings
-    location: JSON.stringify({ lat: 37.7749, lng: -122.4194, name: 'Backyard' }),
-    lastSeen: new Date().toISOString(),
-  },
-  {
-    id: 'test-camera-3',
-    name: 'Living Room Camera',
-    type: 'camera' as const,
-    subtype: 'indoor_cam',
-    isOnline: false, // Offline for testing status
-    batteryLevel: 50,
-    location: JSON.stringify({ lat: 37.7749, lng: -122.4194, name: 'Living Room' }),
-    lastSeen: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-  },
-  {
-    id: 'test-camera-4',
-    name: 'Garage Camera',
-    type: 'camera' as const,
-    subtype: 'stick_up_cam',
-    isOnline: true,
-    batteryLevel: 95, // Healthy battery
-    location: JSON.stringify({ lat: 37.7749, lng: -122.4194, name: 'Garage' }),
-    lastSeen: new Date().toISOString(),
-  },
-  {
-    id: 'test-camera-5',
-    name: 'Driveway Camera',
-    type: 'camera' as const,
-    subtype: 'floodlight_cam',
-    isOnline: true,
-    batteryLevel: undefined, // Wired camera - no battery
-    location: JSON.stringify({ lat: 37.7749, lng: -122.4194, name: 'Driveway' }),
-    lastSeen: new Date().toISOString(),
-  },
+	{
+		id: 'test-camera-1',
+		name: 'Front Door Camera',
+		type: 'doorbell' as const,
+		isOnline: true,
+		batteryLevel: 85,
+		location: JSON.stringify({ lat: 37.7749, lng: -122.4194, name: 'Front Door' }),
+		lastSeen: new Date().toISOString()
+	},
+	{
+		id: 'test-camera-2',
+		name: 'Backyard Camera',
+		type: 'camera' as const,
+		subtype: 'stick_up_cam',
+		isOnline: true,
+		batteryLevel: 15, // Low battery for testing warnings
+		location: JSON.stringify({ lat: 37.7749, lng: -122.4194, name: 'Backyard' }),
+		lastSeen: new Date().toISOString()
+	},
+	{
+		id: 'test-camera-3',
+		name: 'Living Room Camera',
+		type: 'camera' as const,
+		subtype: 'indoor_cam',
+		isOnline: false, // Offline for testing status
+		batteryLevel: 50,
+		location: JSON.stringify({ lat: 37.7749, lng: -122.4194, name: 'Living Room' }),
+		lastSeen: new Date(Date.now() - 3600000).toISOString() // 1 hour ago
+	},
+	{
+		id: 'test-camera-4',
+		name: 'Garage Camera',
+		type: 'camera' as const,
+		subtype: 'stick_up_cam',
+		isOnline: true,
+		batteryLevel: 95, // Healthy battery
+		location: JSON.stringify({ lat: 37.7749, lng: -122.4194, name: 'Garage' }),
+		lastSeen: new Date().toISOString()
+	},
+	{
+		id: 'test-camera-5',
+		name: 'Driveway Camera',
+		type: 'camera' as const,
+		subtype: 'floodlight_cam',
+		isOnline: true,
+		batteryLevel: undefined, // Wired camera - no battery
+		location: JSON.stringify({ lat: 37.7749, lng: -122.4194, name: 'Driveway' }),
+		lastSeen: new Date().toISOString()
+	}
 ];
 
 /**
  * Generate event IDs and recording IDs upfront for consistency
  */
 const generateEventData = () => {
-  const now = Date.now();
-  const events: Array<{
-    id: string;
-    deviceId: string;
-    deviceName: string;
-    eventType: 'motion' | 'ding' | 'door_open' | 'door_close' | 'device_offline' | 'device_online';
-    timestamp: string;
-    metadata: string;
-    recordingId?: string;
-  }> = [];
+	const now = Date.now();
+	const events: Array<{
+		id: string;
+		deviceId: string;
+		deviceName: string;
+		eventType: 'motion' | 'ding' | 'door_open' | 'door_close' | 'device_offline' | 'device_online';
+		timestamp: string;
+		metadata: string;
+		recordingId?: string;
+	}> = [];
 
-  // Recent motion event with recording (Front Door Camera)
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-1',
-    deviceName: 'Front Door Camera',
-    eventType: 'motion',
-    timestamp: new Date(now - 300000).toISOString(), // 5 minutes ago
-    metadata: JSON.stringify({
-      confidence: 0.95,
-      duration: 5000,
-      zone: 'front',
-      triggeredBy: 'edge_camera'
-    }),
-    recordingId: 'recording-1',
-  });
+	// Recent motion event with recording (Front Door Camera)
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-1',
+		deviceName: 'Front Door Camera',
+		eventType: 'motion',
+		timestamp: new Date(now - 300000).toISOString(), // 5 minutes ago
+		metadata: JSON.stringify({
+			confidence: 0.95,
+			duration: 5000,
+			zone: 'front',
+			triggeredBy: 'edge_camera'
+		}),
+		recordingId: 'recording-1'
+	});
 
-  // Doorbell ring event with recording (Front Door Camera)
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-1',
-    deviceName: 'Front Door Camera',
-    eventType: 'ding',
-    timestamp: new Date(now - 600000).toISOString(), // 10 minutes ago
-    metadata: JSON.stringify({
-      button: 'front_door',
-      duration: 30000
-    }),
-    recordingId: 'recording-2',
-  });
+	// Doorbell ring event with recording (Front Door Camera)
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-1',
+		deviceName: 'Front Door Camera',
+		eventType: 'ding',
+		timestamp: new Date(now - 600000).toISOString(), // 10 minutes ago
+		metadata: JSON.stringify({
+			button: 'front_door',
+			duration: 30000
+		}),
+		recordingId: 'recording-2'
+	});
 
-  // Motion event with recording (Backyard Camera - low battery)
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-2',
-    deviceName: 'Backyard Camera',
-    eventType: 'motion',
-    timestamp: new Date(now - 900000).toISOString(), // 15 minutes ago
-    metadata: JSON.stringify({
-      confidence: 0.88,
-      duration: 8000,
-      zone: 'backyard'
-    }),
-    recordingId: 'recording-3',
-  });
+	// Motion event with recording (Backyard Camera - low battery)
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-2',
+		deviceName: 'Backyard Camera',
+		eventType: 'motion',
+		timestamp: new Date(now - 900000).toISOString(), // 15 minutes ago
+		metadata: JSON.stringify({
+			confidence: 0.88,
+			duration: 8000,
+			zone: 'backyard'
+		}),
+		recordingId: 'recording-3'
+	});
 
-  // Older motion event with recording (Garage Camera)
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-4',
-    deviceName: 'Garage Camera',
-    eventType: 'motion',
-    timestamp: new Date(now - 3600000).toISOString(), // 1 hour ago
-    metadata: JSON.stringify({
-      confidence: 0.92,
-      duration: 6000,
-      zone: 'garage'
-    }),
-    recordingId: 'recording-4',
-  });
+	// Older motion event with recording (Garage Camera)
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-4',
+		deviceName: 'Garage Camera',
+		eventType: 'motion',
+		timestamp: new Date(now - 3600000).toISOString(), // 1 hour ago
+		metadata: JSON.stringify({
+			confidence: 0.92,
+			duration: 6000,
+			zone: 'garage'
+		}),
+		recordingId: 'recording-4'
+	});
 
-  // Motion event with recording (Driveway Camera)
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-5',
-    deviceName: 'Driveway Camera',
-    eventType: 'motion',
-    timestamp: new Date(now - 1800000).toISOString(), // 30 minutes ago
-    metadata: JSON.stringify({
-      confidence: 0.97,
-      duration: 10000,
-      vehicle_detected: true,
-      zone: 'front'
-    }),
-    recordingId: 'recording-5',
-  });
+	// Motion event with recording (Driveway Camera)
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-5',
+		deviceName: 'Driveway Camera',
+		eventType: 'motion',
+		timestamp: new Date(now - 1800000).toISOString(), // 30 minutes ago
+		metadata: JSON.stringify({
+			confidence: 0.97,
+			duration: 10000,
+			vehicle_detected: true,
+			zone: 'front'
+		}),
+		recordingId: 'recording-5'
+	});
 
-  // Older event - yesterday (Front Door)
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-1',
-    deviceName: 'Front Door Camera',
-    eventType: 'motion',
-    timestamp: new Date(now - 86400000).toISOString(), // 1 day ago
-    metadata: JSON.stringify({
-      confidence: 0.85,
-      duration: 7000,
-      zone: 'front'
-    }),
-    recordingId: 'recording-6',
-  });
+	// Older event - yesterday (Front Door)
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-1',
+		deviceName: 'Front Door Camera',
+		eventType: 'motion',
+		timestamp: new Date(now - 86400000).toISOString(), // 1 day ago
+		metadata: JSON.stringify({
+			confidence: 0.85,
+			duration: 7000,
+			zone: 'front'
+		}),
+		recordingId: 'recording-6'
+	});
 
-  // Motion event without recording (test camera offline scenario)
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-2',
-    deviceName: 'Backyard Camera',
-    eventType: 'motion',
-    timestamp: new Date(now - 7200000).toISOString(), // 2 hours ago
-    metadata: JSON.stringify({
-      confidence: 0.78,
-      duration: 4000,
-      recording_failed: true
-    }),
-  });
+	// Motion event without recording (test camera offline scenario)
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-2',
+		deviceName: 'Backyard Camera',
+		eventType: 'motion',
+		timestamp: new Date(now - 7200000).toISOString(), // 2 hours ago
+		metadata: JSON.stringify({
+			confidence: 0.78,
+			duration: 4000,
+			recording_failed: true
+		})
+	});
 
-  // Device offline event (Living Room Camera)
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-3',
-    deviceName: 'Living Room Camera',
-    eventType: 'device_offline',
-    timestamp: new Date(now - 3600000).toISOString(), // 1 hour ago
-    metadata: JSON.stringify({
-      reason: 'connection_lost',
-      last_successful_ping: new Date(now - 3700000).toISOString()
-    }),
-  });
+	// Device offline event (Living Room Camera)
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-3',
+		deviceName: 'Living Room Camera',
+		eventType: 'device_offline',
+		timestamp: new Date(now - 3600000).toISOString(), // 1 hour ago
+		metadata: JSON.stringify({
+			reason: 'connection_lost',
+			last_successful_ping: new Date(now - 3700000).toISOString()
+		})
+	});
 
-  // Motion event - 2 days ago
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-4',
-    deviceName: 'Garage Camera',
-    eventType: 'motion',
-    timestamp: new Date(now - 172800000).toISOString(), // 2 days ago
-    metadata: JSON.stringify({
-      confidence: 0.89,
-      duration: 5500,
-      zone: 'garage'
-    }),
-    recordingId: 'recording-7',
-  });
+	// Motion event - 2 days ago
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-4',
+		deviceName: 'Garage Camera',
+		eventType: 'motion',
+		timestamp: new Date(now - 172800000).toISOString(), // 2 days ago
+		metadata: JSON.stringify({
+			confidence: 0.89,
+			duration: 5500,
+			zone: 'garage'
+		}),
+		recordingId: 'recording-7'
+	});
 
-  // Doorbell ring - 3 days ago
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-1',
-    deviceName: 'Front Door Camera',
-    eventType: 'ding',
-    timestamp: new Date(now - 259200000).toISOString(), // 3 days ago
-    metadata: JSON.stringify({
-      button: 'front_door',
-      duration: 25000
-    }),
-    recordingId: 'recording-8',
-  });
+	// Doorbell ring - 3 days ago
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-1',
+		deviceName: 'Front Door Camera',
+		eventType: 'ding',
+		timestamp: new Date(now - 259200000).toISOString(), // 3 days ago
+		metadata: JSON.stringify({
+			button: 'front_door',
+			duration: 25000
+		}),
+		recordingId: 'recording-8'
+	});
 
-  // Motion event - 4 days ago
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-5',
-    deviceName: 'Driveway Camera',
-    eventType: 'motion',
-    timestamp: new Date(now - 345600000).toISOString(), // 4 days ago
-    metadata: JSON.stringify({
-      confidence: 0.91,
-      duration: 8500,
-      zone: 'front'
-    }),
-    recordingId: 'recording-9',
-  });
+	// Motion event - 4 days ago
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-5',
+		deviceName: 'Driveway Camera',
+		eventType: 'motion',
+		timestamp: new Date(now - 345600000).toISOString(), // 4 days ago
+		metadata: JSON.stringify({
+			confidence: 0.91,
+			duration: 8500,
+			zone: 'front'
+		}),
+		recordingId: 'recording-9'
+	});
 
-  // Motion event - 5 days ago
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-2',
-    deviceName: 'Backyard Camera',
-    eventType: 'motion',
-    timestamp: new Date(now - 432000000).toISOString(), // 5 days ago
-    metadata: JSON.stringify({
-      confidence: 0.86,
-      duration: 6500,
-      zone: 'backyard'
-    }),
-    recordingId: 'recording-10',
-  });
+	// Motion event - 5 days ago
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-2',
+		deviceName: 'Backyard Camera',
+		eventType: 'motion',
+		timestamp: new Date(now - 432000000).toISOString(), // 5 days ago
+		metadata: JSON.stringify({
+			confidence: 0.86,
+			duration: 6500,
+			zone: 'backyard'
+		}),
+		recordingId: 'recording-10'
+	});
 
-  // Additional motion event - 6 days ago
-  events.push({
-    id: uuidv4(),
-    deviceId: 'test-camera-1',
-    deviceName: 'Front Door Camera',
-    eventType: 'motion',
-    timestamp: new Date(now - 518400000).toISOString(), // 6 days ago
-    metadata: JSON.stringify({
-      confidence: 0.93,
-      duration: 7200,
-      zone: 'front'
-    }),
-    recordingId: 'recording-11',
-  });
+	// Additional motion event - 6 days ago
+	events.push({
+		id: uuidv4(),
+		deviceId: 'test-camera-1',
+		deviceName: 'Front Door Camera',
+		eventType: 'motion',
+		timestamp: new Date(now - 518400000).toISOString(), // 6 days ago
+		metadata: JSON.stringify({
+			confidence: 0.93,
+			duration: 7200,
+			zone: 'front'
+		}),
+		recordingId: 'recording-11'
+	});
 
-  return events;
+	return events;
 };
 
 export const seedEvents = generateEventData();
@@ -280,209 +280,209 @@ export const seedEvents = generateEventData();
  * Seed Recordings - corresponds to events with recordingId
  */
 export const seedRecordings = [
-  {
-    id: 'recording-1',
-    deviceId: 'test-camera-1',
-    eventId: seedEvents[0].id,
-    filePath: '/data/recordings/test-camera-1-motion-1.mp4',
-    thumbnailPath: '/data/thumbnails/test-camera-1-motion-1.jpg',
-    duration: 30,
-    fileSize: 5242880, // 5 MB
-    status: 'completed' as const,
-    createdAt: seedEvents[0].timestamp,
-  },
-  {
-    id: 'recording-2',
-    deviceId: 'test-camera-1',
-    eventId: seedEvents[1].id,
-    filePath: '/data/recordings/test-camera-1-ding-1.mp4',
-    thumbnailPath: '/data/thumbnails/test-camera-1-ding-1.jpg',
-    duration: 30,
-    fileSize: 5120000, // 5 MB
-    status: 'completed' as const,
-    createdAt: seedEvents[1].timestamp,
-  },
-  {
-    id: 'recording-3',
-    deviceId: 'test-camera-2',
-    eventId: seedEvents[2].id,
-    filePath: '/data/recordings/test-camera-2-motion-1.mp4',
-    thumbnailPath: '/data/thumbnails/test-camera-2-motion-1.jpg',
-    duration: 30,
-    fileSize: 4800000, // 4.8 MB
-    status: 'completed' as const,
-    createdAt: seedEvents[2].timestamp,
-  },
-  {
-    id: 'recording-4',
-    deviceId: 'test-camera-4',
-    eventId: seedEvents[3].id,
-    filePath: '/data/recordings/test-camera-4-motion-1.mp4',
-    thumbnailPath: '/data/thumbnails/test-camera-4-motion-1.jpg',
-    duration: 30,
-    fileSize: 5300000, // 5.3 MB
-    status: 'completed' as const,
-    createdAt: seedEvents[3].timestamp,
-  },
-  {
-    id: 'recording-5',
-    deviceId: 'test-camera-5',
-    eventId: seedEvents[4].id,
-    filePath: '/data/recordings/test-camera-5-motion-1.mp4',
-    thumbnailPath: '/data/thumbnails/test-camera-5-motion-1.jpg',
-    duration: 30,
-    fileSize: 5500000, // 5.5 MB
-    status: 'completed' as const,
-    createdAt: seedEvents[4].timestamp,
-  },
-  {
-    id: 'recording-6',
-    deviceId: 'test-camera-1',
-    eventId: seedEvents[5].id,
-    filePath: '/data/recordings/test-camera-1-motion-2.mp4',
-    thumbnailPath: '/data/thumbnails/test-camera-1-motion-2.jpg',
-    duration: 30,
-    fileSize: 4900000, // 4.9 MB
-    status: 'completed' as const,
-    createdAt: seedEvents[5].timestamp,
-  },
-  {
-    id: 'recording-7',
-    deviceId: 'test-camera-4',
-    eventId: seedEvents[8].id,
-    filePath: '/data/recordings/test-camera-4-motion-2.mp4',
-    thumbnailPath: '/data/thumbnails/test-camera-4-motion-2.jpg',
-    duration: 30,
-    fileSize: 5100000, // 5.1 MB
-    status: 'completed' as const,
-    createdAt: seedEvents[8].timestamp,
-  },
-  {
-    id: 'recording-8',
-    deviceId: 'test-camera-1',
-    eventId: seedEvents[9].id,
-    filePath: '/data/recordings/test-camera-1-ding-2.mp4',
-    thumbnailPath: '/data/thumbnails/test-camera-1-ding-2.jpg',
-    duration: 25,
-    fileSize: 4700000, // 4.7 MB
-    status: 'completed' as const,
-    createdAt: seedEvents[9].timestamp,
-  },
-  {
-    id: 'recording-9',
-    deviceId: 'test-camera-5',
-    eventId: seedEvents[10].id,
-    filePath: '/data/recordings/test-camera-5-motion-2.mp4',
-    thumbnailPath: '/data/thumbnails/test-camera-5-motion-2.jpg',
-    duration: 30,
-    fileSize: 5400000, // 5.4 MB
-    status: 'completed' as const,
-    createdAt: seedEvents[10].timestamp,
-  },
-  {
-    id: 'recording-10',
-    deviceId: 'test-camera-2',
-    eventId: seedEvents[11].id,
-    filePath: '/data/recordings/test-camera-2-motion-2.mp4',
-    thumbnailPath: '/data/thumbnails/test-camera-2-motion-2.jpg',
-    duration: 30,
-    fileSize: 4600000, // 4.6 MB
-    status: 'completed' as const,
-    createdAt: seedEvents[11].timestamp,
-  },
-  {
-    id: 'recording-11',
-    deviceId: 'test-camera-1',
-    eventId: seedEvents[12].id,
-    filePath: '/data/recordings/test-camera-1-motion-3.mp4',
-    thumbnailPath: '/data/thumbnails/test-camera-1-motion-3.jpg',
-    duration: 30,
-    fileSize: 5000000, // 5 MB
-    status: 'completed' as const,
-    createdAt: seedEvents[12].timestamp,
-  },
+	{
+		id: 'recording-1',
+		deviceId: 'test-camera-1',
+		eventId: seedEvents[0].id,
+		filePath: '/data/recordings/test-camera-1-motion-1.mp4',
+		thumbnailPath: '/data/thumbnails/test-camera-1-motion-1.jpg',
+		duration: 30,
+		fileSize: 5242880, // 5 MB
+		status: 'completed' as const,
+		createdAt: seedEvents[0].timestamp
+	},
+	{
+		id: 'recording-2',
+		deviceId: 'test-camera-1',
+		eventId: seedEvents[1].id,
+		filePath: '/data/recordings/test-camera-1-ding-1.mp4',
+		thumbnailPath: '/data/thumbnails/test-camera-1-ding-1.jpg',
+		duration: 30,
+		fileSize: 5120000, // 5 MB
+		status: 'completed' as const,
+		createdAt: seedEvents[1].timestamp
+	},
+	{
+		id: 'recording-3',
+		deviceId: 'test-camera-2',
+		eventId: seedEvents[2].id,
+		filePath: '/data/recordings/test-camera-2-motion-1.mp4',
+		thumbnailPath: '/data/thumbnails/test-camera-2-motion-1.jpg',
+		duration: 30,
+		fileSize: 4800000, // 4.8 MB
+		status: 'completed' as const,
+		createdAt: seedEvents[2].timestamp
+	},
+	{
+		id: 'recording-4',
+		deviceId: 'test-camera-4',
+		eventId: seedEvents[3].id,
+		filePath: '/data/recordings/test-camera-4-motion-1.mp4',
+		thumbnailPath: '/data/thumbnails/test-camera-4-motion-1.jpg',
+		duration: 30,
+		fileSize: 5300000, // 5.3 MB
+		status: 'completed' as const,
+		createdAt: seedEvents[3].timestamp
+	},
+	{
+		id: 'recording-5',
+		deviceId: 'test-camera-5',
+		eventId: seedEvents[4].id,
+		filePath: '/data/recordings/test-camera-5-motion-1.mp4',
+		thumbnailPath: '/data/thumbnails/test-camera-5-motion-1.jpg',
+		duration: 30,
+		fileSize: 5500000, // 5.5 MB
+		status: 'completed' as const,
+		createdAt: seedEvents[4].timestamp
+	},
+	{
+		id: 'recording-6',
+		deviceId: 'test-camera-1',
+		eventId: seedEvents[5].id,
+		filePath: '/data/recordings/test-camera-1-motion-2.mp4',
+		thumbnailPath: '/data/thumbnails/test-camera-1-motion-2.jpg',
+		duration: 30,
+		fileSize: 4900000, // 4.9 MB
+		status: 'completed' as const,
+		createdAt: seedEvents[5].timestamp
+	},
+	{
+		id: 'recording-7',
+		deviceId: 'test-camera-4',
+		eventId: seedEvents[8].id,
+		filePath: '/data/recordings/test-camera-4-motion-2.mp4',
+		thumbnailPath: '/data/thumbnails/test-camera-4-motion-2.jpg',
+		duration: 30,
+		fileSize: 5100000, // 5.1 MB
+		status: 'completed' as const,
+		createdAt: seedEvents[8].timestamp
+	},
+	{
+		id: 'recording-8',
+		deviceId: 'test-camera-1',
+		eventId: seedEvents[9].id,
+		filePath: '/data/recordings/test-camera-1-ding-2.mp4',
+		thumbnailPath: '/data/thumbnails/test-camera-1-ding-2.jpg',
+		duration: 25,
+		fileSize: 4700000, // 4.7 MB
+		status: 'completed' as const,
+		createdAt: seedEvents[9].timestamp
+	},
+	{
+		id: 'recording-9',
+		deviceId: 'test-camera-5',
+		eventId: seedEvents[10].id,
+		filePath: '/data/recordings/test-camera-5-motion-2.mp4',
+		thumbnailPath: '/data/thumbnails/test-camera-5-motion-2.jpg',
+		duration: 30,
+		fileSize: 5400000, // 5.4 MB
+		status: 'completed' as const,
+		createdAt: seedEvents[10].timestamp
+	},
+	{
+		id: 'recording-10',
+		deviceId: 'test-camera-2',
+		eventId: seedEvents[11].id,
+		filePath: '/data/recordings/test-camera-2-motion-2.mp4',
+		thumbnailPath: '/data/thumbnails/test-camera-2-motion-2.jpg',
+		duration: 30,
+		fileSize: 4600000, // 4.6 MB
+		status: 'completed' as const,
+		createdAt: seedEvents[11].timestamp
+	},
+	{
+		id: 'recording-11',
+		deviceId: 'test-camera-1',
+		eventId: seedEvents[12].id,
+		filePath: '/data/recordings/test-camera-1-motion-3.mp4',
+		thumbnailPath: '/data/thumbnails/test-camera-1-motion-3.jpg',
+		duration: 30,
+		fileSize: 5000000, // 5 MB
+		status: 'completed' as const,
+		createdAt: seedEvents[12].timestamp
+	}
 ];
 
 /**
  * Zone Configuration Seeding - Edge/Core zones with cascade triggers
  */
 export const seedZones: CameraZone[] = [
-  {
-    name: 'front',
-    triggerCameras: ['Front Door Camera', 'Driveway Camera'], // Edge cameras
-    recordCameras: ['Front Door Camera', 'Driveway Camera'], // All cameras in zone
-    motionCooldownSeconds: 7,
-  },
-  {
-    name: 'backyard',
-    triggerCameras: ['Backyard Camera'], // Edge camera
-    recordCameras: ['Backyard Camera'], // Core + Edge cameras
-    motionCooldownSeconds: 7,
-  },
-  {
-    name: 'garage',
-    triggerCameras: ['Garage Camera'], // Edge camera
-    recordCameras: ['Garage Camera'], // Core + Edge cameras
-    motionCooldownSeconds: 7,
-  },
+	{
+		name: 'front',
+		triggerCameras: ['Front Door Camera', 'Driveway Camera'], // Edge cameras
+		recordCameras: ['Front Door Camera', 'Driveway Camera'], // All cameras in zone
+		motionCooldownSeconds: 7
+	},
+	{
+		name: 'backyard',
+		triggerCameras: ['Backyard Camera'], // Edge camera
+		recordCameras: ['Backyard Camera'], // Core + Edge cameras
+		motionCooldownSeconds: 7
+	},
+	{
+		name: 'garage',
+		triggerCameras: ['Garage Camera'], // Edge camera
+		recordCameras: ['Garage Camera'], // Core + Edge cameras
+		motionCooldownSeconds: 7
+	}
 ];
 
 /**
  * Mock API Response Data
  */
 export const mockApiResponses = {
-  devices: seedDevices.map(d => ({
-    id: d.id,
-    name: d.name,
-    type: d.type,
-    subtype: d.subtype,
-    location: d.location ? JSON.parse(d.location) : undefined,
-    batteryLevel: d.batteryLevel,
-    isOnline: d.isOnline,
-    lastSeen: d.lastSeen,
-  })),
+	devices: seedDevices.map((d) => ({
+		id: d.id,
+		name: d.name,
+		type: d.type,
+		subtype: d.subtype,
+		location: d.location ? JSON.parse(d.location) : undefined,
+		batteryLevel: d.batteryLevel,
+		isOnline: d.isOnline,
+		lastSeen: d.lastSeen
+	})),
 
-  events: seedEvents.map(e => ({
-    id: e.id,
-    deviceId: e.deviceId,
-    deviceName: e.deviceName,
-    eventType: e.eventType,
-    timestamp: e.timestamp,
-    metadata: JSON.parse(e.metadata),
-    recordingId: e.recordingId,
-  })),
+	events: seedEvents.map((e) => ({
+		id: e.id,
+		deviceId: e.deviceId,
+		deviceName: e.deviceName,
+		eventType: e.eventType,
+		timestamp: e.timestamp,
+		metadata: JSON.parse(e.metadata),
+		recordingId: e.recordingId
+	})),
 
-  recordings: seedRecordings.map(r => ({
-    id: r.id,
-    deviceId: r.deviceId,
-    eventId: r.eventId,
-    filePath: r.filePath,
-    thumbnailPath: r.thumbnailPath,
-    duration: r.duration,
-    fileSize: r.fileSize,
-    status: r.status,
-    createdAt: r.createdAt,
-  })),
+	recordings: seedRecordings.map((r) => ({
+		id: r.id,
+		deviceId: r.deviceId,
+		eventId: r.eventId,
+		filePath: r.filePath,
+		thumbnailPath: r.thumbnailPath,
+		duration: r.duration,
+		fileSize: r.fileSize,
+		status: r.status,
+		createdAt: r.createdAt
+	})),
 
-  zones: seedZones,
+	zones: seedZones,
 
-  stats: {
-    totalDevices: seedDevices.length,
-    onlineDevices: seedDevices.filter(d => d.isOnline).length,
-    totalEventsToday: seedEvents.filter(e => {
-      const eventDate = new Date(e.timestamp);
-      const today = new Date();
-      return eventDate.toDateString() === today.toDateString();
-    }).length,
-    totalRecordings: seedRecordings.length,
-    storageUsed: seedRecordings.reduce((sum, r) => sum + r.fileSize, 0),
-  },
+	stats: {
+		totalDevices: seedDevices.length,
+		onlineDevices: seedDevices.filter((d) => d.isOnline).length,
+		totalEventsToday: seedEvents.filter((e) => {
+			const eventDate = new Date(e.timestamp);
+			const today = new Date();
+			return eventDate.toDateString() === today.toDateString();
+		}).length,
+		totalRecordings: seedRecordings.length,
+		storageUsed: seedRecordings.reduce((sum, r) => sum + r.fileSize, 0)
+	},
 
-  systemConfig: {
-    ringPollingIntervalSeconds: 30,
-    recordingDurationSeconds: 30,
-    retentionDays: 30,
-    bufferEnabled: false,
-    motionCooldownSeconds: 7,
-  },
+	systemConfig: {
+		ringPollingIntervalSeconds: 30,
+		recordingDurationSeconds: 30,
+		retentionDays: 30,
+		bufferEnabled: false,
+		motionCooldownSeconds: 7
+	}
 };

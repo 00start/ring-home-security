@@ -34,7 +34,13 @@ export type DeviceType = 'doorbell' | 'camera' | 'sensor' | 'misc';
 export type SensorSubtype = 'contact' | 'motion' | 'flood' | 'smoke' | 'co' | 'unknown';
 
 // Misc device subtypes
-export type MiscSubtype = 'base_station' | 'keypad' | 'range_extender' | 'siren' | 'hub' | 'unknown';
+export type MiscSubtype =
+	| 'base_station'
+	| 'keypad'
+	| 'range_extender'
+	| 'siren'
+	| 'hub'
+	| 'unknown';
 
 export interface Device {
 	id: string;

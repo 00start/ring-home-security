@@ -19,7 +19,10 @@ interface RecordingFilters {
 	offset?: number;
 }
 
-export async function fetchRecordings(filters: RecordingFilters = {}, skipCache = false): Promise<void> {
+export async function fetchRecordings(
+	filters: RecordingFilters = {},
+	skipCache = false
+): Promise<void> {
 	loading.set(true);
 	error.set(null);
 

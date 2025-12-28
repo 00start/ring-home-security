@@ -18,7 +18,10 @@ export const POST: RequestHandler = async ({ params }) => {
 		}
 
 		if (recording.status !== 'failed' && recording.status !== 'pending') {
-			return json({ success: false, error: 'Only failed or pending recordings can be retried' }, { status: 400 });
+			return json(
+				{ success: false, error: 'Only failed or pending recordings can be retried' },
+				{ status: 400 }
+			);
 		}
 
 		const event = eventsRepo.getEventById(recording.eventId);
@@ -29,7 +32,10 @@ export const POST: RequestHandler = async ({ params }) => {
 		// Extract ding ID from metadata
 		const dingId = event.metadata?.notificationId as string;
 		if (!dingId) {
-			return json({ success: false, error: 'No notification ID found for this event' }, { status: 400 });
+			return json(
+				{ success: false, error: 'No notification ID found for this event' },
+				{ status: 400 }
+			);
 		}
 
 		// Update status to processing
@@ -37,7 +43,7 @@ export const POST: RequestHandler = async ({ params }) => {
 
 		// Find the camera
 		const cameras = await getCameras();
-		const camera = cameras.find(c => c.id.toString() === recording.deviceId);
+		const camera = cameras.find((c) => c.id.toString() === recording.deviceId);
 
 		if (!camera) {
 			recordingsRepo.updateRecordingStatus(recording.id, 'failed');
@@ -65,10 +71,13 @@ export const POST: RequestHandler = async ({ params }) => {
 
 		if (!recordingUrl) {
 			recordingsRepo.updateRecordingStatus(recording.id, 'failed');
-			return json({
-				success: false,
-				error: 'Recording URL not available. The video may have expired from Ring\'s servers.'
-			}, { status: 404 });
+			return json(
+				{
+					success: false,
+					error: "Recording URL not available. The video may have expired from Ring's servers."
+				},
+				{ status: 404 }
+			);
 		}
 
 		// Enqueue transcode job

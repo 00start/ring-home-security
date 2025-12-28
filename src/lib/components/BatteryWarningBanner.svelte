@@ -62,9 +62,9 @@
 	<div
 		data-testid="battery-warning-banner"
 		data-severity={isCritical ? 'critical' : 'warning'}
-		class="rounded-lg border p-4 mb-6 {isCritical
-			? 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800'
-			: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800'}"
+		class="mb-6 rounded-lg border p-4 {isCritical
+			? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950'
+			: 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950'}"
 		role="alert"
 		aria-live="polite"
 	>
@@ -83,7 +83,7 @@
 			</div>
 
 			<!-- Content -->
-			<div class="flex-1 min-w-0">
+			<div class="min-w-0 flex-1">
 				<h3
 					class="text-sm font-semibold {isCritical
 						? 'text-red-800 dark:text-red-200'
@@ -101,13 +101,13 @@
 							? 'One device has'
 							: `${lowBatteryDevices.length} devices have`} low battery:
 					</p>
-					<ul class="mt-2 space-y-1 list-disc list-inside">
+					<ul class="mt-2 list-inside list-disc space-y-1">
 						{#each lowBatteryDevices as device}
 							<li data-testid="low-battery-device" data-device-id={device.id}>
 								<span class="font-medium">{device.name}</span> - {device.batteryLevel}%
 								{#if device.batteryLevel! < 10}
 									<span
-										class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+										class="ml-1 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-300"
 									>
 										Critical
 									</span>

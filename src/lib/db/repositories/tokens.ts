@@ -8,19 +8,23 @@ interface TokenRow {
 
 export function getRefreshToken(): string | null {
 	const db = getDatabase();
-	const row = db.prepare('SELECT refresh_token FROM ring_tokens WHERE id = 1').get() as TokenRow | undefined;
+	const row = db.prepare('SELECT refresh_token FROM ring_tokens WHERE id = 1').get() as
+		| TokenRow
+		| undefined;
 	return row?.refresh_token ?? null;
 }
 
 export function saveRefreshToken(refreshToken: string): void {
 	const db = getDatabase();
-	db.prepare(`
+	db.prepare(
+		`
         INSERT INTO ring_tokens (id, refresh_token, updated_at)
         VALUES (1, ?, datetime('now'))
         ON CONFLICT(id) DO UPDATE SET
             refresh_token = excluded.refresh_token,
             updated_at = datetime('now')
-    `).run(refreshToken);
+    `
+	).run(refreshToken);
 }
 
 export function deleteRefreshToken(): void {

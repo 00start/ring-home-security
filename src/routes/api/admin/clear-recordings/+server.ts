@@ -4,6 +4,9 @@ import { recordingsRepo } from '$lib/db';
 import { promises as fs } from 'fs';
 import { config } from '$lib/config';
 import { join, dirname } from 'path';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('api-admin');
 
 export const DELETE: RequestHandler = async ({ locals }) => {
 	if (!locals.user) {
@@ -58,7 +61,7 @@ export const DELETE: RequestHandler = async ({ locals }) => {
 			}
 		});
 	} catch (error) {
-		console.error('Failed to clear recordings:', error);
+		logger.error({ error }, 'Failed to clear recordings');
 		return json({ success: false, error: 'Failed to clear recordings' }, { status: 500 });
 	}
 };

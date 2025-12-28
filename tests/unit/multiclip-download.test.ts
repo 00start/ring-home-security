@@ -313,7 +313,7 @@ describe('FTR-001: Multi-Clip Download', () => {
 
 			// Assert
 			expect(result.valid).toBe(false);
-			expect(result.errors.some(e => e.includes('not completed'))).toBe(true);
+			expect(result.errors.some((e) => e.includes('not completed'))).toBe(true);
 		});
 	});
 
@@ -480,16 +480,18 @@ describe('FTR-001: Multi-Clip Download', () => {
 			const mockService: MultiClipMergeService = {
 				validateRecordings: vi.fn().mockResolvedValue({
 					valid: true,
-					validRecordings: [{
-						id: 'rec-1',
-						deviceId: 'cam-1',
-						eventId: 'evt-1',
-						filePath: '/recordings/rec-1.mp4',
-						duration: 30,
-						fileSize: 1024000,
-						status: 'completed',
-						createdAt: new Date()
-					}],
+					validRecordings: [
+						{
+							id: 'rec-1',
+							deviceId: 'cam-1',
+							eventId: 'evt-1',
+							filePath: '/recordings/rec-1.mp4',
+							duration: 30,
+							fileSize: 1024000,
+							status: 'completed',
+							createdAt: new Date()
+						}
+					],
 					invalidRecordings: [],
 					errors: []
 				}),

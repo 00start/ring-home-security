@@ -13,7 +13,13 @@ dotenvConfig();
 
 import { RingCamera } from 'ring-client-api';
 import { initDatabase, devicesRepo, eventsRepo, recordingsRepo } from '../lib/db/index.js';
-import { getRingApi, getCameras, getDevices, mapCameraType, mapDeviceType } from '../lib/ring/index.js';
+import {
+	getRingApi,
+	getCameras,
+	getDevices,
+	mapCameraType,
+	mapDeviceType
+} from '../lib/ring/index.js';
 import { addTranscodeJob } from '../lib/queue/index.js';
 import { retry, sleep } from '../lib/utils/index.js';
 import { createLogger } from '../lib/utils/logger.server.js';
@@ -32,13 +38,60 @@ interface RingDeviceData {
 	zid: string;
 	name: string;
 	faulted?: boolean;
-	[key: string]: any;
+	motion?: boolean;
+	motionStatus?: 'motion' | 'no-motion' | string;
+	motionDetected?: boolean;
+	status?: 'online' | 'offline' | string;
+	[key: string]: unknown;
+}
+
+// Type for Ring camera data properties
+interface RingCameraData {
+	subscribed?: boolean;
+	subscription_status?: string;
+	features?: Record<string, unknown>;
+	settings?: {
+		motion_detection_enabled?: boolean;
+		video_settings?: {
+			recording_enabled?: boolean;
+		};
+	};
+}
+
+// Type for Ring notification structure
+interface RingNotificationData {
+	data?: {
+		event?: {
+			ding?: {
+				id?: string;
+				subtype?: 'motion' | 'button_press' | 'on_demand' | string;
+				detection_type?: 'motion' | 'person' | string;
+			};
+		};
+	};
+	ding?: {
+		id?: string;
+		kind?: 'motion' | 'ding' | string;
+	};
+	action?: string;
+}
+
+// Type for Ring event from API
+interface RingEventData {
+	id: string;
+	created_at?: string;
+	recording?: {
+		url?: string;
+	};
+	cv_properties?: {
+		video_url?: string;
+	};
 }
 
 async function handleMotionOrDing(
 	camera: RingCamera,
 	eventType: 'motion' | 'ding',
-	notification?: any
+	notification?: RingNotificationData
 ): Promise<void> {
 	const timestamp = new Date();
 
@@ -62,7 +115,8 @@ async function handleMotionOrDing(
 
 	// Create event record
 	const dingId = notification?.data?.event?.ding?.id || notification?.ding?.id || 'unknown';
-	const dingKind = notification?.data?.event?.ding?.subtype || notification?.ding?.kind || eventType;
+	const dingKind =
+		notification?.data?.event?.ding?.subtype || notification?.ding?.kind || eventType;
 
 	const event = eventsRepo.createEvent({
 		deviceId: camera.id.toString(),
@@ -83,10 +137,13 @@ async function handleMotionOrDing(
 		const zoneResult = await zoneManager.handleMotion(camera);
 
 		if (zoneResult.triggered) {
-			logger.info({
-				cameraName: camera.name,
-				zones: zoneResult.zones
-			}, 'Zone recording triggered by motion');
+			logger.info(
+				{
+					cameraName: camera.name,
+					zones: zoneResult.zones
+				},
+				'Zone recording triggered by motion'
+			);
 			// Zone recordings are handled by the zone manager callback
 			// The original camera recording will be started by the zone manager
 			return;
@@ -113,7 +170,12 @@ async function recordLiveStream(
 		const recordingDuration = config.recordingDurationSeconds;
 
 		logger.info(
-			{ recordingId, cameraId: camera.id, cameraName: camera.name, durationSeconds: recordingDuration },
+			{
+				recordingId,
+				cameraId: camera.id,
+				cameraName: camera.name,
+				durationSeconds: recordingDuration
+			},
 			'Starting live stream capture'
 		);
 
@@ -122,15 +184,22 @@ async function recordLiveStream(
 
 		const streamSession = await camera.streamVideo({
 			output: [
-				'-t', recordingDuration.toString(),
-				'-f', 'mp4',
-				'-movflags', 'frag_keyframe+empty_moov',
-				'-reset_timestamps', '1',
+				'-t',
+				recordingDuration.toString(),
+				'-f',
+				'mp4',
+				'-movflags',
+				'frag_keyframe+empty_moov',
+				'-reset_timestamps',
+				'1',
 				filePath
 			]
 		});
 
-		logger.info({ recordingId, durationSeconds: recordingDuration }, 'Stream session started, recording...');
+		logger.info(
+			{ recordingId, durationSeconds: recordingDuration },
+			'Stream session started, recording...'
+		);
 
 		// Wait for recording to complete or timeout
 		await Promise.race([
@@ -140,7 +209,7 @@ async function recordLiveStream(
 					resolve(undefined);
 				});
 			}),
-			sleep((recordingDuration * 1000) + 5000) // Add 5s buffer
+			sleep(recordingDuration * 1000 + 5000) // Add 5s buffer
 		]);
 
 		// Stop the stream
@@ -158,7 +227,6 @@ async function recordLiveStream(
 		};
 
 		await addTranscodeJob(jobData);
-
 	} catch (error) {
 		logger.error({ error, recordingId }, 'Failed to record live stream');
 		recordingsRepo.updateRecordingStatus(recordingId, 'failed');
@@ -222,12 +290,18 @@ async function processRecording(
 
 				await addTranscodeJob(jobData);
 			} else {
-				logger.warn({ eventId, cameraId: camera.id }, 'Buffer capture failed, falling back to live stream');
+				logger.warn(
+					{ eventId, cameraId: camera.id },
+					'Buffer capture failed, falling back to live stream'
+				);
 				await recordLiveStream(camera, recording.id, filePath, eventId);
 			}
 		} else {
 			// No buffer available, fall back to live stream recording
-			logger.info({ eventId, cameraId: camera.id }, 'No buffer available, using live stream recording');
+			logger.info(
+				{ eventId, cameraId: camera.id },
+				'No buffer available, using live stream recording'
+			);
 			await recordLiveStream(camera, recording.id, filePath, eventId);
 		}
 	} catch (error) {
@@ -246,12 +320,15 @@ async function handleZoneRecording(
 ): Promise<void> {
 	const timestamp = new Date();
 
-	logger.info({
-		cameraId: camera.id,
-		cameraName: camera.name,
-		triggeredBy,
-		zoneName
-	}, 'Zone-triggered recording started');
+	logger.info(
+		{
+			cameraId: camera.id,
+			cameraName: camera.name,
+			triggeredBy,
+			zoneName
+		},
+		'Zone-triggered recording started'
+	);
 
 	// Ensure device exists in database
 	devicesRepo.upsertDevice({
@@ -282,25 +359,30 @@ async function handleZoneRecording(
 async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<string | null> {
 	try {
 		// First, check if this camera has recording capability
-		const cameraData = (camera as any).data || {};
-		logger.info({
-			cameraId: camera.id,
-			cameraName: camera.name,
-			hasSnapshotWithinSeconds: (camera as any).hasSnapshotWithinSeconds,
-			operatingOnBattery: camera.operatingOnBattery,
-			subscribed: cameraData.subscribed,
-			subscriptionStatus: cameraData.subscription_status,
-			features: cameraData.features,
-			settings: {
-				recordingEnabled: cameraData.settings?.motion_detection_enabled,
-				videoRecordingEnabled: cameraData.settings?.video_settings?.recording_enabled
-			}
-		}, 'Camera recording capability check');
+		const cameraData = (camera as unknown as { data?: RingCameraData }).data ?? {};
+		logger.info(
+			{
+				cameraId: camera.id,
+				cameraName: camera.name,
+				operatingOnBattery: camera.operatingOnBattery,
+				subscribed: cameraData.subscribed,
+				subscriptionStatus: cameraData.subscription_status,
+				features: cameraData.features,
+				settings: {
+					recordingEnabled: cameraData.settings?.motion_detection_enabled,
+					videoRecordingEnabled: cameraData.settings?.video_settings?.recording_enabled
+				}
+			},
+			'Camera recording capability check'
+		);
 
 		// Note: Even without a subscription, we'll try the share/play endpoint
 		// which may work for recent recordings
 		if (cameraData.subscribed === false) {
-			logger.warn({ cameraId: camera.id }, 'No active subscription - will try share/play endpoint anyway');
+			logger.warn(
+				{ cameraId: camera.id },
+				'No active subscription - will try share/play endpoint anyway'
+			);
 		}
 
 		// Try to get the recording URL with retries (up to 2 minutes of retries)
@@ -328,25 +410,31 @@ async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<stri
 							logger.info({ attemptCount }, 'Trying alternative approach: fetching recent events');
 							try {
 								const eventsResponse = await camera.getEvents({ limit: 10 });
-								const events = Array.isArray(eventsResponse) ? eventsResponse : (eventsResponse as any).events || [];
-								logger.info({
-									eventCount: events.length,
-									eventIds: events.map((e: any) => e.id),
-									lookingFor: dingId
-								}, 'Recent events fetched');
+								const eventsArray = eventsResponse as unknown as { events?: RingEventData[] };
+								const events: RingEventData[] = Array.isArray(eventsResponse)
+									? (eventsResponse as RingEventData[])
+									: (eventsArray.events ?? []);
+								logger.info(
+									{
+										eventCount: events.length,
+										eventIds: events.map((e) => e.id),
+										lookingFor: dingId
+									},
+									'Recent events fetched'
+								);
 
-								const matchingEvent = events.find((e: any) => e.id === dingId);
+								const matchingEvent = events.find((e) => e.id === dingId);
 								if (matchingEvent) {
 									logger.info({ event: matchingEvent }, 'Found matching event');
 
 									// Try to get URL from the event object if it has one
-									if ((matchingEvent as any).recording?.url) {
+									if (matchingEvent.recording?.url) {
 										logger.info('Found URL in event.recording.url');
-										return (matchingEvent as any).recording.url;
+										return matchingEvent.recording.url;
 									}
-									if ((matchingEvent as any).cv_properties?.video_url) {
+									if (matchingEvent.cv_properties?.video_url) {
 										logger.info('Found URL in event.cv_properties.video_url');
-										return (matchingEvent as any).cv_properties.video_url;
+										return matchingEvent.cv_properties.video_url;
 									}
 								}
 							} catch (eventsErr) {
@@ -357,14 +445,20 @@ async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<stri
 						throw new Error('Recording not yet available');
 					}
 
-					logger.info({ dingId, url: recordingUrl, attemptCount }, 'Recording URL obtained successfully!');
+					logger.info(
+						{ dingId, url: recordingUrl, attemptCount },
+						'Recording URL obtained successfully!'
+					);
 					return recordingUrl;
 				} catch (err) {
-					logger.warn({
-						dingId,
-						attemptCount,
-						error: err instanceof Error ? err.message : String(err)
-					}, 'Attempt failed');
+					logger.warn(
+						{
+							dingId,
+							attemptCount,
+							error: err instanceof Error ? err.message : String(err)
+						},
+						'Attempt failed'
+					);
 					throw err;
 				}
 			},
@@ -373,11 +467,14 @@ async function getRecordingUrl(camera: RingCamera, dingId: string): Promise<stri
 
 		return url;
 	} catch (error) {
-		logger.error({
-			error: error instanceof Error ? { message: error.message, stack: error.stack } : error,
-			dingId,
-			cameraId: camera.id
-		}, 'Failed to get recording URL after all retries');
+		logger.error(
+			{
+				error: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+				dingId,
+				cameraId: camera.id
+			},
+			'Failed to get recording URL after all retries'
+		);
 		return null;
 	}
 }
@@ -461,32 +558,34 @@ async function subscribeToCamera(camera: RingCamera): Promise<void> {
 				// Handle different notification structures
 				let eventType: 'motion' | 'ding' = 'motion';
 
+				// Cast to our notification type for type-safe access
+				const notificationData = notification as RingNotificationData;
+
 				// New notification format (notification.data.event.ding.subtype)
-				const notificationAny = notification as any;
-				if (notification.data?.event?.ding?.subtype === 'motion') {
+				if (notificationData.data?.event?.ding?.subtype === 'motion') {
 					eventType = 'motion';
-				} else if (notification.data?.event?.ding?.subtype === 'button_press') {
+				} else if (notificationData.data?.event?.ding?.subtype === 'button_press') {
 					eventType = 'ding';
-				} else if (notification.data?.event?.ding?.subtype === 'on_demand') {
+				} else if (notificationData.data?.event?.ding?.subtype === 'on_demand') {
 					eventType = 'ding';
-				} else if (notification.data?.event?.ding?.detection_type === 'motion') {
+				} else if (notificationData.data?.event?.ding?.detection_type === 'motion') {
 					eventType = 'motion';
 				}
 				// Old notification format (notification.ding.kind)
-				else if (notificationAny.ding?.kind === 'ding') {
+				else if (notificationData.ding?.kind === 'ding') {
 					eventType = 'ding';
-				} else if (notificationAny.ding?.kind === 'motion') {
+				} else if (notificationData.ding?.kind === 'motion') {
 					eventType = 'motion';
 				}
 				// Fallback to action field
-				else if (notificationAny.action === 'com.ring.push.HANDLE_NEW_DING') {
+				else if (notificationData.action === 'com.ring.push.HANDLE_NEW_DING') {
 					eventType = 'ding';
-				} else if (notificationAny.action === 'com.ring.push.HANDLE_NEW_motion') {
+				} else if (notificationData.action === 'com.ring.push.HANDLE_NEW_motion') {
 					eventType = 'motion';
 				}
 
 				logger.info({ deviceName: camera.name, eventType }, 'Received notification');
-				await handleMotionOrDing(camera, eventType, notification);
+				await handleMotionOrDing(camera, eventType, notificationData);
 			} catch (error) {
 				logger.error({ error, notification, cameraId: camera.id }, 'Error handling notification');
 			}
@@ -517,12 +616,15 @@ async function subscribeToSensors(): Promise<void> {
 		logger.info({ locationCount: locations.length }, 'Found Ring locations');
 
 		for (const location of locations) {
-			logger.info({
-				locationId: location.id,
-				locationName: location.name,
-				hasAlarmSystem: location.hasAlarmBaseStation,
-				hasHubs: location.hasHubs
-			}, 'Subscribing to location');
+			logger.info(
+				{
+					locationId: location.id,
+					locationName: location.name,
+					hasAlarmSystem: location.hasAlarmBaseStation,
+					hasHubs: location.hasHubs
+				},
+				'Subscribing to location'
+			);
 
 			// Skip if no hubs (getDevices will return empty anyway)
 			if (!location.hasHubs) {
@@ -531,51 +633,72 @@ async function subscribeToSensors(): Promise<void> {
 			}
 
 			// Get all devices at this location with a timeout
-			logger.debug({ locationName: location.name }, 'Fetching Ring Alarm devices (may take up to 30s)');
+			logger.debug(
+				{ locationName: location.name },
+				'Fetching Ring Alarm devices (may take up to 30s)'
+			);
 			let devices;
 			try {
 				// Add a timeout to prevent hanging forever
 				const timeoutPromise = new Promise<never>((_, reject) => {
-					setTimeout(() => reject(new Error('Timeout: getDevices() took longer than 30 seconds')), 30000);
+					setTimeout(
+						() => reject(new Error('Timeout: getDevices() took longer than 30 seconds')),
+						30000
+					);
 				});
 
-				devices = await Promise.race([
-					location.getDevices(),
-					timeoutPromise
-				]);
-				logger.debug({ deviceCount: devices?.length ?? 0, locationName: location.name }, 'getDevices() completed');
+				devices = await Promise.race([location.getDevices(), timeoutPromise]);
+				logger.debug(
+					{ deviceCount: devices?.length ?? 0, locationName: location.name },
+					'getDevices() completed'
+				);
 			} catch (deviceError) {
 				const errorMessage = String(deviceError);
-				logger.error({ error: deviceError, locationName: location.name }, 'Failed to get devices for location');
+				logger.error(
+					{ error: deviceError, locationName: location.name },
+					'Failed to get devices for location'
+				);
 
 				if (errorMessage.includes('Timeout')) {
-					logger.warn({ locationName: location.name }, 'Ring Alarm base station may be offline or taking too long to respond');
+					logger.warn(
+						{ locationName: location.name },
+						'Ring Alarm base station may be offline or taking too long to respond'
+					);
 				}
 				continue;
 			}
 
 			if (!devices || devices.length === 0) {
-				logger.warn({ locationName: location.name }, 'No devices returned from getDevices() - sensors may not be configured or base station offline');
+				logger.warn(
+					{ locationName: location.name },
+					'No devices returned from getDevices() - sensors may not be configured or base station offline'
+				);
 				continue;
 			}
 
-			logger.info({ deviceCount: devices.length, locationName: location.name }, 'Found devices at location');
+			logger.info(
+				{ deviceCount: devices.length, locationName: location.name },
+				'Found devices at location'
+			);
 
 			for (const device of devices) {
-				const deviceData = device.data as RingDeviceData;
+				const deviceData = device.data as unknown as RingDeviceData;
 				const ringDeviceType = device.deviceType;
 				const deviceTypeInfo = mapDeviceType(device);
 
 				// Log device type for debugging
-				logger.info({
-					deviceId: deviceData.zid,
-					deviceName: deviceData.name,
-					ringDeviceType,
-					mappedType: deviceTypeInfo.type,
-					mappedSubtype: deviceTypeInfo.subtype,
-					hasFaulted: 'faulted' in deviceData,
-					deviceData: JSON.stringify(deviceData).substring(0, 500)
-				}, 'Found device');
+				logger.info(
+					{
+						deviceId: deviceData.zid,
+						deviceName: deviceData.name,
+						ringDeviceType,
+						mappedType: deviceTypeInfo.type,
+						mappedSubtype: deviceTypeInfo.subtype,
+						hasFaulted: 'faulted' in deviceData,
+						deviceData: JSON.stringify(deviceData).substring(0, 500)
+					},
+					'Found device'
+				);
 
 				// Register device in database with type and subtype
 				devicesRepo.upsertDevice({
@@ -598,20 +721,23 @@ async function subscribeToSensors(): Promise<void> {
 				// Subscribe to device data updates for sensors
 				device.onData.subscribe({
 					next: (data) => {
-						const newData = data as RingDeviceData;
+						const newData = data as unknown as RingDeviceData;
 						const previousState = sensorStates.get(newData.zid) || {};
 
 						// Handle contact sensor (door/window) open/close
 						if ('faulted' in newData && newData.faulted !== previousState.faulted) {
 							const eventType: EventType = newData.faulted ? 'door_open' : 'door_close';
 
-							logger.info({
-								deviceId: newData.zid,
-								deviceName: newData.name,
-								eventType,
-								previousFaulted: previousState.faulted,
-								newFaulted: newData.faulted
-							}, 'Contact sensor state changed');
+							logger.info(
+								{
+									deviceId: newData.zid,
+									deviceName: newData.name,
+									eventType,
+									previousFaulted: previousState.faulted,
+									newFaulted: newData.faulted
+								},
+								'Contact sensor state changed'
+							);
 
 							handleSensorEvent(newData, eventType, {
 								faulted: newData.faulted,
@@ -624,16 +750,20 @@ async function subscribeToSensors(): Promise<void> {
 
 						// Handle motion sensor
 						// Motion sensors typically have a 'motion' or 'motionStatus' property
-						const motionDetected = (newData as any).motion === true ||
-							(newData as any).motionStatus === 'motion' ||
-							(newData as any).motionDetected === true;
+						const motionDetected =
+							newData.motion === true ||
+							newData.motionStatus === 'motion' ||
+							newData.motionDetected === true;
 
 						if (motionDetected && !previousState.motionDetected) {
-							logger.info({
-								deviceId: newData.zid,
-								deviceName: newData.name,
-								eventType: 'motion'
-							}, 'Motion sensor triggered');
+							logger.info(
+								{
+									deviceId: newData.zid,
+									deviceName: newData.name,
+									eventType: 'motion'
+								},
+								'Motion sensor triggered'
+							);
 
 							handleSensorEvent(newData, 'motion', {
 								sensorType: 'motion'
@@ -652,7 +782,7 @@ async function subscribeToSensors(): Promise<void> {
 						}
 
 						// Handle device online/offline status changes
-						const isOnline = (newData as any).status !== 'offline';
+						const isOnline = newData.status !== 'offline';
 						devicesRepo.updateDeviceStatus(newData.zid, isOnline);
 					},
 					error: (error) => {
@@ -667,18 +797,21 @@ async function subscribeToSensors(): Promise<void> {
 					logger.debug({ update }, 'Device data update from location');
 
 					// This catches events that might not come through individual device subscriptions
-					const deviceInfo = update as any;
+					const deviceInfo = update as unknown as RingDeviceData;
 					if (deviceInfo.zid && deviceInfo.name) {
 						// Check for motion events
 						if (deviceInfo.motion === true || deviceInfo.motionStatus === 'motion') {
 							const previousState = sensorStates.get(deviceInfo.zid) || {};
 							if (!previousState.motionDetected) {
-								logger.info({
-									deviceId: deviceInfo.zid,
-									deviceName: deviceInfo.name
-								}, 'Motion detected via location update');
+								logger.info(
+									{
+										deviceId: deviceInfo.zid,
+										deviceName: deviceInfo.name
+									},
+									'Motion detected via location update'
+								);
 
-								handleSensorEvent(deviceInfo as RingDeviceData, 'motion', {
+								handleSensorEvent(deviceInfo, 'motion', {
 									sensorType: 'motion',
 									source: 'location_update'
 								});
@@ -707,13 +840,16 @@ async function startListener(): Promise<void> {
 	logger.info('Starting Ring listener worker');
 
 	// Log battery optimization settings
-	logger.info({
-		bufferEnabled: config.bufferEnabled,
-		ringPollingIntervalSeconds: config.ringPollingIntervalSeconds,
-		batteryLowThreshold: config.batteryLowThreshold,
-		liveViewTimeoutSeconds: config.liveViewTimeoutSeconds,
-		recordingDurationSeconds: config.recordingDurationSeconds
-	}, 'Battery optimization settings');
+	logger.info(
+		{
+			bufferEnabled: config.bufferEnabled,
+			ringPollingIntervalSeconds: config.ringPollingIntervalSeconds,
+			batteryLowThreshold: config.batteryLowThreshold,
+			liveViewTimeoutSeconds: config.liveViewTimeoutSeconds,
+			recordingDurationSeconds: config.recordingDurationSeconds
+		},
+		'Battery optimization settings'
+	);
 
 	// Initialize database
 	await initDatabase();
@@ -793,11 +929,14 @@ async function main(): Promise<void> {
 		} catch (error) {
 			logger.error(
 				{
-					error: error instanceof Error ? {
-						message: error.message,
-						stack: error.stack,
-						name: error.name
-					} : error
+					error:
+						error instanceof Error
+							? {
+									message: error.message,
+									stack: error.stack,
+									name: error.name
+								}
+							: error
 				},
 				'Ring listener error, restarting in 30 seconds'
 			);

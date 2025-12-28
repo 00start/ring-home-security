@@ -14,8 +14,11 @@ import {
 	DEFAULT_QUALITY_TIER,
 	type QualityTierName,
 	type QualityTier,
-	type QualityPreference,
+	type QualityPreference
 } from '$lib/constants/quality-tiers.js';
+import { createLogger } from '$lib/utils/logger.server';
+
+const logger = createLogger('quality-manager');
 
 /**
  * In-memory cache for user quality preferences
@@ -43,7 +46,7 @@ const userPreferences = new Map<string, QualityPreference>();
 export function getQualityForBattery(batteryLevel: number): QualityTierName {
 	// Validate battery level
 	if (batteryLevel < 0 || batteryLevel > 100) {
-		console.warn(`Invalid battery level: ${batteryLevel}, using default quality`);
+		logger.warn({ batteryLevel }, 'Invalid battery level, using default quality');
 		return DEFAULT_QUALITY_TIER;
 	}
 
@@ -113,7 +116,7 @@ export function setUserOverride(userId: string, preference: QualityPreference): 
 	}
 
 	if (preference.mode === 'auto' && preference.tier !== null) {
-		console.warn('Auto mode should not have a tier, clearing tier');
+		logger.warn('Auto mode should not have a tier, clearing tier');
 		preference.tier = null;
 	}
 

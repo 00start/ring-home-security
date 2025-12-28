@@ -14,222 +14,222 @@ import { mockApiResponses } from './seed.js';
  * Setup all API route mocks for a page
  */
 export async function setupApiMocks(page: Page) {
-  // Mock devices API
-  await page.route('**/api/devices**', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        success: true,
-        data: mockApiResponses.devices,
-      }),
-    });
-  });
+	// Mock devices API
+	await page.route('**/api/devices**', async (route) => {
+		await route.fulfill({
+			status: 200,
+			contentType: 'application/json',
+			body: JSON.stringify({
+				success: true,
+				data: mockApiResponses.devices
+			})
+		});
+	});
 
-  // Mock events API
-  await page.route('**/api/events**', async (route) => {
-    const url = new URL(route.request().url());
-    const limit = parseInt(url.searchParams.get('limit') || '10');
-    const offset = parseInt(url.searchParams.get('offset') || '0');
-    const deviceId = url.searchParams.get('deviceId');
+	// Mock events API
+	await page.route('**/api/events**', async (route) => {
+		const url = new URL(route.request().url());
+		const limit = parseInt(url.searchParams.get('limit') || '10');
+		const offset = parseInt(url.searchParams.get('offset') || '0');
+		const deviceId = url.searchParams.get('deviceId');
 
-    let events = mockApiResponses.events;
+		let events = mockApiResponses.events;
 
-    // Filter by device if specified
-    if (deviceId) {
-      events = events.filter(e => e.deviceId === deviceId);
-    }
+		// Filter by device if specified
+		if (deviceId) {
+			events = events.filter((e) => e.deviceId === deviceId);
+		}
 
-    // Apply pagination
-    const paginatedEvents = events.slice(offset, offset + limit);
+		// Apply pagination
+		const paginatedEvents = events.slice(offset, offset + limit);
 
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        success: true,
-        data: paginatedEvents,
-        total: events.length,
-        page: Math.floor(offset / limit) + 1,
-        limit,
-      }),
-    });
-  });
+		await route.fulfill({
+			status: 200,
+			contentType: 'application/json',
+			body: JSON.stringify({
+				success: true,
+				data: paginatedEvents,
+				total: events.length,
+				page: Math.floor(offset / limit) + 1,
+				limit
+			})
+		});
+	});
 
-  // Mock recordings API
-  await page.route('**/api/recordings**', async (route) => {
-    const url = new URL(route.request().url());
-    const deviceId = url.searchParams.get('deviceId');
+	// Mock recordings API
+	await page.route('**/api/recordings**', async (route) => {
+		const url = new URL(route.request().url());
+		const deviceId = url.searchParams.get('deviceId');
 
-    let recordings = mockApiResponses.recordings;
+		let recordings = mockApiResponses.recordings;
 
-    // Filter by device if specified
-    if (deviceId) {
-      recordings = recordings.filter(r => r.deviceId === deviceId);
-    }
+		// Filter by device if specified
+		if (deviceId) {
+			recordings = recordings.filter((r) => r.deviceId === deviceId);
+		}
 
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        success: true,
-        data: recordings,
-      }),
-    });
-  });
+		await route.fulfill({
+			status: 200,
+			contentType: 'application/json',
+			body: JSON.stringify({
+				success: true,
+				data: recordings
+			})
+		});
+	});
 
-  // Mock stats API
-  await page.route('**/api/stats**', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        success: true,
-        data: mockApiResponses.stats,
-      }),
-    });
-  });
+	// Mock stats API
+	await page.route('**/api/stats**', async (route) => {
+		await route.fulfill({
+			status: 200,
+			contentType: 'application/json',
+			body: JSON.stringify({
+				success: true,
+				data: mockApiResponses.stats
+			})
+		});
+	});
 
-  // Mock system config API
-  await page.route('**/api/system/config**', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify(mockApiResponses.systemConfig),
-    });
-  });
+	// Mock system config API
+	await page.route('**/api/system/config**', async (route) => {
+		await route.fulfill({
+			status: 200,
+			contentType: 'application/json',
+			body: JSON.stringify(mockApiResponses.systemConfig)
+		});
+	});
 
-  // Mock zones API
-  await page.route('**/api/zones**', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        success: true,
-        data: mockApiResponses.zones,
-      }),
-    });
-  });
+	// Mock zones API
+	await page.route('**/api/zones**', async (route) => {
+		await route.fulfill({
+			status: 200,
+			contentType: 'application/json',
+			body: JSON.stringify({
+				success: true,
+				data: mockApiResponses.zones
+			})
+		});
+	});
 
-  // Mock individual device API
-  await page.route('**/api/devices/*', async (route) => {
-    const deviceId = route.request().url().split('/').pop()?.split('?')[0];
-    const device = mockApiResponses.devices.find(d => d.id === deviceId);
+	// Mock individual device API
+	await page.route('**/api/devices/*', async (route) => {
+		const deviceId = route.request().url().split('/').pop()?.split('?')[0];
+		const device = mockApiResponses.devices.find((d) => d.id === deviceId);
 
-    if (device) {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: true,
-          data: device,
-        }),
-      });
-    } else {
-      await route.fulfill({
-        status: 404,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: false,
-          error: 'Device not found',
-        }),
-      });
-    }
-  });
+		if (device) {
+			await route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({
+					success: true,
+					data: device
+				})
+			});
+		} else {
+			await route.fulfill({
+				status: 404,
+				contentType: 'application/json',
+				body: JSON.stringify({
+					success: false,
+					error: 'Device not found'
+				})
+			});
+		}
+	});
 
-  // Mock recording download (return mock video)
-  await page.route('**/api/recordings/*/download**', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'video/mp4',
-      body: Buffer.from('mock-video-data'),
-      headers: {
-        'Content-Disposition': 'attachment; filename="recording.mp4"',
-      },
-    });
-  });
+	// Mock recording download (return mock video)
+	await page.route('**/api/recordings/*/download**', async (route) => {
+		await route.fulfill({
+			status: 200,
+			contentType: 'video/mp4',
+			body: Buffer.from('mock-video-data'),
+			headers: {
+				'Content-Disposition': 'attachment; filename="recording.mp4"'
+			}
+		});
+	});
 
-  // Mock thumbnail requests
-  await page.route('**/data/thumbnails/**', async (route) => {
-    // Return a small 1x1 pixel transparent PNG
-    const transparentPng = Buffer.from(
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-      'base64'
-    );
+	// Mock thumbnail requests
+	await page.route('**/data/thumbnails/**', async (route) => {
+		// Return a small 1x1 pixel transparent PNG
+		const transparentPng = Buffer.from(
+			'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+			'base64'
+		);
 
-    await route.fulfill({
-      status: 200,
-      contentType: 'image/png',
-      body: transparentPng,
-    });
-  });
+		await route.fulfill({
+			status: 200,
+			contentType: 'image/png',
+			body: transparentPng
+		});
+	});
 }
 
 /**
  * Setup API mocks with custom delays for performance testing
  */
 export async function setupSlowApiMocks(page: Page, delayMs: number = 500) {
-  await page.route('**/api/**', async (route) => {
-    await new Promise(resolve => setTimeout(resolve, delayMs));
-    await route.continue();
-  });
+	await page.route('**/api/**', async (route) => {
+		await new Promise((resolve) => setTimeout(resolve, delayMs));
+		await route.continue();
+	});
 }
 
 /**
  * Setup API mocks to simulate errors
  */
 export async function setupErrorApiMocks(page: Page) {
-  await page.route('**/api/**', async (route) => {
-    await route.fulfill({
-      status: 500,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        success: false,
-        error: 'Internal Server Error',
-      }),
-    });
-  });
+	await page.route('**/api/**', async (route) => {
+		await route.fulfill({
+			status: 500,
+			contentType: 'application/json',
+			body: JSON.stringify({
+				success: false,
+				error: 'Internal Server Error'
+			})
+		});
+	});
 }
 
 /**
  * Setup API mocks to simulate network timeout
  */
 export async function setupTimeoutApiMocks(page: Page) {
-  await page.route('**/api/**', async (route) => {
-    // Never resolve - simulates timeout
-    await new Promise(() => {});
-  });
+	await page.route('**/api/**', async (route) => {
+		// Never resolve - simulates timeout
+		await new Promise(() => {});
+	});
 }
 
 /**
  * Mock Ring API live stream URL
  */
 export async function mockLiveStreamUrl(page: Page) {
-  await page.route('**/api/devices/*/live**', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        success: true,
-        data: {
-          url: 'https://mock-stream.example.com/live.m3u8',
-          expires: new Date(Date.now() + 300000).toISOString(), // 5 minutes
-        },
-      }),
-    });
-  });
+	await page.route('**/api/devices/*/live**', async (route) => {
+		await route.fulfill({
+			status: 200,
+			contentType: 'application/json',
+			body: JSON.stringify({
+				success: true,
+				data: {
+					url: 'https://mock-stream.example.com/live.m3u8',
+					expires: new Date(Date.now() + 300000).toISOString() // 5 minutes
+				}
+			})
+		});
+	});
 }
 
 /**
  * Get seeded data for assertions
  */
 export function getSeedData() {
-  return {
-    devices: mockApiResponses.devices,
-    events: mockApiResponses.events,
-    recordings: mockApiResponses.recordings,
-    zones: mockApiResponses.zones,
-    stats: mockApiResponses.stats,
-    systemConfig: mockApiResponses.systemConfig,
-  };
+	return {
+		devices: mockApiResponses.devices,
+		events: mockApiResponses.events,
+		recordings: mockApiResponses.recordings,
+		zones: mockApiResponses.zones,
+		stats: mockApiResponses.stats,
+		systemConfig: mockApiResponses.systemConfig
+	};
 }

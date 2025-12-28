@@ -87,9 +87,15 @@
 		const result = await notificationService.requestPermission();
 		notificationPermission = result;
 		if (result === 'granted') {
-			toasts.success('Notifications Enabled', 'You will now receive browser notifications for events.');
+			toasts.success(
+				'Notifications Enabled',
+				'You will now receive browser notifications for events.'
+			);
 		} else if (result === 'denied') {
-			toasts.error('Notifications Blocked', 'Please enable notifications in your browser settings.');
+			toasts.error(
+				'Notifications Blocked',
+				'Please enable notifications in your browser settings.'
+			);
 		}
 	}
 
@@ -145,7 +151,9 @@
 	}
 
 	async function handleDeleteUser(userId: string, username: string) {
-		if (!confirm(`Are you sure you want to delete the user "${username}"? This cannot be undone.`)) {
+		if (
+			!confirm(`Are you sure you want to delete the user "${username}"? This cannot be undone.`)
+		) {
 			return;
 		}
 
@@ -198,7 +206,11 @@
 	}
 
 	async function handleDeleteRecordings() {
-		if (!confirm('Are you sure you want to delete ALL recordings? This will also delete the video files. This cannot be undone.')) {
+		if (
+			!confirm(
+				'Are you sure you want to delete ALL recordings? This will also delete the video files. This cannot be undone.'
+			)
+		) {
 			return;
 		}
 
@@ -301,7 +313,9 @@
 					<!-- Browser Permission -->
 					<div class="flex items-center justify-between">
 						<div>
-							<h4 class="text-sm font-medium text-zinc-900 dark:text-white">Browser Notifications</h4>
+							<h4 class="text-sm font-medium text-zinc-900 dark:text-white">
+								Browser Notifications
+							</h4>
 							<p class="text-sm text-zinc-500 dark:text-zinc-400">
 								{#if notificationPermission === 'granted'}
 									Notifications are enabled
@@ -313,25 +327,33 @@
 							</p>
 						</div>
 						{#if notificationPermission === 'granted'}
-							<span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
+							<span
+								class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200"
+							>
 								Enabled
 							</span>
 						{:else if notificationPermission === 'denied'}
-							<span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
+							<span
+								class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200"
+							>
 								Blocked
 							</span>
 						{:else}
-							<Button onclick={requestNotificationPermission}>
-								Enable
-							</Button>
+							<Button onclick={requestNotificationPermission}>Enable</Button>
 						{/if}
 					</div>
 
 					<!-- Master Toggle -->
-					<div class="flex items-center justify-between border-t border-zinc-200 pt-4 dark:border-zinc-700">
+					<div
+						class="flex items-center justify-between border-t border-zinc-200 pt-4 dark:border-zinc-700"
+					>
 						<div>
-							<h4 class="text-sm font-medium text-zinc-900 dark:text-white">Enable Notifications</h4>
-							<p class="text-sm text-zinc-500 dark:text-zinc-400">Show notifications for Ring events</p>
+							<h4 class="text-sm font-medium text-zinc-900 dark:text-white">
+								Enable Notifications
+							</h4>
+							<p class="text-sm text-zinc-500 dark:text-zinc-400">
+								Show notifications for Ring events
+							</p>
 						</div>
 						<label class="relative inline-flex cursor-pointer items-center">
 							<input
@@ -340,7 +362,9 @@
 								checked={$notificationPreferences.enabled}
 								onchange={(e) => notificationPreferences.setEnabled(e.currentTarget.checked)}
 							/>
-							<div class="peer h-6 w-11 rounded-full bg-zinc-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-zinc-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none dark:border-zinc-600 dark:bg-zinc-700"></div>
+							<div
+								class="peer h-6 w-11 rounded-full bg-zinc-200 peer-checked:bg-blue-600 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-zinc-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:border-zinc-600 dark:bg-zinc-700"
+							></div>
 						</label>
 					</div>
 
@@ -348,7 +372,9 @@
 					<div class="flex items-center justify-between">
 						<div>
 							<h4 class="text-sm font-medium text-zinc-900 dark:text-white">Sound Alerts</h4>
-							<p class="text-sm text-zinc-500 dark:text-zinc-400">Play sound for doorbell and important events</p>
+							<p class="text-sm text-zinc-500 dark:text-zinc-400">
+								Play sound for doorbell and important events
+							</p>
 						</div>
 						<label class="relative inline-flex cursor-pointer items-center">
 							<input
@@ -357,7 +383,9 @@
 								checked={$notificationPreferences.soundEnabled}
 								onchange={(e) => notificationPreferences.setSoundEnabled(e.currentTarget.checked)}
 							/>
-							<div class="peer h-6 w-11 rounded-full bg-zinc-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-zinc-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none dark:border-zinc-600 dark:bg-zinc-700"></div>
+							<div
+								class="peer h-6 w-11 rounded-full bg-zinc-200 peer-checked:bg-blue-600 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-zinc-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:border-zinc-600 dark:bg-zinc-700"
+							></div>
 						</label>
 					</div>
 
@@ -373,9 +401,15 @@
 											type="checkbox"
 											class="peer sr-only"
 											checked={$notificationPreferences.eventTypes[eventType as EventType]}
-											onchange={(e) => notificationPreferences.setEventTypeEnabled(eventType as EventType, e.currentTarget.checked)}
+											onchange={(e) =>
+												notificationPreferences.setEventTypeEnabled(
+													eventType as EventType,
+													e.currentTarget.checked
+												)}
 										/>
-										<div class="peer h-5 w-9 rounded-full bg-zinc-200 after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-zinc-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none dark:border-zinc-600 dark:bg-zinc-700"></div>
+										<div
+											class="peer h-5 w-9 rounded-full bg-zinc-200 peer-checked:bg-blue-600 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-zinc-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:border-zinc-600 dark:bg-zinc-700"
+										></div>
 									</label>
 								</div>
 							{/each}
@@ -388,20 +422,16 @@
 		<!-- Change Password -->
 		<Card title="Change Password" data-testid="settings-password-section" id="password">
 			{#snippet children()}
-				<form onsubmit={(e) => { e.preventDefault(); handlePasswordChange(); }} class="space-y-4">
-					<Input
-						type="password"
-						label="Current Password"
-						bind:value={currentPassword}
-						required
-					/>
+				<form
+					onsubmit={(e) => {
+						e.preventDefault();
+						handlePasswordChange();
+					}}
+					class="space-y-4"
+				>
+					<Input type="password" label="Current Password" bind:value={currentPassword} required />
 
-					<Input
-						type="password"
-						label="New Password"
-						bind:value={newPassword}
-						required
-					/>
+					<Input type="password" label="New Password" bind:value={newPassword} required />
 
 					<Input
 						type="password"
@@ -411,16 +441,22 @@
 					/>
 
 					{#if passwordError}
-						<p data-testid="error-message" data-error-type="password" class="text-sm text-red-600">{passwordError}</p>
+						<p data-testid="error-message" data-error-type="password" class="text-sm text-red-600">
+							{passwordError}
+						</p>
 					{/if}
 
 					{#if passwordSuccess}
-						<p data-testid="success-message" data-success-type="password" class="text-sm text-green-600">{passwordSuccess}</p>
+						<p
+							data-testid="success-message"
+							data-success-type="password"
+							class="text-sm text-green-600"
+						>
+							{passwordSuccess}
+						</p>
 					{/if}
 
-					<Button type="submit" loading={isChangingPassword}>
-						Change Password
-					</Button>
+					<Button type="submit" loading={isChangingPassword}>Change Password</Button>
 				</form>
 			{/snippet}
 		</Card>
@@ -435,7 +471,9 @@
 							<p class="mt-1 text-zinc-900 dark:text-white">0.0.1</p>
 						</div>
 						<div>
-							<div class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Environment</div>
+							<div class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+								Environment
+							</div>
 							<p class="mt-1 text-zinc-900 dark:text-white">Production</p>
 						</div>
 					</div>
@@ -501,27 +539,28 @@
 					<!-- Create New User -->
 					<div class="border-t border-zinc-200 pt-4 dark:border-zinc-700">
 						<h4 class="mb-3 text-sm font-medium text-zinc-900 dark:text-white">Create New User</h4>
-						<form onsubmit={(e) => { e.preventDefault(); handleCreateUser(); }} class="space-y-4">
-							<Input
-								label="Username"
-								bind:value={newUsername}
-								required
-							/>
+						<form
+							onsubmit={(e) => {
+								e.preventDefault();
+								handleCreateUser();
+							}}
+							class="space-y-4"
+						>
+							<Input label="Username" bind:value={newUsername} required />
 
-							<Input
-								type="password"
-								label="Password"
-								bind:value={newUserPassword}
-								required
-							/>
+							<Input type="password" label="Password" bind:value={newUserPassword} required />
 
 							{#if createUserError}
-								<p data-testid="error-message" data-error-type="create-user" class="text-sm text-red-600">{createUserError}</p>
+								<p
+									data-testid="error-message"
+									data-error-type="create-user"
+									class="text-sm text-red-600"
+								>
+									{createUserError}
+								</p>
 							{/if}
 
-							<Button type="submit" loading={isCreatingUser}>
-								Create User
-							</Button>
+							<Button type="submit" loading={isCreatingUser}>Create User</Button>
 						</form>
 					</div>
 				</div>
@@ -544,7 +583,11 @@
 						<Button variant="danger" loading={isClearingEvents} onclick={handleClearEvents}>
 							Clear All Events
 						</Button>
-						<Button variant="danger" loading={isDeletingRecordings} onclick={handleDeleteRecordings}>
+						<Button
+							variant="danger"
+							loading={isDeletingRecordings}
+							onclick={handleDeleteRecordings}
+						>
 							Delete All Recordings
 						</Button>
 					</div>
@@ -554,13 +597,14 @@
 	</div>
 
 	<!-- Sticky Navigation Menu -->
-	<nav class="hidden lg:block w-48 shrink-0">
+	<nav class="hidden w-48 shrink-0 lg:block">
 		<div class="sticky top-24 space-y-1">
 			{#each sections as section}
 				<button
-					class="block w-full text-left px-3 py-2 text-sm rounded-md transition-all duration-200 {activeSection === section.id
-						? 'bg-blue-50 text-blue-700 font-medium dark:bg-blue-900/20 dark:text-blue-400'
-						: 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-800/50'}"
+					class="block w-full rounded-md px-3 py-2 text-left text-sm transition-all duration-200 {activeSection ===
+					section.id
+						? 'bg-blue-50 font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+						: 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200'}"
 					onclick={() => scrollToSection(section.id)}
 				>
 					{section.label}
