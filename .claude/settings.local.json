@@ -17,7 +17,8 @@
       "Bash(gh pr view:*)",
       "Bash(gh pr diff:*)",
       "Bash(gh pr merge:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(find:*)"
     ]
   }
 }
