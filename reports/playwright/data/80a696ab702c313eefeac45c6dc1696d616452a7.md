@@ -1,0 +1,197 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - navigation [ref=e6]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - generic [ref=e13]: Chiswick
+        - generic [ref=e14]:
+          - link "Dashboard" [active] [ref=e15] [cursor=pointer]:
+            - /url: /
+            - img [ref=e16]
+            - text: Dashboard
+          - link "Timeline" [ref=e18] [cursor=pointer]:
+            - /url: /timeline
+            - img [ref=e19]
+            - text: Timeline
+          - link "Devices" [ref=e21] [cursor=pointer]:
+            - /url: /devices
+            - img [ref=e22]
+            - text: Devices
+          - link "Recordings" [ref=e24] [cursor=pointer]:
+            - /url: /recordings
+            - img [ref=e25]
+            - text: Recordings
+          - link "Settings" [ref=e27] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e28]
+            - text: Settings
+      - generic [ref=e30]:
+        - generic [ref=e31]: admin
+        - button "Logout" [ref=e32] [cursor=pointer]
+  - main [ref=e33]:
+    - generic [ref=e34]:
+      - generic [ref=e35]:
+        - heading "Dashboard" [level=1] [ref=e36]
+        - paragraph [ref=e37]: Monitor your home security devices and events
+      - generic [ref=e38]:
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - paragraph [ref=e42]: Total Devices
+            - paragraph [ref=e43]: "26"
+          - img [ref=e45]
+        - generic [ref=e48]:
+          - generic [ref=e49]:
+            - paragraph [ref=e50]: Online
+            - paragraph [ref=e51]: 26 / 26
+          - img [ref=e53]
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - paragraph [ref=e58]: Events Today
+            - paragraph [ref=e59]: "186"
+          - img [ref=e61]
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - paragraph [ref=e66]: Storage Used
+            - paragraph [ref=e67]: 1.31 GB
+          - img [ref=e69]
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - generic [ref=e73]:
+            - heading "Devices" [level=2] [ref=e74]
+            - link "View all" [ref=e75] [cursor=pointer]:
+              - /url: /devices
+          - generic [ref=e76]:
+            - generic [ref=e78]:
+              - 'button "Front Door doorbell Online Last seen: 2h ago 100%" [ref=e79]':
+                - generic [ref=e80]:
+                  - generic [ref=e81]:
+                    - img [ref=e83]
+                    - generic [ref=e85]:
+                      - heading "Front Door" [level=3] [ref=e86]
+                      - paragraph [ref=e87]: doorbell
+                  - generic [ref=e90]: Online
+                - generic [ref=e91]:
+                  - generic [ref=e92]: "Last seen: 2h ago"
+                  - generic [ref=e93]:
+                    - img [ref=e94]
+                    - generic [ref=e96]: 100%
+              - button "Live View" [ref=e98] [cursor=pointer]:
+                - img
+                - text: Live View
+            - generic [ref=e100]:
+              - 'button "Front Alley camera Online Last seen: 2h ago 96%" [ref=e101]':
+                - generic [ref=e102]:
+                  - generic [ref=e103]:
+                    - img [ref=e105]
+                    - generic [ref=e107]:
+                      - heading "Front Alley" [level=3] [ref=e108]
+                      - paragraph [ref=e109]: camera
+                  - generic [ref=e112]: Online
+                - generic [ref=e113]:
+                  - generic [ref=e114]: "Last seen: 2h ago"
+                  - generic [ref=e115]:
+                    - img [ref=e116]
+                    - generic [ref=e118]: 96%
+              - button "Live View" [ref=e120] [cursor=pointer]:
+                - img
+                - text: Live View
+            - generic [ref=e122]:
+              - 'button "Front Elevation camera Online Last seen: 2h ago 90%" [ref=e123]':
+                - generic [ref=e124]:
+                  - generic [ref=e125]:
+                    - img [ref=e127]
+                    - generic [ref=e129]:
+                      - heading "Front Elevation" [level=3] [ref=e130]
+                      - paragraph [ref=e131]: camera
+                  - generic [ref=e134]: Online
+                - generic [ref=e135]:
+                  - generic [ref=e136]: "Last seen: 2h ago"
+                  - generic [ref=e137]:
+                    - img [ref=e138]
+                    - generic [ref=e140]: 90%
+              - button "Live View" [ref=e142] [cursor=pointer]:
+                - img
+                - text: Live View
+            - generic [ref=e144]:
+              - 'button "Front walk camera Online Last seen: 2h ago 92%" [ref=e145]':
+                - generic [ref=e146]:
+                  - generic [ref=e147]:
+                    - img [ref=e149]
+                    - generic [ref=e151]:
+                      - heading "Front walk" [level=3] [ref=e152]
+                      - paragraph [ref=e153]: camera
+                  - generic [ref=e156]: Online
+                - generic [ref=e157]:
+                  - generic [ref=e158]: "Last seen: 2h ago"
+                  - generic [ref=e159]:
+                    - img [ref=e160]
+                    - generic [ref=e162]: 92%
+              - button "Live View" [ref=e164] [cursor=pointer]:
+                - img
+                - text: Live View
+        - generic [ref=e165]:
+          - generic [ref=e166]:
+            - heading "Recent Events" [level=2] [ref=e167]
+            - link "View all" [ref=e168] [cursor=pointer]:
+              - /url: /timeline
+          - generic [ref=e169]:
+            - button "Motion Detected Pending Front Alley 07:59 PM Today" [ref=e170] [cursor=pointer]:
+              - generic [ref=e171]:
+                - img [ref=e173]
+                - generic [ref=e175]:
+                  - generic [ref=e176]:
+                    - paragraph [ref=e177]: Motion Detected
+                    - generic [ref=e179]: Pending
+                  - paragraph [ref=e180]: Front Alley
+                - generic [ref=e181]:
+                  - paragraph [ref=e182]: 07:59 PM
+                  - paragraph [ref=e183]: Today
+            - button "Motion Detected Pending Garden 07:59 PM Today" [ref=e184] [cursor=pointer]:
+              - generic [ref=e185]:
+                - img [ref=e187]
+                - generic [ref=e189]:
+                  - generic [ref=e190]:
+                    - paragraph [ref=e191]: Motion Detected
+                    - generic [ref=e193]: Pending
+                  - paragraph [ref=e194]: Garden
+                - generic [ref=e195]:
+                  - paragraph [ref=e196]: 07:59 PM
+                  - paragraph [ref=e197]: Today
+            - button "Motion Detected Pending Kitchen 2 07:59 PM Today" [ref=e198] [cursor=pointer]:
+              - generic [ref=e199]:
+                - img [ref=e201]
+                - generic [ref=e203]:
+                  - generic [ref=e204]:
+                    - paragraph [ref=e205]: Motion Detected
+                    - generic [ref=e207]: Pending
+                  - paragraph [ref=e208]: Kitchen 2
+                - generic [ref=e209]:
+                  - paragraph [ref=e210]: 07:59 PM
+                  - paragraph [ref=e211]: Today
+            - button "Motion Detected Pending Garden 07:59 PM Today" [ref=e212] [cursor=pointer]:
+              - generic [ref=e213]:
+                - img [ref=e215]
+                - generic [ref=e217]:
+                  - generic [ref=e218]:
+                    - paragraph [ref=e219]: Motion Detected
+                    - generic [ref=e221]: Pending
+                  - paragraph [ref=e222]: Garden
+                - generic [ref=e223]:
+                  - paragraph [ref=e224]: 07:59 PM
+                  - paragraph [ref=e225]: Today
+            - button "Motion Detected Garden 07:59 PM Today" [ref=e226] [cursor=pointer]:
+              - generic [ref=e227]:
+                - img [ref=e229]
+                - generic [ref=e231]:
+                  - paragraph [ref=e233]: Motion Detected
+                  - paragraph [ref=e234]: Garden
+                - generic [ref=e235]:
+                  - paragraph [ref=e236]: 07:59 PM
+                  - paragraph [ref=e237]: Today
+```

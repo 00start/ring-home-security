@@ -1,0 +1,57 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - navigation [ref=e6]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - generic [ref=e13]: Ring Security
+        - generic [ref=e14]:
+          - link "Dashboard" [ref=e15] [cursor=pointer]:
+            - /url: /
+            - img [ref=e16]
+            - text: Dashboard
+          - link "Timeline" [ref=e18] [cursor=pointer]:
+            - /url: /timeline
+            - img [ref=e19]
+            - text: Timeline
+          - link "Devices" [ref=e21] [cursor=pointer]:
+            - /url: /devices
+            - img [ref=e22]
+            - text: Devices
+          - link "Recordings" [ref=e24] [cursor=pointer]:
+            - /url: /recordings
+            - img [ref=e25]
+            - text: Recordings
+          - link "Settings" [ref=e27] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e28]
+            - text: Settings
+      - button "Logout" [ref=e31] [cursor=pointer]
+  - main [ref=e32]:
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - heading "Dashboard" [level=1] [ref=e35]
+        - paragraph [ref=e36]: Monitor your home security devices and events
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - heading "Devices" [level=2] [ref=e45]
+            - link "View all" [ref=e46] [cursor=pointer]:
+              - /url: /devices
+          - generic [ref=e48]:
+            - img [ref=e49]
+            - paragraph [ref=e51]: No devices found. Start the Ring listener to discover devices.
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - heading "Recent Events" [level=2] [ref=e54]
+            - link "View all" [ref=e55] [cursor=pointer]:
+              - /url: /timeline
+          - generic [ref=e57]:
+            - img [ref=e58]
+            - paragraph [ref=e60]: No events yet. Events will appear here when detected.
+```

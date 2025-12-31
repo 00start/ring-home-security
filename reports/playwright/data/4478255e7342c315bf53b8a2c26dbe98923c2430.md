@@ -1,0 +1,296 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - navigation [ref=e6]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - generic [ref=e13]: Chiswick
+        - generic [ref=e14]:
+          - link "Dashboard" [ref=e15] [cursor=pointer]:
+            - /url: /
+            - img [ref=e16]
+            - text: Dashboard
+          - link "Timeline" [ref=e18] [cursor=pointer]:
+            - /url: /timeline
+            - img [ref=e19]
+            - text: Timeline
+          - link "Devices" [ref=e21] [cursor=pointer]:
+            - /url: /devices
+            - img [ref=e22]
+            - text: Devices
+          - link "Recordings" [ref=e24] [cursor=pointer]:
+            - /url: /recordings
+            - img [ref=e25]
+            - text: Recordings
+          - link "Settings" [ref=e27] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e28]
+            - text: Settings
+      - generic [ref=e30]:
+        - generic [ref=e31]: admin
+        - button "Logout" [ref=e32] [cursor=pointer]
+  - main [ref=e33]:
+    - generic [ref=e34]:
+      - link "Back to Devices" [ref=e36] [cursor=pointer]:
+        - /url: /devices
+        - img [ref=e37]
+        - text: Back to Devices
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - img [ref=e44]
+            - generic [ref=e46]:
+              - heading "Front Door" [level=1] [ref=e47]
+              - paragraph [ref=e48]: doorbell
+          - generic [ref=e49]: Online
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - paragraph [ref=e52]: Device ID
+            - paragraph [ref=e53]: "27277621"
+          - generic [ref=e54]:
+            - paragraph [ref=e55]: Last Seen
+            - paragraph [ref=e56]: 2h ago
+          - generic [ref=e57]:
+            - paragraph [ref=e58]: Battery
+            - generic [ref=e59]:
+              - img [ref=e60]
+              - generic [ref=e62]: 100%
+      - generic [ref=e63]:
+        - heading "Camera Settings" [level=3] [ref=e65]
+        - generic [ref=e68]:
+          - generic [ref=e69]:
+            - generic [ref=e70]:
+              - heading "Pre-event buffer" [level=4] [ref=e71]
+              - button "Show information about pre-event buffer" [ref=e73]:
+                - img [ref=e74]
+            - paragraph [ref=e76]: Capture 3 seconds before motion trigger
+          - checkbox [ref=e78]
+      - generic [ref=e80]:
+        - heading "Recent Events (20)" [level=2] [ref=e81]
+        - generic [ref=e82]:
+          - button "Motion Detected Pending Front Door 07:59 PM Today" [ref=e83] [cursor=pointer]:
+            - generic [ref=e84]:
+              - img [ref=e86]
+              - generic [ref=e88]:
+                - generic [ref=e89]:
+                  - paragraph [ref=e90]: Motion Detected
+                  - generic [ref=e92]: Pending
+                - paragraph [ref=e93]: Front Door
+              - generic [ref=e94]:
+                - paragraph [ref=e95]: 07:59 PM
+                - paragraph [ref=e96]: Today
+          - button "Motion Detected Pending Front Door 07:59 PM Today" [ref=e97] [cursor=pointer]:
+            - generic [ref=e98]:
+              - img [ref=e100]
+              - generic [ref=e102]:
+                - generic [ref=e103]:
+                  - paragraph [ref=e104]: Motion Detected
+                  - generic [ref=e106]: Pending
+                - paragraph [ref=e107]: Front Door
+              - generic [ref=e108]:
+                - paragraph [ref=e109]: 07:59 PM
+                - paragraph [ref=e110]: Today
+          - button "Motion Detected Pending Front Door 04:03 PM Today" [ref=e111] [cursor=pointer]:
+            - generic [ref=e112]:
+              - img [ref=e114]
+              - generic [ref=e116]:
+                - generic [ref=e117]:
+                  - paragraph [ref=e118]: Motion Detected
+                  - generic [ref=e120]: Pending
+                - paragraph [ref=e121]: Front Door
+              - generic [ref=e122]:
+                - paragraph [ref=e123]: 04:03 PM
+                - paragraph [ref=e124]: Today
+          - button "Motion Detected Pending Front Door 03:26 PM Today" [ref=e125] [cursor=pointer]:
+            - generic [ref=e126]:
+              - img [ref=e128]
+              - generic [ref=e130]:
+                - generic [ref=e131]:
+                  - paragraph [ref=e132]: Motion Detected
+                  - generic [ref=e134]: Pending
+                - paragraph [ref=e135]: Front Door
+              - generic [ref=e136]:
+                - paragraph [ref=e137]: 03:26 PM
+                - paragraph [ref=e138]: Today
+          - button "Motion Detected Pending Front Door 03:02 PM Today" [ref=e139] [cursor=pointer]:
+            - generic [ref=e140]:
+              - img [ref=e142]
+              - generic [ref=e144]:
+                - generic [ref=e145]:
+                  - paragraph [ref=e146]: Motion Detected
+                  - generic [ref=e148]: Pending
+                - paragraph [ref=e149]: Front Door
+              - generic [ref=e150]:
+                - paragraph [ref=e151]: 03:02 PM
+                - paragraph [ref=e152]: Today
+          - button "Motion Detected Pending Front Door 02:03 PM Today" [ref=e153] [cursor=pointer]:
+            - generic [ref=e154]:
+              - img [ref=e156]
+              - generic [ref=e158]:
+                - generic [ref=e159]:
+                  - paragraph [ref=e160]: Motion Detected
+                  - generic [ref=e162]: Pending
+                - paragraph [ref=e163]: Front Door
+              - generic [ref=e164]:
+                - paragraph [ref=e165]: 02:03 PM
+                - paragraph [ref=e166]: Today
+          - button "Motion Detected Pending Front Door 02:03 PM Today" [ref=e167] [cursor=pointer]:
+            - generic [ref=e168]:
+              - img [ref=e170]
+              - generic [ref=e172]:
+                - generic [ref=e173]:
+                  - paragraph [ref=e174]: Motion Detected
+                  - generic [ref=e176]: Pending
+                - paragraph [ref=e177]: Front Door
+              - generic [ref=e178]:
+                - paragraph [ref=e179]: 02:03 PM
+                - paragraph [ref=e180]: Today
+          - button "Motion Detected Pending Front Door 02:01 PM Today" [ref=e181] [cursor=pointer]:
+            - generic [ref=e182]:
+              - img [ref=e184]
+              - generic [ref=e186]:
+                - generic [ref=e187]:
+                  - paragraph [ref=e188]: Motion Detected
+                  - generic [ref=e190]: Pending
+                - paragraph [ref=e191]: Front Door
+              - generic [ref=e192]:
+                - paragraph [ref=e193]: 02:01 PM
+                - paragraph [ref=e194]: Today
+          - button "Motion Detected Pending Front Door 02:01 PM Today" [ref=e195] [cursor=pointer]:
+            - generic [ref=e196]:
+              - img [ref=e198]
+              - generic [ref=e200]:
+                - generic [ref=e201]:
+                  - paragraph [ref=e202]: Motion Detected
+                  - generic [ref=e204]: Pending
+                - paragraph [ref=e205]: Front Door
+              - generic [ref=e206]:
+                - paragraph [ref=e207]: 02:01 PM
+                - paragraph [ref=e208]: Today
+          - button "Motion Detected Pending Front Door 01:00 PM Today" [ref=e209] [cursor=pointer]:
+            - generic [ref=e210]:
+              - img [ref=e212]
+              - generic [ref=e214]:
+                - generic [ref=e215]:
+                  - paragraph [ref=e216]: Motion Detected
+                  - generic [ref=e218]: Pending
+                - paragraph [ref=e219]: Front Door
+              - generic [ref=e220]:
+                - paragraph [ref=e221]: 01:00 PM
+                - paragraph [ref=e222]: Today
+          - button "Motion Detected Pending Front Door 01:00 PM Today" [ref=e223] [cursor=pointer]:
+            - generic [ref=e224]:
+              - img [ref=e226]
+              - generic [ref=e228]:
+                - generic [ref=e229]:
+                  - paragraph [ref=e230]: Motion Detected
+                  - generic [ref=e232]: Pending
+                - paragraph [ref=e233]: Front Door
+              - generic [ref=e234]:
+                - paragraph [ref=e235]: 01:00 PM
+                - paragraph [ref=e236]: Today
+          - button "Motion Detected Pending Front Door 10:21 AM Today" [ref=e237] [cursor=pointer]:
+            - generic [ref=e238]:
+              - img [ref=e240]
+              - generic [ref=e242]:
+                - generic [ref=e243]:
+                  - paragraph [ref=e244]: Motion Detected
+                  - generic [ref=e246]: Pending
+                - paragraph [ref=e247]: Front Door
+              - generic [ref=e248]:
+                - paragraph [ref=e249]: 10:21 AM
+                - paragraph [ref=e250]: Today
+          - button "Motion Detected Pending Front Door 10:10 AM Today" [ref=e251] [cursor=pointer]:
+            - generic [ref=e252]:
+              - img [ref=e254]
+              - generic [ref=e256]:
+                - generic [ref=e257]:
+                  - paragraph [ref=e258]: Motion Detected
+                  - generic [ref=e260]: Pending
+                - paragraph [ref=e261]: Front Door
+              - generic [ref=e262]:
+                - paragraph [ref=e263]: 10:10 AM
+                - paragraph [ref=e264]: Today
+          - button "Motion Detected Pending Front Door 10:09 AM Today" [ref=e265] [cursor=pointer]:
+            - generic [ref=e266]:
+              - img [ref=e268]
+              - generic [ref=e270]:
+                - generic [ref=e271]:
+                  - paragraph [ref=e272]: Motion Detected
+                  - generic [ref=e274]: Pending
+                - paragraph [ref=e275]: Front Door
+              - generic [ref=e276]:
+                - paragraph [ref=e277]: 10:09 AM
+                - paragraph [ref=e278]: Today
+          - button "Motion Detected Pending Front Door 10:06 AM Today" [ref=e279] [cursor=pointer]:
+            - generic [ref=e280]:
+              - img [ref=e282]
+              - generic [ref=e284]:
+                - generic [ref=e285]:
+                  - paragraph [ref=e286]: Motion Detected
+                  - generic [ref=e288]: Pending
+                - paragraph [ref=e289]: Front Door
+              - generic [ref=e290]:
+                - paragraph [ref=e291]: 10:06 AM
+                - paragraph [ref=e292]: Today
+          - button "Motion Detected Pending Front Door 10:06 AM Today" [ref=e293] [cursor=pointer]:
+            - generic [ref=e294]:
+              - img [ref=e296]
+              - generic [ref=e298]:
+                - generic [ref=e299]:
+                  - paragraph [ref=e300]: Motion Detected
+                  - generic [ref=e302]: Pending
+                - paragraph [ref=e303]: Front Door
+              - generic [ref=e304]:
+                - paragraph [ref=e305]: 10:06 AM
+                - paragraph [ref=e306]: Today
+          - button "Motion Detected Pending Front Door 08:57 AM Today" [ref=e307] [cursor=pointer]:
+            - generic [ref=e308]:
+              - img [ref=e310]
+              - generic [ref=e312]:
+                - generic [ref=e313]:
+                  - paragraph [ref=e314]: Motion Detected
+                  - generic [ref=e316]: Pending
+                - paragraph [ref=e317]: Front Door
+              - generic [ref=e318]:
+                - paragraph [ref=e319]: 08:57 AM
+                - paragraph [ref=e320]: Today
+          - button "Motion Detected Pending Front Door 08:57 AM Today" [ref=e321] [cursor=pointer]:
+            - generic [ref=e322]:
+              - img [ref=e324]
+              - generic [ref=e326]:
+                - generic [ref=e327]:
+                  - paragraph [ref=e328]: Motion Detected
+                  - generic [ref=e330]: Pending
+                - paragraph [ref=e331]: Front Door
+              - generic [ref=e332]:
+                - paragraph [ref=e333]: 08:57 AM
+                - paragraph [ref=e334]: Today
+          - button "Motion Detected Pending Front Door 07:13 AM Today" [ref=e335] [cursor=pointer]:
+            - generic [ref=e336]:
+              - img [ref=e338]
+              - generic [ref=e340]:
+                - generic [ref=e341]:
+                  - paragraph [ref=e342]: Motion Detected
+                  - generic [ref=e344]: Pending
+                - paragraph [ref=e345]: Front Door
+              - generic [ref=e346]:
+                - paragraph [ref=e347]: 07:13 AM
+                - paragraph [ref=e348]: Today
+          - button "Motion Detected Pending Front Door 07:13 AM Today" [ref=e349] [cursor=pointer]:
+            - generic [ref=e350]:
+              - img [ref=e352]
+              - generic [ref=e354]:
+                - generic [ref=e355]:
+                  - paragraph [ref=e356]: Motion Detected
+                  - generic [ref=e358]: Pending
+                - paragraph [ref=e359]: Front Door
+              - generic [ref=e360]:
+                - paragraph [ref=e361]: 07:13 AM
+                - paragraph [ref=e362]: Today
+```

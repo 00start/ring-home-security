@@ -18,7 +18,10 @@
       "Bash(gh pr diff:*)",
       "Bash(gh pr merge:*)",
       "Bash(git pull:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npm run test:e2e:*)",
+      "Bash(npx playwright install:*)",
+      "Bash(cat:*)"
     ]
   }
 }

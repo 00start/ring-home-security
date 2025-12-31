@@ -1,0 +1,131 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - navigation [ref=e6]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - generic [ref=e13]: Chiswick
+        - generic [ref=e14]:
+          - link "Dashboard" [ref=e15] [cursor=pointer]:
+            - /url: /
+            - img [ref=e16]
+            - text: Dashboard
+          - link "Timeline" [ref=e18] [cursor=pointer]:
+            - /url: /timeline
+            - img [ref=e19]
+            - text: Timeline
+          - link "Devices" [ref=e21] [cursor=pointer]:
+            - /url: /devices
+            - img [ref=e22]
+            - text: Devices
+          - link "Recordings" [ref=e24] [cursor=pointer]:
+            - /url: /recordings
+            - img [ref=e25]
+            - text: Recordings
+          - link "Settings" [ref=e27] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e28]
+            - text: Settings
+      - generic [ref=e30]:
+        - generic [ref=e31]: admin
+        - button "Logout" [ref=e32] [cursor=pointer]
+  - main [ref=e33]:
+    - generic [ref=e34]:
+      - generic [ref=e35]:
+        - heading "Dashboard" [level=1] [ref=e36]
+        - paragraph [ref=e37]: Monitor your home security devices and events
+      - generic [ref=e38]:
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - paragraph [ref=e42]: Total Devices
+            - paragraph [ref=e43]: "26"
+          - img [ref=e45]
+        - generic [ref=e48]:
+          - generic [ref=e49]:
+            - paragraph [ref=e50]: Online
+            - paragraph [ref=e51]: 26 / 26
+          - img [ref=e53]
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - paragraph [ref=e58]: Events Today
+            - paragraph [ref=e59]: "186"
+          - img [ref=e61]
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - paragraph [ref=e66]: Storage Used
+            - paragraph [ref=e67]: 1.31 GB
+          - img [ref=e69]
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - generic [ref=e73]:
+            - heading "Devices" [level=2] [ref=e74]
+            - link "View all" [ref=e75] [cursor=pointer]:
+              - /url: /devices
+          - generic [ref=e77]:
+            - img [ref=e78]
+            - paragraph [ref=e80]: No devices found. Start the Ring listener to discover devices.
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - heading "Recent Events" [level=2] [ref=e83]
+            - link "View all" [ref=e84] [cursor=pointer]:
+              - /url: /timeline
+          - generic [ref=e85]:
+            - button "Motion Detected Pending Front Alley 07:59 PM Today" [ref=e86] [cursor=pointer]:
+              - generic [ref=e87]:
+                - img [ref=e89]
+                - generic [ref=e91]:
+                  - generic [ref=e92]:
+                    - paragraph [ref=e93]: Motion Detected
+                    - generic [ref=e95]: Pending
+                  - paragraph [ref=e96]: Front Alley
+                - generic [ref=e97]:
+                  - paragraph [ref=e98]: 07:59 PM
+                  - paragraph [ref=e99]: Today
+            - button "Motion Detected Pending Garden 07:59 PM Today" [ref=e100] [cursor=pointer]:
+              - generic [ref=e101]:
+                - img [ref=e103]
+                - generic [ref=e105]:
+                  - generic [ref=e106]:
+                    - paragraph [ref=e107]: Motion Detected
+                    - generic [ref=e109]: Pending
+                  - paragraph [ref=e110]: Garden
+                - generic [ref=e111]:
+                  - paragraph [ref=e112]: 07:59 PM
+                  - paragraph [ref=e113]: Today
+            - button "Motion Detected Pending Kitchen 2 07:59 PM Today" [ref=e114] [cursor=pointer]:
+              - generic [ref=e115]:
+                - img [ref=e117]
+                - generic [ref=e119]:
+                  - generic [ref=e120]:
+                    - paragraph [ref=e121]: Motion Detected
+                    - generic [ref=e123]: Pending
+                  - paragraph [ref=e124]: Kitchen 2
+                - generic [ref=e125]:
+                  - paragraph [ref=e126]: 07:59 PM
+                  - paragraph [ref=e127]: Today
+            - button "Motion Detected Pending Garden 07:59 PM Today" [ref=e128] [cursor=pointer]:
+              - generic [ref=e129]:
+                - img [ref=e131]
+                - generic [ref=e133]:
+                  - generic [ref=e134]:
+                    - paragraph [ref=e135]: Motion Detected
+                    - generic [ref=e137]: Pending
+                  - paragraph [ref=e138]: Garden
+                - generic [ref=e139]:
+                  - paragraph [ref=e140]: 07:59 PM
+                  - paragraph [ref=e141]: Today
+            - button "Motion Detected Garden 07:59 PM Today" [ref=e142] [cursor=pointer]:
+              - generic [ref=e143]:
+                - img [ref=e145]
+                - generic [ref=e147]:
+                  - paragraph [ref=e149]: Motion Detected
+                  - paragraph [ref=e150]: Garden
+                - generic [ref=e151]:
+                  - paragraph [ref=e152]: 07:59 PM
+                  - paragraph [ref=e153]: Today
+```

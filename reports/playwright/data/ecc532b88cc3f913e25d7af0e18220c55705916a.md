@@ -1,0 +1,209 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - navigation [ref=e6]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - generic [ref=e13]: Chiswick
+        - generic [ref=e14]:
+          - link "Dashboard" [ref=e15] [cursor=pointer]:
+            - /url: /
+            - img [ref=e16]
+            - text: Dashboard
+          - link "Timeline" [ref=e18] [cursor=pointer]:
+            - /url: /timeline
+            - img [ref=e19]
+            - text: Timeline
+          - link "Devices" [ref=e21] [cursor=pointer]:
+            - /url: /devices
+            - img [ref=e22]
+            - text: Devices
+          - link "Recordings" [ref=e24] [cursor=pointer]:
+            - /url: /recordings
+            - img [ref=e25]
+            - text: Recordings
+          - link "Settings" [ref=e27] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e28]
+            - text: Settings
+      - generic [ref=e30]:
+        - generic [ref=e31]: admin
+        - button "Logout" [ref=e32] [cursor=pointer]
+  - main [ref=e33]:
+    - generic [ref=e34]:
+      - generic [ref=e35]:
+        - heading "Dashboard" [level=1] [ref=e36]
+        - paragraph [ref=e37]: Monitor your home security devices and events
+      - alert [ref=e38]:
+        - generic [ref=e39]:
+          - img [ref=e41]
+          - generic [ref=e43]:
+            - heading "Low Battery Warning" [level=3] [ref=e44]
+            - generic [ref=e45]:
+              - paragraph [ref=e46]: "One device has low battery:"
+              - list [ref=e47]:
+                - listitem [ref=e48]: Backyard Camera - 15%
+            - generic [ref=e49]:
+              - button "Snooze 1 hour" [ref=e50]
+              - button "Snooze 1 day" [ref=e51]
+          - button "Dismiss banner" [ref=e52]:
+            - img [ref=e53]
+      - generic [ref=e55]:
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - paragraph [ref=e59]: Total Devices
+            - paragraph [ref=e60]: "5"
+          - img [ref=e62]
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - paragraph [ref=e67]: Online
+            - paragraph [ref=e68]: 4 / 5
+          - img [ref=e70]
+        - generic [ref=e73]:
+          - generic [ref=e74]:
+            - paragraph [ref=e75]: Events Today
+            - paragraph [ref=e76]: "7"
+          - img [ref=e78]
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - paragraph [ref=e83]: Storage Used
+            - paragraph [ref=e84]: 53.08 MB
+          - img [ref=e86]
+      - generic [ref=e88]:
+        - generic [ref=e89]:
+          - generic [ref=e90]:
+            - heading "Devices" [level=2] [ref=e91]
+            - link "View all" [ref=e92] [cursor=pointer]:
+              - /url: /devices
+          - generic [ref=e93]:
+            - generic [ref=e95]:
+              - 'button "Front Door Camera doorbell Online Last seen: Just now 85%" [ref=e96]':
+                - generic [ref=e97]:
+                  - generic [ref=e98]:
+                    - img [ref=e100]
+                    - generic [ref=e102]:
+                      - heading "Front Door Camera" [level=3] [ref=e103]
+                      - paragraph [ref=e104]: doorbell
+                  - generic [ref=e107]: Online
+                - generic [ref=e108]:
+                  - generic [ref=e109]: "Last seen: Just now"
+                  - generic [ref=e110]:
+                    - img [ref=e111]
+                    - generic [ref=e113]: 85%
+              - button "Live View" [ref=e115] [cursor=pointer]:
+                - img
+                - text: Live View
+            - generic [ref=e117]:
+              - 'button "Backyard Camera stick_up_cam Online Last seen: Just now 15%" [ref=e118]':
+                - generic [ref=e119]:
+                  - generic [ref=e120]:
+                    - img [ref=e122]
+                    - generic [ref=e124]:
+                      - heading "Backyard Camera" [level=3] [ref=e125]
+                      - paragraph [ref=e126]: stick_up_cam
+                  - generic [ref=e129]: Online
+                - generic [ref=e130]:
+                  - generic [ref=e131]: "Last seen: Just now"
+                  - generic [ref=e132]:
+                    - img [ref=e133]
+                    - generic [ref=e135]: 15%
+              - button "Live View" [ref=e137] [cursor=pointer]:
+                - img
+                - text: Live View
+            - 'button "Living Room Camera indoor_cam Offline Last seen: 1h ago 50%" [ref=e140]':
+              - generic [ref=e141]:
+                - generic [ref=e142]:
+                  - img [ref=e144]
+                  - generic [ref=e146]:
+                    - heading "Living Room Camera" [level=3] [ref=e147]
+                    - paragraph [ref=e148]: indoor_cam
+                - generic [ref=e151]: Offline
+              - generic [ref=e152]:
+                - generic [ref=e153]: "Last seen: 1h ago"
+                - generic [ref=e154]:
+                  - img [ref=e155]
+                  - generic [ref=e157]: 50%
+            - generic [ref=e159]:
+              - 'button "Garage Camera stick_up_cam Online Last seen: Just now 95%" [ref=e160]':
+                - generic [ref=e161]:
+                  - generic [ref=e162]:
+                    - img [ref=e164]
+                    - generic [ref=e166]:
+                      - heading "Garage Camera" [level=3] [ref=e167]
+                      - paragraph [ref=e168]: stick_up_cam
+                  - generic [ref=e171]: Online
+                - generic [ref=e172]:
+                  - generic [ref=e173]: "Last seen: Just now"
+                  - generic [ref=e174]:
+                    - img [ref=e175]
+                    - generic [ref=e177]: 95%
+              - button "Live View" [ref=e179] [cursor=pointer]:
+                - img
+                - text: Live View
+        - generic [ref=e180]:
+          - generic [ref=e181]:
+            - heading "Recent Events" [level=2] [ref=e182]
+            - link "View all" [ref=e183] [cursor=pointer]:
+              - /url: /timeline
+          - generic [ref=e184]:
+            - button "Motion Detected Pending Front Door Camera 08:52 PM Today" [ref=e185] [cursor=pointer]:
+              - generic [ref=e186]:
+                - img [ref=e188]
+                - generic [ref=e190]:
+                  - generic [ref=e191]:
+                    - paragraph [ref=e192]: Motion Detected
+                    - generic [ref=e194]: Pending
+                  - paragraph [ref=e195]: Front Door Camera
+                - generic [ref=e196]:
+                  - paragraph [ref=e197]: 08:52 PM
+                  - paragraph [ref=e198]: Today
+            - button "Doorbell Ring Pending Front Door Camera 08:47 PM Today" [ref=e199] [cursor=pointer]:
+              - generic [ref=e200]:
+                - img [ref=e202]
+                - generic [ref=e204]:
+                  - generic [ref=e205]:
+                    - paragraph [ref=e206]: Doorbell Ring
+                    - generic [ref=e208]: Pending
+                  - paragraph [ref=e209]: Front Door Camera
+                - generic [ref=e210]:
+                  - paragraph [ref=e211]: 08:47 PM
+                  - paragraph [ref=e212]: Today
+            - button "Motion Detected Pending Backyard Camera 08:42 PM Today" [ref=e213] [cursor=pointer]:
+              - generic [ref=e214]:
+                - img [ref=e216]
+                - generic [ref=e218]:
+                  - generic [ref=e219]:
+                    - paragraph [ref=e220]: Motion Detected
+                    - generic [ref=e222]: Pending
+                  - paragraph [ref=e223]: Backyard Camera
+                - generic [ref=e224]:
+                  - paragraph [ref=e225]: 08:42 PM
+                  - paragraph [ref=e226]: Today
+            - button "Motion Detected Pending Garage Camera 07:57 PM Today" [ref=e227] [cursor=pointer]:
+              - generic [ref=e228]:
+                - img [ref=e230]
+                - generic [ref=e232]:
+                  - generic [ref=e233]:
+                    - paragraph [ref=e234]: Motion Detected
+                    - generic [ref=e236]: Pending
+                  - paragraph [ref=e237]: Garage Camera
+                - generic [ref=e238]:
+                  - paragraph [ref=e239]: 07:57 PM
+                  - paragraph [ref=e240]: Today
+            - button "Motion Detected Pending Driveway Camera 08:27 PM Today" [ref=e241] [cursor=pointer]:
+              - generic [ref=e242]:
+                - img [ref=e244]
+                - generic [ref=e246]:
+                  - generic [ref=e247]:
+                    - paragraph [ref=e248]: Motion Detected
+                    - generic [ref=e250]: Pending
+                  - paragraph [ref=e251]: Driveway Camera
+                - generic [ref=e252]:
+                  - paragraph [ref=e253]: 08:27 PM
+                  - paragraph [ref=e254]: Today
+```
