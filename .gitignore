@@ -38,3 +38,9 @@ logs
 
 # Test coverage
 coverage
+
+# Claude Code local settings (per-machine state)
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+**/.claude/settings.local.json
+**/.claude/scheduled_tasks.lock
